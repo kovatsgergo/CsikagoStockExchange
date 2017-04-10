@@ -90,14 +90,5 @@ public class AIeasy extends AI {
 	}
 */
 
-	public int countContain(ArrayList<String> list, String element) {
-		int i = 0;
-		for (String elem : list) {
-			if (elem.equals(element)) {
-				i++;
-			}
-		}
-		return i;
-	}
 
 }

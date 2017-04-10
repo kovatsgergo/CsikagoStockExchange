@@ -119,15 +119,6 @@ public class AIhard extends AI {
 		return choice;
 	}
 */
-	public int countContain(ArrayList<String> list, String element) {
-		int i = 0;
-		for (String elem : list) {
-			if (elem.equals(element)) {
-				i++;
-			}
-		}
-		return i;
-	}
 
 	public void setPlayers(ArrayList<Player> players) {
 		this.players = players;
