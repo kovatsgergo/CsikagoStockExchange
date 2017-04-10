@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/* Gergo Kovats */
 package stockexchange;
 
 import java.awt.Color;
@@ -29,10 +25,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-/**
- *
- * @author Gergo
- */
 class MyPanel_old extends JPanel {
 
 	GameClass theGame;
