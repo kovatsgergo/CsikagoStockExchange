@@ -10,7 +10,7 @@ public class AImedium extends AI {
 	}
 
 	@Override
-	public int[] makeMove(int position, ArrayList<String> tops, int[] prices) {
+	protected int[] makeMove(int position, ArrayList<String> tops, int[] prices) {
 		int max = 0;
 		int check = 0;
 		int[] choice = new int[2];

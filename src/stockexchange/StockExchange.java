@@ -13,7 +13,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -57,18 +56,18 @@ public class StockExchange {
     int numPlayers;
     if (namesgiven.length < MAXPLAYERS) {
       numPlayers = plyrs;
-      System.out.println("bifo numPlayers = plyrs: " + plyrs);
-      System.out.println("namesg len" + namesgiven.length);
-      System.out.println("bifo names: " + Arrays.toString(names));
+//      System.out.println("bifo numPlayers = plyrs: " + plyrs);
+//      System.out.println("namesg len" + namesgiven.length);
+//      System.out.println("bifo names: " + Arrays.toString(names));
       for (int i = namesgiven.length; i < MAXPLAYERS; i++) {
         names[i] = defaultNames[i];
       }
-      System.out.println("afto numPlayers = plyrs: " + plyrs);
-      System.out.println("afto names: " + Arrays.toString(names));
+//      System.out.println("afto numPlayers = plyrs: " + plyrs);
+//      System.out.println("afto names: " + Arrays.toString(names));
     } else {
       names = namesgiven;
       numPlayers = plyrs;
-      System.out.println("numPlayers = names.length: " + names.length);
+//      System.out.println("numPlayers = names.length: " + names.length);
     }
 
     JFrame f = new JFrame("Startup");
@@ -101,7 +100,7 @@ public class StockExchange {
     for (int i = 0; i < MAXPLAYERS; i++) {
       textFields.add(new JTextField(20));
       if (i < names.length) {
-        System.out.println("textfields " + i);
+//        System.out.println("textfields " + i);
         if (names[i].length() > 0) {
           textFields.get(i).setText(names[i]);
         }
@@ -118,8 +117,8 @@ public class StockExchange {
           String[] names = (String[]) textfield.getClientProperty("1");
           int i = (Integer) textfield.getClientProperty("2");
           names[i] = textfield.getText();// TODO: set the checkboxes if the text starts with AI
-          System.out.println("TxtFld names[" + i + "] set to " + textfield.getText());
-          System.out.println(Arrays.toString(names));
+//          System.out.println("TxtFld names[" + i + "] set to " + textfield.getText());
+//          System.out.println(Arrays.toString(names));
         }
       });
     }
