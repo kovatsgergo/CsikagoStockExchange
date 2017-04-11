@@ -198,8 +198,7 @@ class MyPanel extends JPanel {
 		int col = -1;
 		for (int i = 0; i < theGame.getNrCols(); i++) {
 			if (bounds.get(i).contains(pnt)) {
-				col = i;
-				break;
+				return i;
 			}
 		}
 		return col;
