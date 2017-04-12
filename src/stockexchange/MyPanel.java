@@ -134,7 +134,7 @@ class MyPanel extends AbstractGamePanel {
 //			movePrices();
 //		}
 //	});
-	public MyPanel(String[] playernames, int[] dims) throws IOException {
+	public MyPanel(int[] dims) throws IOException {
 		//playerNames = playernames;
 		URL imageURL = this.getClass().getResource("/images/Wheat.png");
 		goodImgs.add(ImageIO.read(imageURL));
@@ -193,7 +193,7 @@ class MyPanel extends AbstractGamePanel {
 		figureSize = Math.round(goodsSize / 5);
 	}
 
-	public int getClickedCol(Point pnt) {
+	public int getClickedCol(Point pnt) {//TODO: Human Player
 		int col = -1;
 		for (int i = 0; i < nrGameCols; i++) {
 			if (bounds.get(i).contains(pnt)) {
@@ -258,12 +258,11 @@ class MyPanel extends AbstractGamePanel {
 		thrownGoodY[2] = -1;
 		keptGoodY[2] = -1;
 		keptGoodX[1] = (actualPlayer * 2 * fifth);
-//		for (int i = 0; i < 6; i++) {
-//			pricesDiff[i] = prices[i];
-//		}
+		//Set prices
 		for (int i = 0; i < 6; i++) {
 			pricesDiff[i + 6] = prices[i];
 		}
+		
 		fallenCols = emptiedColoumns;
 		for (int colNr : fallenCols)
 			if (colNr > -1 && colNr < position) {
@@ -272,7 +271,10 @@ class MyPanel extends AbstractGamePanel {
 		colSizes = sizes;
 		choiceStage = false;
 		this.topGoods = topGoods;
-		startMoveAll();
+		//Start animating objects
+		timerAll.setInitialDelay(ANIM_INIT_DELAY);
+		timerAll.setDelay(ANIM_TICK);
+		timerAll.start();
 		actualPlayer = (actualPlayer + 1) % playerNames.length;
 	}
 
@@ -411,6 +413,7 @@ class MyPanel extends AbstractGamePanel {
 
 	}
 
+	//Called from StockExchange
 	public void setHintsOnOff(boolean onoff) {
 		if (onoff) {
 			hints = true;
@@ -422,6 +425,7 @@ class MyPanel extends AbstractGamePanel {
 		}
 	}
 
+	//Called from GameClass
 	public int gameOverPopup(String helpString) {
 		if (returnThis().isVisible()) {
 			//System.out.println("popup called");
@@ -437,25 +441,21 @@ class MyPanel extends AbstractGamePanel {
 	/////////////////////////////////////////////
 	//Animation
 	////////////////////////////////////////////
-	private void startMoveAll() {
-		timerAll.setInitialDelay(ANIM_INIT_DELAY);
-		timerAll.setDelay(ANIM_TICK);
-		timerAll.start();
-	}
 
-	public void startMoveFigure() {
+	private void startMoveFigure() {
 		timerFig.setInitialDelay(ANIM_INIT_DELAY);
 		timerFig.setDelay(ANIM_TICK);
 		timerFig.start();
 	}
 
-	public boolean moveFigure() {
+	private boolean moveFigure() {
 		repaint();
 		boolean finished = true;
 		//Rotate the figure
 		//System.out.printf("again: nrCols %d   thegamenrcols %d |  thegameposi %d |  angle0 %1.3f   angle1 %1.3f%n",
 		//        nrCols, nrGameCols, position, angleFig[0], angleFig[1]);
 		double figDiff;
+		//Keep angle between 0 and 2PI
 		angleFig[0] -= ((int) (angleFig[0] / (Math.PI * 2.))) * Math.PI * 2.;
 		//System.out.printf("modif: nrCols %d   thegamenrcols %d |  thegameposi %d |  angle0 %1.3f   angle1 %1.3f%n",
 		//        nrCols, nrGameCols, position, angleFig[0], angleFig[1]);
@@ -483,6 +483,7 @@ class MyPanel extends AbstractGamePanel {
 		return finished;
 	}
 
+	//Called from GameClass (TODO: remove)
 	public void setNrGameCols(int i) {
 		nrGameCols = i;
 	}
@@ -492,7 +493,7 @@ class MyPanel extends AbstractGamePanel {
 //		timerCols.setDelay(ANIM_TICK);
 //		timerCols.start();
 //	}
-	public boolean moveCols() {//timer2
+	private boolean moveCols() {//timer2
 		repaint();
 		double sumDiff = 0;
 		double[] colsDiff = new double[9];
@@ -544,7 +545,7 @@ class MyPanel extends AbstractGamePanel {
 //		timerPrices.setDelay(ANIM_TICK);
 //		timerPrices.start();
 //	}
-	public boolean movePrices() {
+	private boolean movePrices() {
 		int sum = 0;
 		boolean finished = false;
 		for (int i = 0; i < 6; i++) {
@@ -572,7 +573,7 @@ class MyPanel extends AbstractGamePanel {
 //		timerGoods.setDelay(ANIM_TICK);
 //		timerGoods.start();
 //	}
-	public boolean moveGoods() {
+	private boolean moveGoods() {
 		boolean finished = false;
 		//System.out.println("moveGoods event " + sinking + " sinking2 " + sinking2);
 		sinkImg = GameClass.GOOD_TYPES.indexOf(sinkStr);

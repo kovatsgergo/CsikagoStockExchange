@@ -66,9 +66,10 @@ public class GameClass {//TODO: enum vagy map
 				players.add(new Player(playerNames[i]));
 			}
 		}
-		System.out.println(players.toString());
+		//System.out.println(players.toString());
 		reStart();
-		//////////////////////////
+		////////////////////////// STINKY
+		//Set the modified names on the controller JPanel
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(getPanel());
@@ -77,7 +78,7 @@ public class GameClass {//TODO: enum vagy map
 				String[] playerNames = getAllNames();
 				for (int i = 0; i < playerNames.length; i++) {
 					//System.out.println(i + " " + temppan2.getComponent(i));
-					((JLabel) temppan2.getComponent(i*2)).setText(playerNames[i]);
+					((JLabel) temppan2.getComponent(i * 2)).setText(playerNames[i]);
 				}
 			}
 		});
@@ -122,11 +123,10 @@ public class GameClass {//TODO: enum vagy map
 		return coloumns.size();
 	}
 
-	public Coloumn getCol(int nr) {/////////////REMOVE
-		return coloumns.get(nr % getNrCols());
-	}
-
-	public int[] getPossible() {
+//	public Coloumn getCol(int nr) {/////////////REMOVE
+//		return coloumns.get(nr % getNrCols());
+//	}
+	private int[] getPossible() {
 		int[] possible = new int[3];
 		possible[0] = (position + 1) % getNrCols();
 		possible[1] = (position + 2) % getNrCols();
@@ -134,26 +134,25 @@ public class GameClass {//TODO: enum vagy map
 		return possible;
 	}
 
-	public int[] getNeighbors() {
+	private int[] getNeighbors() {
 		int[] neighbors = new int[2];
 		neighbors[0] = (position + 1) % getNrCols();
 		neighbors[1] = (position + getNrCols() - 1) % getNrCols();
 		return neighbors;
 	}
 
-	/**
-	 * Returns the neighbor in front [0] and the neighbor in back [1]
-	 *
-	 * @param position the figure's current state
-	 * @return int[]
-	 */
-	public int[] getNeighbors(int position) {
-		int[] neighbors = new int[2];
-		neighbors[0] = (position + 1) % getNrCols();
-		neighbors[1] = (position + getNrCols() - 1) % getNrCols();
-		return neighbors;
-	}
-
+//	/**
+//	 * Returns the neighbor in front [0] and the neighbor in back [1]
+//	 *
+//	 * @param position the figure's current state
+//	 * @return int[]
+//	 */
+//	private int[] getNeighbors(int position) {
+//		int[] neighbors = new int[2];
+//		neighbors[0] = (position + 1) % getNrCols();
+//		neighbors[1] = (position + getNrCols() - 1) % getNrCols();
+//		return neighbors;
+//	}
 	private int[] getAIMove() {
 		//return ((AI) players.get(actualPlayer)).makeMove(this);
 		if (players.get(actualPlayer) instanceof AIhard)
@@ -174,7 +173,7 @@ public class GameClass {//TODO: enum vagy map
 		//System.out.println("actualK.getTop() "+actualK.getTop()+ " \t actualO.getTop()"
 		//+actualO.getTop());
 		actualK.remove();
-		if (actualK.goods.size() == 0) {
+		if (actualK.goods.isEmpty()) {
 			coloumns.remove(keep);
 			panel.setNrGameCols(coloumns.size());
 			ret[0] = keep;
@@ -186,7 +185,7 @@ public class GameClass {//TODO: enum vagy map
 			}
 		}
 		actualO.remove();
-		if (actualO.goods.size() == 0) {
+		if (actualO.goods.isEmpty()) {
 			coloumns.remove(out);
 			panel.setNrGameCols(coloumns.size());
 			ret[1] = out;
@@ -196,7 +195,7 @@ public class GameClass {//TODO: enum vagy map
 		}
 		prices[outIdx] -= 1;
 		countPoints();
-		System.out.println(Arrays.toString(prices));
+		//System.out.println(Arrays.toString(prices));
 		if (coloumns.size() < 3) {
 			gameOver = true;
 		}
@@ -254,14 +253,17 @@ public class GameClass {//TODO: enum vagy map
 	});
 
 	private void aiPoint() {
-		System.out.println("aiPoint called\t actual: " + players.get(actualPlayer).getName());
+		//System.out.println("aiPoint called\t actual: " + players.get(actualPlayer).getName());
 		if (players.get(actualPlayer) instanceof AI && !gameOver) {
 			timerAI.start();
 		}
 	}
 
+	/**
+	 * Handles the AIs' turns at both stages
+	 */
 	private void aiChoice() {
-		System.out.println("aiChoice run");
+		//System.out.println("aiChoice run");
 		if (players.get(actualPlayer) instanceof AI && !gameOver) {
 			int pointNr;
 			if (!choiceStage) {
@@ -278,11 +280,16 @@ public class GameClass {//TODO: enum vagy map
 			timerAI.stop();
 	}
 
-	public void runRound(int pointNr) {
+	/**
+	 * Almost like a "game loop"
+	 *
+	 * @param pointNr the chosen coloumns index number
+	 */
+	private void runRound(int pointNr) {
 		//System.out.println("\trunRound started\tgamover: " + theGame.gameOver + "\tcoloumns: " + theGame.coloumns.size());
 		if (!gameOver) {
 			if (!choiceStage) {
-				System.out.println("Step Stage started");
+				System.out.println("Step Stage started pointNr " + pointNr);
 				if (Arrays.toString(getPossible()).contains(pointNr + "")) {
 					position = pointNr;
 					panel.setFigure(position);
@@ -290,16 +297,16 @@ public class GameClass {//TODO: enum vagy map
 					choiceStage = !choiceStage;
 				}
 			} else {
-				System.out.println("Choice Stage started");
+				System.out.println("Choice Stage started pointNr " + pointNr);
 				int out;
 				int[] emptiedColoumns;
 				if (Arrays.toString(getNeighbors()).contains(pointNr + "")) {
 					if (getNeighbors()[0] == pointNr) {
 						choiceStage = !choiceStage;
-						out = 1;
+						out = 0;
 					} else {
 						choiceStage = !choiceStage;
-						out = 0;
+						out = 1;
 					}
 					//String thrownStr = coloumns.get(getNeighbors()[out]).getTop();
 					//String takenStr = coloumns.get().getTop();
@@ -351,6 +358,9 @@ public class GameClass {//TODO: enum vagy map
 		}
 	}
 
+	/**
+	 * Initialization
+	 */
 	private void reStart() {
 		gameOver = false;
 		for (Player player : players) {
@@ -359,10 +369,9 @@ public class GameClass {//TODO: enum vagy map
 		}
 		int playAgains = playerNames.length;
 		System.out.println("last starter: " + lastStarter);
-		//theGame = new GameClass(playAgains, (++lastStarter) % playAgains, playerNames);
 		prices = Arrays.copyOf(PRICES_AT_START, 6);
-		System.out.println("RESTART prices " + Arrays.toString(prices));
-		System.out.println("RESTART prices " + Arrays.toString(GameClass.PRICES_AT_START));
+		//System.out.println("RESTART prices " + Arrays.toString(prices));
+		//System.out.println("RESTART prices " + Arrays.toString(GameClass.PRICES_AT_START));
 		coloumns.clear();
 		for (int i = 0; i < START_NR_COLOUMS; i++) {
 			coloumns.add(new Coloumn());
@@ -382,7 +391,7 @@ public class GameClass {//TODO: enum vagy map
 
 	}
 
-	public void makeHints() {
+	private void makeHints() {
 		String[] returnHints = new String[playerNames.length * 2];
 		Player[] hintPlayers = players.toArray(new Player[players.size()]);
 		for (int i = 0; i < playerNames.length; i++) {
@@ -431,11 +440,11 @@ public class GameClass {//TODO: enum vagy map
 
 	}
 
-	public String gameOverString() {
+	private String gameOverString() {
 		String helpString = "";
 		for (int i = 0; i < winner.size() - 1; i++) {
 			helpString += players.get(winner.get(i)).getName() + ", ";
-			System.out.println(helpString);
+			//System.out.println(helpString);
 		}
 		helpString += players.get(winner.get(winner.size() - 1)).getName();
 		helpString += " WINS!\n\n";

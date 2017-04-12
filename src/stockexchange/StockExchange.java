@@ -298,8 +298,7 @@ public class StockExchange {
 
     //panels
     JPanel top = new JPanel(new GridLayout(1, players.length * 2 + 2));
-    final MyPanel panel = new MyPanel(players, dimensions);
-		
+    final MyPanel panel = new MyPanel(dimensions);
 		final GameClass theGame = new GameClass(0, players, panel);
     // Hints toggle
     final JToggleButton helpTGL = new JToggleButton("hints off");
