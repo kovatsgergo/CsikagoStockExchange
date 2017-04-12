@@ -14,5 +14,7 @@ public abstract class AbstractGamePanel extends JPanel {
 					int[] prices, ArrayList<String> topGoods, int[] sizes);
 	public abstract void setHint(String[] hintText);
 	public abstract int gameOverPopup(String gameOverString);
+	public abstract void setNrGameCols(int nrCols);
+	public abstract void setInterface(GameInterface interf);
 
 }

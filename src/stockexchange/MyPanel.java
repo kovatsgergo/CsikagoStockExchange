@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 class MyPanel extends AbstractGamePanel {
 
 	//GameClass theGame;
+	GameInterface interf;
 	double[] center = new double[2];// = {600, 220};
 	int h;
 	int w;
@@ -158,7 +159,7 @@ class MyPanel extends AbstractGamePanel {
 			public void mouseClicked(MouseEvent e) {
 				repaint();
 				Point point = e.getPoint();
-				////////runHumanRound(getClickedCol(point));
+				interf.setClickedColoumn(getClickedCol(point));
 			}
 		});
 
@@ -207,6 +208,16 @@ class MyPanel extends AbstractGamePanel {
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(950, 550);
+	}
+
+	// Inherited from AbstractGamePanel
+	@Override
+	public void setNrGameCols(int i) {
+		nrGameCols = i;
+	}
+	
+	public void setInterface(GameInterface interf){
+		this.interf = interf;
 	}
 
 	// Inherited from AbstractGamePanel
@@ -262,7 +273,7 @@ class MyPanel extends AbstractGamePanel {
 		for (int i = 0; i < 6; i++) {
 			pricesDiff[i + 6] = prices[i];
 		}
-		
+
 		fallenCols = emptiedColoumns;
 		for (int colNr : fallenCols)
 			if (colNr > -1 && colNr < position) {
@@ -441,7 +452,6 @@ class MyPanel extends AbstractGamePanel {
 	/////////////////////////////////////////////
 	//Animation
 	////////////////////////////////////////////
-
 	private void startMoveFigure() {
 		timerFig.setInitialDelay(ANIM_INIT_DELAY);
 		timerFig.setDelay(ANIM_TICK);
@@ -481,11 +491,6 @@ class MyPanel extends AbstractGamePanel {
 			finished = true;
 		}
 		return finished;
-	}
-
-	//Called from GameClass (TODO: remove)
-	public void setNrGameCols(int i) {
-		nrGameCols = i;
 	}
 
 //	public void startMoveCols() {

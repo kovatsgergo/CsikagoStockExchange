@@ -298,8 +298,9 @@ public class StockExchange {
 
     //panels
     JPanel top = new JPanel(new GridLayout(1, players.length * 2 + 2));
-    final MyPanel panel = new MyPanel(dimensions);
-		final GameClass theGame = new GameClass(0, players, panel);
+    final AbstractGamePanel panel = new MyPanel(dimensions);
+		final GameInterface theGame = new GameClass(0, players, panel);
+		panel.setInterface(theGame);
     // Hints toggle
     final JToggleButton helpTGL = new JToggleButton("hints off");
     helpTGL.putClientProperty("1", panel);
@@ -330,7 +331,7 @@ public class StockExchange {
         createAndShowFirstGUI(tempStrings.length, dimensions, (String[]) tempStrings);
         f.setVisible(false);
         panel.setVisible(false);
-        theGame.gameOver = true;
+        theGame.setGameOver(true);
       }
     }
     );

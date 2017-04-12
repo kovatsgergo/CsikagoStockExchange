@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-public class GameClass {//TODO: enum vagy map
+public class GameClass implements GameInterface{//TODO: enum vagy map
 
 	static final ArrayList<String> GOOD_TYPES = new ArrayList(Arrays.asList(new String[]{"Wheat", "Sugar", "Coffee", "Rice", "Cocoa", "Corn"}));
 	static final int[] PRICES_AT_START = {7, 6, 6, 6, 6, 6};
@@ -35,10 +35,10 @@ public class GameClass {//TODO: enum vagy map
 	final int AI_SPEED = 100;
 	int[] AIchoice = new int[2];
 	boolean choiceStage = false;
-	MyPanel panel;
+	AbstractGamePanel panel;
 	int lastStarter = -1;
 
-	public GameClass(int starter, String[] playerNames, MyPanel panel) {
+	public GameClass(int starter, String[] playerNames, AbstractGamePanel panel) {
 
 		numPlayers = playerNames.length;
 //		for (int i = 0; i < numPlayers; i++) {
@@ -85,7 +85,7 @@ public class GameClass {//TODO: enum vagy map
 		/////////////////////////
 	}
 
-	private MyPanel getPanel() {
+	private AbstractGamePanel getPanel() {
 		return panel;
 	}
 
@@ -153,6 +153,17 @@ public class GameClass {//TODO: enum vagy map
 //		neighbors[1] = (position + getNrCols() - 1) % getNrCols();
 //		return neighbors;
 //	}
+	//From GameInterface
+	@Override
+	public void setClickedColoumn(int coloumn) {
+		runRound(coloumn);
+	}
+	
+	//From GameInterFace
+	public void setGameOver(boolean gameOver){
+		this.gameOver = gameOver;
+	}
+	
 	private int[] getAIMove() {
 		//return ((AI) players.get(actualPlayer)).makeMove(this);
 		if (players.get(actualPlayer) instanceof AIhard)
