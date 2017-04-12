@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -31,7 +32,7 @@ public class GameClass {//TODO: enum vagy map
 	int numPlayers;
 	String[] playerNames;
 	int[] wins;
-	final int AI_SPEED = 2000;
+	final int AI_SPEED = 100;
 	int[] AIchoice = new int[2];
 	boolean choiceStage = false;
 	MyPanel panel;
@@ -65,7 +66,26 @@ public class GameClass {//TODO: enum vagy map
 				players.add(new Player(playerNames[i]));
 			}
 		}
+		System.out.println(players.toString());
 		reStart();
+		//////////////////////////
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(getPanel());
+				JPanel temppan = (JPanel) temp.getContentPane();
+				JPanel temppan2 = (JPanel) temppan.getComponent(0);
+				String[] playerNames = getAllNames();
+				for (int i = 0; i < playerNames.length; i++) {
+					//System.out.println(i + " " + temppan2.getComponent(i));
+					((JLabel) temppan2.getComponent(i*2)).setText(playerNames[i]);
+				}
+			}
+		});
+		/////////////////////////
+	}
+
+	private MyPanel getPanel() {
+		return panel;
 	}
 
 	private void dealGoods() {
@@ -88,6 +108,14 @@ public class GameClass {//TODO: enum vagy map
 				startGoods.add(GOOD_TYPES.get(i));
 			}
 		}
+	}
+
+	private String[] getAllNames() {
+		String[] allNames = new String[players.size()];
+		for (int i = 0; i < players.size(); i++) {
+			allNames[i] = players.get(i).getName();
+		}
+		return allNames;
 	}
 
 	private int getNrCols() {
@@ -126,14 +154,14 @@ public class GameClass {//TODO: enum vagy map
 		return neighbors;
 	}
 
-	public int[] getAIMove() {
+	private int[] getAIMove() {
 		//return ((AI) players.get(actualPlayer)).makeMove(this);
 		if (players.get(actualPlayer) instanceof AIhard)
 			((AIhard) players.get(actualPlayer)).setPlayers(players);
 		return ((AI) players.get(actualPlayer)).makeMove(position, getTops(), prices);
 	}
 
-	public int[] handleChoice(int keep, int out) {
+	private int[] handleChoice(int keep, int out) {
 		System.out.println("Handle");
 		keep %= getNrCols();
 		out %= getNrCols();
@@ -182,7 +210,7 @@ public class GameClass {//TODO: enum vagy map
 	/**
 	 * Recalculates all players' points based on the new prices
 	 */
-	public void countPoints() {
+	private void countPoints() {
 		for (Player player : players) {
 			int sum = 0;
 			for (String good : player.goods) {
@@ -192,7 +220,7 @@ public class GameClass {//TODO: enum vagy map
 		}
 	}
 
-	public int nextPlayer(int actual) {
+	private int nextPlayer(int actual) {
 		return (actual + 1) % numPlayers;
 	}
 
@@ -282,8 +310,8 @@ public class GameClass {//TODO: enum vagy map
 			}
 			System.out.println("ai started in runhuman");
 			aiPoint();
-			timerAI.setDelay(AI_SPEED);
-			timerAI.start();
+			//timerAI.setDelay(AI_SPEED);
+			//timerAI.start();
 		}
 		//repaint();
 
@@ -344,10 +372,11 @@ public class GameClass {//TODO: enum vagy map
 		Collections.shuffle(startGoods);
 		dealGoods();
 
-		panel.start(getTops(), getColsSizes(), wins);
+		panel.start(getTops(), getAllNames(), getColsSizes(), wins);
 //		int nextStarter = (++lastStarter) % playAgains;
 //		actualPlayer = Math.max(nextStarter, Math.min(nextStarter, numPlayers - 1));
 		actualPlayer = (++lastStarter) % playAgains;
+		position = 0;
 		runRound(-1);
 		System.out.println("next starter: " + actualPlayer + "\n");
 

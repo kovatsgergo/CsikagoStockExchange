@@ -135,7 +135,7 @@ class MyPanel extends AbstractGamePanel {
 //		}
 //	});
 	public MyPanel(String[] playernames, int[] dims) throws IOException {
-		playerNames = playernames;
+		//playerNames = playernames;
 		URL imageURL = this.getClass().getResource("/images/Wheat.png");
 		goodImgs.add(ImageIO.read(imageURL));
 		imageURL = this.getClass().getResource("/images/Sugar.png");
@@ -171,7 +171,6 @@ class MyPanel extends AbstractGamePanel {
 		}
 
 		addComponentListener(new ResizeListener());
-
 	}
 
 	public MyPanel returnThis() {
@@ -212,9 +211,10 @@ class MyPanel extends AbstractGamePanel {
 
 	// Inherited from AbstractGamePanel
 	@Override
-	public void start(ArrayList<String> topGoods, int[] sizes, int[] wins) {
+	public void start(ArrayList<String> topGoods, String[] playerNames, int[] sizes, int[] wins) {
 		this.topGoods = topGoods;
 		this.wins = wins;
+		this.playerNames = playerNames;
 		colSizes = sizes;
 		setNrGameCols(sizes.length);
 		angleFig[0] = angleFig[1] = 0;
@@ -225,6 +225,7 @@ class MyPanel extends AbstractGamePanel {
 			angleCols[i] = i * (Math.PI * 2 / nrGameCols);
 			angleCols[i + GameClass.START_NR_COLOUMS] = i * (Math.PI * 2 / nrGameCols);
 		}
+		poss = new int[]{1, 2, 3};
 		repaint();
 	}
 
@@ -232,6 +233,7 @@ class MyPanel extends AbstractGamePanel {
 	@Override
 	public void setPossible(int[] possibleColoumns) {
 		poss = possibleColoumns;
+		System.out.println("possible" + Arrays.toString(poss));
 	}
 
 	// Inherited from AbstractGamePanel
@@ -271,6 +273,7 @@ class MyPanel extends AbstractGamePanel {
 		choiceStage = false;
 		this.topGoods = topGoods;
 		startMoveAll();
+		actualPlayer = (actualPlayer + 1) % playerNames.length;
 	}
 
 	// Inherited from AbstractGamePanel
@@ -322,7 +325,7 @@ class MyPanel extends AbstractGamePanel {
 		int before = (position + 1) % nrGameCols;
 		int after = (position + nrGameCols - 1) % nrGameCols;
 		int coeff = Math.round(w * (float) Math.sqrt(nrGameCols / 9f) / 5f);
-		System.out.println("SINKINGS" + sinking + " " + sinking2);
+		//System.out.println("SINKINGS" + sinking + " " + sinking2);
 		for (int i = 0; i < nrGameCols; i++) {
 			//Calculate values
 			angleCols[i + 9] = i * (Math.PI * 2 / nrGameCols);
@@ -331,12 +334,12 @@ class MyPanel extends AbstractGamePanel {
 			String topGood = topGoods.get(i);
 			int height = colSizes[i];
 			if (sinking == i && thrownGoodY[2] == -1) {
-				System.out.println("sinking1 " + i);
+				//System.out.println("sinking1 " + i);
 				thrownGoodX = x;
 				thrownGoodY[2] = y;
 			}
 			if (sinking2 == i && keptGoodY[2] == -1) {
-				System.out.println("sinking2 " + i);
+				//System.out.println("sinking2 " + i);
 				keptGoodX[0] = x;
 				keptGoodY[2] = y;
 			}
@@ -571,7 +574,7 @@ class MyPanel extends AbstractGamePanel {
 //	}
 	public boolean moveGoods() {
 		boolean finished = false;
-		System.out.println("moveGoods event " + sinking + " sinking2 " + sinking2);
+		//System.out.println("moveGoods event " + sinking + " sinking2 " + sinking2);
 		sinkImg = GameClass.GOOD_TYPES.indexOf(sinkStr);
 		sinkImg2 = GameClass.GOOD_TYPES.indexOf(sinkStr2);
 		if (thrownGoodY[2] > 0) {
@@ -587,37 +590,37 @@ class MyPanel extends AbstractGamePanel {
 		float diff = thrownGoodY[1] - thrownGoodY[0];
 		float diff2 = keptGoodY[0] - keptGoodY[1];
 		float diff3 = keptGoodX[0] - keptGoodX[1];
-		if (diff > 2) {//The good which is thrown away
+		if (diff > 1) {//The good which is thrown away
 			//sinkY[0] += Math.sqrt(diff) / 2;
 			thrownGoodY[0] += diff / 10f;
 			int extraSpace = (int) Math.round(diff / 10f);
 			repaint(thrownGoodX, Math.round(thrownGoodY[0] - extraSpace), goodsSize, goodsSize + extraSpace);
 		} else {
-			System.out.println("------------sinking1 arrived");
-			thrownGoodY[0] = thrownGoodY[1];
-			sinking = -1;
-			sinkImg = -1;
-			thrownGoodY[2] = -1;
+//			System.out.println("------------sinking1 arrived");
+//			thrownGoodY[0] = thrownGoodY[1];
+//			sinking = -1;
+//			sinkImg = -1;
+//			thrownGoodY[2] = -1;
 		}
-		if (Math.abs(diff3) > 2) {
+		if (Math.abs(diff3) > 1) {
 			//sinkX2[0] -= Math.sqrt(Math.abs(diff3)) * Math.signum(diff3);
 			keptGoodX[0] -= diff3 / 3f;
 			int extraSpace = (int) Math.round(diff3 / 4f);
 			repaint(Math.round(keptGoodX[0]), Math.round(keptGoodY[0]), goodsSize + extraSpace, goodsSize);
-		}else
-		if (diff2 > 2) {
+		}
+		if (diff2 > 1) {
 			//keptGoodY[0] -= Math.sqrt(diff2);
 			keptGoodY[0] -= diff2 / 7f;
 			int extraSpace = (int) Math.round(diff2 / 2f);
 			repaint(Math.round(keptGoodX[0]), Math.round(keptGoodY[0]) - extraSpace, goodsSize, goodsSize + extraSpace);
 		} else {
-			System.out.println("------------sinking2 arrived");
-			keptGoodY[0] = keptGoodY[1];
-			sinking2 = -1;
-			sinkImg2 = -1;
-			keptGoodY[2] = -1;
+//			System.out.println("------------sinking2 arrived");
+//			keptGoodY[0] = keptGoodY[1];
+//			sinking2 = -1;
+//			sinkImg2 = -1;
+//			keptGoodY[2] = -1;
 		}
-		if (diff <= 3 && diff2 <= 5) {
+		if (diff < 1 && diff2 < 1) {
 			System.out.println("moveGoods has stopped");
 			//timerGoods.stop();
 			finished = true;

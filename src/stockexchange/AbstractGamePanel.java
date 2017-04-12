@@ -6,7 +6,7 @@ import javax.swing.JPanel;
 
 public abstract class AbstractGamePanel extends JPanel {
 
-	public abstract void start(ArrayList<String> topGoods,
+	public abstract void start(ArrayList<String> topGoods, String[] playerNames,
 					int[] sizes, int[] wins);
 	public abstract void setPossible(int[] possibleColoumns);
 	public abstract void setFigure(int destination);

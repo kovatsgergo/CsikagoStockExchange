@@ -39,4 +39,11 @@ public class Player {
 		this.points = points;
 	}
 
+	@Override
+	public String toString() {
+		return "Player{" + "points=" + points + ", name=" + name + ", goods=" + goods + '}';
+	}
+	
+	
+
 }
