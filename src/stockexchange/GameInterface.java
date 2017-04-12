@@ -1,9 +1,6 @@
+/*Gergo Kovats*/
 package stockexchange;
 
-/**
- *
- * @author Gergo Kovats
- */
 public interface GameInterface {
 	
 	void setClickedColoumn(int coloumn);
