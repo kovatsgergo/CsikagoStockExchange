@@ -9,6 +9,10 @@ public class AImedium extends AI {
 		super();
 	}
 
+	public AImedium(String name) {
+		super(name);
+	}
+
 	@Override
 	public int[] makeMove(int position, ArrayList<String> tops, int[] prices) {
 		int max = 0;
@@ -22,8 +26,8 @@ public class AImedium extends AI {
 			int[] gain = new int[2];
 			int[] loss = new int[2];
 			String[] neighborsString = {tops.get(neighbors[0]), tops.get(neighbors[1])};
-			int[] indexes = {GameClass.goodTypes.indexOf(neighborsString[0]),
-				GameClass.goodTypes.indexOf(neighborsString[1])};
+			int[] indexes = {GameClass.GOOD_TYPES.indexOf(neighborsString[0]),
+				GameClass.GOOD_TYPES.indexOf(neighborsString[1])};
 			gain[0] = prices[indexes[0]];
 			gain[1] = prices[indexes[1]];
 			loss[0] = countContain(goods, neighborsString[1]) * -1;//Better than Easy
@@ -54,8 +58,9 @@ public class AImedium extends AI {
 		//System.out.println("position " + position + "\t" + Arrays.toString(choice));
 		return choice;
 	}
+
 	{
-/*
+		/*
 	public int[] makeMove(GameClass theGame) {
 		int position = theGame.position;
 		int max = 0;
@@ -69,13 +74,13 @@ public class AImedium extends AI {
 			int[] loss = new int[2];
 			String[] neighborsString = {theGame.coloumns.get(neighbors[0]).getTop(),
 				theGame.coloumns.get(neighbors[1]).getTop()};
-			int[] indexes = {theGame.goodTypes.indexOf(neighborsString[0]),
-				theGame.goodTypes.indexOf(neighborsString[1])};
+			int[] indexes = {theGame.GOOD_TYPES.indexOf(neighborsString[0]),
+				theGame.GOOD_TYPES.indexOf(neighborsString[1])};
 
 			gain[0] = theGame.prices[indexes[0]];
 			gain[1] = theGame.prices[indexes[1]];
-			loss[0] = countContain(goods, neighborsString[1]) * -1; // opposite as gain!
-			loss[1] = countContain(goods, neighborsString[0]) * -1;
+			loss[0] = countContain(startGoods, neighborsString[1]) * -1; // opposite as gain!
+			loss[1] = countContain(startGoods, neighborsString[0]) * -1;
 			if (neighborsString[0].equals(neighborsString[1])) {
 				loss[0] -= 1;
 				loss[1] -= 1;
@@ -104,7 +109,7 @@ public class AImedium extends AI {
 		//System.out.println("position " + position + "\t" + Arrays.toString(choice));
 		return choice;
 	}
-*/
+		 */
 	}
 
 }

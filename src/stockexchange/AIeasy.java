@@ -9,6 +9,10 @@ public class AIeasy extends AI {
 		super();
 	}
 
+	public AIeasy(String name) {
+		super(name);
+	}
+
 	@Override
 	public int[] makeMove(int position, ArrayList<String> tops, int[] prices) {
 		int max = 0;
@@ -21,8 +25,8 @@ public class AIeasy extends AI {
 			neighbors[1] = (n + tops.size() - 1) % tops.size();
 			int[] gain = new int[2];
 			String[] neighborsString = {tops.get(neighbors[0]), tops.get(neighbors[1])};
-			int[] indexes = {GameClass.goodTypes.indexOf(neighborsString[0]),
-				GameClass.goodTypes.indexOf(neighborsString[1])};
+			int[] indexes = {GameClass.GOOD_TYPES.indexOf(neighborsString[0]),
+				GameClass.GOOD_TYPES.indexOf(neighborsString[1])};
 			gain[0] = prices[indexes[0]];
 			gain[1] = prices[indexes[1]];
 			if (gain[0] > gain[1]) {
@@ -47,7 +51,7 @@ public class AIeasy extends AI {
 		//System.out.println("position " + position + "\t" + Arrays.toString(choice));
 		return choice;
 	}
-/*
+	/*
 	public int[] makeMove(GameClass theGame) {//TODO: öröklődés a könyvből
 		//AI thisPlayer = (AIhard)theGame.players.get(theGame.nextPlayer(theGame.actualPlayer));
 		//thisPlayer.makeMove(theGame);
@@ -62,8 +66,8 @@ public class AIeasy extends AI {
 			int[] gain = new int[2];
 			String[] neighborsString = {theGame.coloumns.get(neighbors[0]).getTop(),
 				theGame.coloumns.get(neighbors[1]).getTop()};
-			int[] indexes = {theGame.goodTypes.indexOf(neighborsString[0]),
-				theGame.goodTypes.indexOf(neighborsString[1])};
+			int[] indexes = {theGame.GOOD_TYPES.indexOf(neighborsString[0]),
+				theGame.GOOD_TYPES.indexOf(neighborsString[1])};
 			gain[0] = theGame.prices[indexes[0]];
 			gain[1] = theGame.prices[indexes[1]];
 			if (gain[0] > gain[1]) {
@@ -88,7 +92,6 @@ public class AIeasy extends AI {
 		//System.out.println("position " + position + "\t" + Arrays.toString(choice));
 		return choice;
 	}
-*/
-
+	 */
 
 }

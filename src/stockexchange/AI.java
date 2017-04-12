@@ -9,6 +9,10 @@ public abstract class AI extends Player {
 		super();
 	}
 
+	public AI(String name) {
+		super(name);
+	}
+
 	//abstract int[] makeMove(GameClass theGame);
 	abstract int[] makeMove(int position, ArrayList<String> tops, int[] prices);
 

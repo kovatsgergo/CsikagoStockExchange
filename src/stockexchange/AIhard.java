@@ -13,6 +13,10 @@ public class AIhard extends AI {
 		super();
 	}
 
+	public AIhard(String name) {
+		super(name);
+	}
+
 	@Override
 	public int[] makeMove(int position, ArrayList<String> tops, int[] prices) {
 		int max = -5;
@@ -26,8 +30,8 @@ public class AIhard extends AI {
 			int[] gain = new int[2];
 			int[] loss = new int[2];
 			String[] neighborsString = {tops.get(neighbors[0]), tops.get(neighbors[1])};
-			int[] indexes = {GameClass.goodTypes.indexOf(neighborsString[0]),
-				GameClass.goodTypes.indexOf(neighborsString[1])};
+			int[] indexes = {GameClass.GOOD_TYPES.indexOf(neighborsString[0]),
+				GameClass.GOOD_TYPES.indexOf(neighborsString[1])};
 			//System.out.println("MAIN\ti: " + n + " neighbors: " + Arrays.toString(neighbors) + " " + Arrays.toString(neighborsString) + " " + Arrays.toString(indexes));
 			gain[0] = prices[indexes[0]];
 			gain[1] = prices[indexes[1]];
@@ -66,7 +70,7 @@ public class AIhard extends AI {
 		return choice;
 	}
 
-/*
+	/*
 	public int[] makeMove(GameClass theGame) {
 		int position = theGame.position;
 		int max = -5;
@@ -79,13 +83,13 @@ public class AIhard extends AI {
 			int[] loss = new int[2];
 			String[] neighborsString = {theGame.coloumns.get(neighbors[0]).getTop(),
 				theGame.coloumns.get(neighbors[1]).getTop()};
-			int[] indexes = {theGame.goodTypes.indexOf(neighborsString[0]),
-				theGame.goodTypes.indexOf(neighborsString[1])};
+			int[] indexes = {theGame.GOOD_TYPES.indexOf(neighborsString[0]),
+				theGame.GOOD_TYPES.indexOf(neighborsString[1])};
 			//System.out.println("MAIN\ti: " + n + " neighbors: " + Arrays.toString(neighbors) + " " + Arrays.toString(neighborsString) + " " + Arrays.toString(indexes));
 			gain[0] = theGame.prices[indexes[0]];
 			gain[1] = theGame.prices[indexes[1]];
-			loss[0] = countContain(goods, neighborsString[1]) * -1; // opposite as gain!
-			loss[1] = countContain(goods, neighborsString[0]) * -1;
+			loss[0] = countContain(startGoods, neighborsString[1]) * -1; // opposite as gain!
+			loss[1] = countContain(startGoods, neighborsString[0]) * -1;
 			if (neighborsString[0].equals(neighborsString[1])) {
 				loss[0] -= 1;
 				loss[1] -= 1;
@@ -118,8 +122,7 @@ public class AIhard extends AI {
 		//System.out.println("\n\nHit something" + thing + "\n\n");
 		return choice;
 	}
-*/
-
+	 */
 	public void setPlayers(ArrayList<Player> players) {
 		this.players = players;
 	}
@@ -137,11 +140,11 @@ public class AIhard extends AI {
 		}
 		Player nextPlayer = players.get((players.indexOf(this) + 1) % players.size());
 		String lastThrown = theGame.coloumns.get(thrownpos).getTop();
-		evilpoint = countContain(nextPlayer.goods, lastThrown);
+		evilpoint = countContain(nextPlayer.startGoods, lastThrown);
 
 		int[] hypotPrices = new int[6];
 		System.arraycopy(theGame.prices, 0, hypotPrices, 0, 6);
-		--hypotPrices[theGame.goodTypes.indexOf(lastThrown)];
+		--hypotPrices[theGame.GOOD_TYPES.indexOf(lastThrown)];
 
 		//int[] choice = new int[2];
 		for (int i = position + 1; i < position + 4; i++) {
@@ -152,13 +155,13 @@ public class AIhard extends AI {
 			int[] loss = new int[2];
 			String[] neighborsString = {theGame.coloumns.get(neighbors[0]).getTop(),
 				theGame.coloumns.get(neighbors[1]).getTop()};
-			int[] indexes = {GameClass.goodTypes.indexOf(neighborsString[0]),
-				GameClass.goodTypes.indexOf(neighborsString[1])};
+			int[] indexes = {GameClass.GOOD_TYPES.indexOf(neighborsString[0]),
+				GameClass.GOOD_TYPES.indexOf(neighborsString[1])};
 			//System.out.println("i: " + n + " neighbors: " + Arrays.toString(neighbors) + " " + Arrays.toString(neighborsString) + " " + Arrays.toString(indexes));
 			gain[0] = hypotPrices[indexes[0]];
 			gain[1] = hypotPrices[indexes[1]];
-			loss[0] = countContain(nextPlayer.goods, neighborsString[1]) * -1; // opposite as gain!
-			loss[1] = countContain(nextPlayer.goods, neighborsString[0]) * -1;
+			loss[0] = countContain(nextPlayer.startGoods, neighborsString[1]) * -1; // opposite as gain!
+			loss[1] = countContain(nextPlayer.startGoods, neighborsString[0]) * -1;
 			if (neighborsString[0].equals(neighborsString[1])) {
 				loss[0] -= 1;
 				loss[1] -= 1;
@@ -185,7 +188,7 @@ public class AIhard extends AI {
 		return max - evilpoint;
 
 	}
-*/
+	 */
 	public int nextStepForecast(ArrayList<String> tops, int pos, int lessen, int[] prices) {
 		int position = pos;
 		int max = 0;
@@ -203,7 +206,7 @@ public class AIhard extends AI {
 
 		int[] hypotPrices = new int[6];
 		System.arraycopy(prices, 0, hypotPrices, 0, 6);
-		--hypotPrices[GameClass.goodTypes.indexOf(lastThrown)];
+		--hypotPrices[GameClass.GOOD_TYPES.indexOf(lastThrown)];
 
 		//int[] choice = new int[2];
 		for (int i = position + 1; i < position + 4; i++) {
@@ -215,8 +218,8 @@ public class AIhard extends AI {
 			int[] gain = new int[2];
 			int[] loss = new int[2];
 			String[] neighborsString = {tops.get(neighbors[0]), tops.get(neighbors[1])};
-			int[] indexes = {GameClass.goodTypes.indexOf(neighborsString[0]),
-				GameClass.goodTypes.indexOf(neighborsString[1])};
+			int[] indexes = {GameClass.GOOD_TYPES.indexOf(neighborsString[0]),
+				GameClass.GOOD_TYPES.indexOf(neighborsString[1])};
 			//System.out.println("i: " + n + " neighbors: " + Arrays.toString(neighbors) + " " + Arrays.toString(neighborsString) + " " + Arrays.toString(indexes));
 			gain[0] = hypotPrices[indexes[0]];
 			gain[1] = hypotPrices[indexes[1]];
