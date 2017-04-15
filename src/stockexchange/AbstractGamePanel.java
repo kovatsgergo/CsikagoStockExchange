@@ -2,9 +2,8 @@
 package stockexchange;
 
 import java.util.ArrayList;
-import javax.swing.JPanel;
 
-public abstract class AbstractGamePanel extends JPanel {
+public interface AbstractGamePanel {
 
 	public abstract void start(ArrayList<String> topGoods, String[] playerNames,
 					int[] sizes, int[] wins);
@@ -16,5 +15,6 @@ public abstract class AbstractGamePanel extends JPanel {
 	public abstract int gameOverPopup(String gameOverString);
 	public abstract void setNrGameCols(int nrCols);
 	public abstract void setInterface(GameInterface interf);
+	public abstract void quitGame();
 
 }

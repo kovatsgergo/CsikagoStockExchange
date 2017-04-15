@@ -6,13 +6,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
-public class GameClass implements GameInterface{//TODO: enum vagy map
+public class GameClass implements GameInterface {//TODO: enum vagy map
 
 	static final ArrayList<String> GOOD_TYPES = new ArrayList(Arrays.asList(new String[]{"Wheat", "Sugar", "Coffee", "Rice", "Cocoa", "Corn"}));
 	static final int[] PRICES_AT_START = {7, 6, 6, 6, 6, 6};
@@ -53,36 +48,34 @@ public class GameClass implements GameInterface{//TODO: enum vagy map
 			if (name.length() > 2) {
 				if (!(name.substring(0, 2).equals("AI"))) {
 					players.add(new Player(playerNames[i]));
-				} else if (name.substring(2, 3).equals("e")) {
-					players.add(new AIeasy("AI " + i + " (easy)"));
-				} else if (name.substring(2, 3).equals("m")) {
-					players.add(new AImedium("AI " + i + " (medium)"));
-				} else if (name.substring(2, 3).equals("h")) {
-					players.add(new AIhard("AI " + i + " (hard)"));
+				} else if (name.contains("easy)")) {
+					players.add(new AIeasy(name));
+				} else if (name.contains("(medium)")) {
+					players.add(new AImedium(name));
+				} else if (name.contains("(hard)")) {
+					players.add(new AIhard(name));
 				}
-			} else if (name.equals("AI")) {
-				players.add(new AIeasy("AI " + i + " (not set easy)"));
 			} else {
 				players.add(new Player(playerNames[i]));
 			}
 		}
 		//System.out.println(players.toString());
 		reStart();
-		////////////////////////// STINKY
-		//Set the modified names on the controller JPanel
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(getPanel());
-				JPanel temppan = (JPanel) temp.getContentPane();
-				JPanel temppan2 = (JPanel) temppan.getComponent(0);
-				String[] playerNames = getAllNames();
-				for (int i = 0; i < playerNames.length; i++) {
-					//System.out.println(i + " " + temppan2.getComponent(i));
-					((JLabel) temppan2.getComponent(i * 2)).setText(playerNames[i]);
-				}
-			}
-		});
-		/////////////////////////
+//		////////////////////////// STINKY
+//		//Set the modified names on the controller JPanel
+//		SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
+//				JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(getPanel());
+//				JPanel temppan = (JPanel) temp.getContentPane();
+//				JPanel temppan2 = (JPanel) temppan.getComponent(0);
+//				String[] playerNames = getAllNames();
+//				for (int i = 0; i < playerNames.length; i++) {
+//					//System.out.println(i + " " + temppan2.getComponent(i));
+//					((JLabel) temppan2.getComponent(i * 2)).setText(playerNames[i]);
+//				}
+//			}
+//		});
+//		/////////////////////////
 	}
 
 	private AbstractGamePanel getPanel() {
@@ -158,16 +151,25 @@ public class GameClass implements GameInterface{//TODO: enum vagy map
 	public void setClickedColoumn(int coloumn) {
 		runRound(coloumn);
 	}
-	
+
 	//From GameInterFace
-	public void setGameOver(boolean gameOver){
+	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
 	}
 	
+	private ArrayList<ObservedPlayer> makeObservedPlayers(){
+		ArrayList<ObservedPlayer> observedPlayers = new ArrayList<>();
+		for (Player player : players) {
+			observedPlayers.add(new ObservedPlayer(player));
+		}
+		return observedPlayers;
+	}
+
 	private int[] getAIMove() {
 		//return ((AI) players.get(actualPlayer)).makeMove(this);
-		if (players.get(actualPlayer) instanceof AIhard)
-			((AIhard) players.get(actualPlayer)).setPlayers(players);
+//		if (players.get(actualPlayer) instanceof AIhard)
+//			((AIhard) players.get(actualPlayer)).setPlayers(players);
+		((AI) players.get(actualPlayer)).setObservedPlayers(makeObservedPlayers());
 		return ((AI) players.get(actualPlayer)).makeMove(position, getTops(), prices);
 	}
 
@@ -218,15 +220,11 @@ public class GameClass implements GameInterface{//TODO: enum vagy map
 	}
 
 	/**
-	 * Recalculates all players' points based on the new prices
+	 * Recalculates points of all players based on the new prices
 	 */
 	private void countPoints() {
 		for (Player player : players) {
-			int sum = 0;
-			for (String good : player.goods) {
-				sum += prices[GOOD_TYPES.indexOf(good)];
-			}
-			player.setPoints(sum);
+			player.setPrices(prices);
 		}
 	}
 
@@ -236,7 +234,7 @@ public class GameClass implements GameInterface{//TODO: enum vagy map
 
 	/**
 	 *
-	 * @return the top startGoods of each coloumn
+	 * @return the top startGoods of each column
 	 */
 	private ArrayList<String> getTops() {
 		ArrayList<String> topGoods = new ArrayList<>();
@@ -294,7 +292,7 @@ public class GameClass implements GameInterface{//TODO: enum vagy map
 	/**
 	 * Almost like a "game loop"
 	 *
-	 * @param pointNr the chosen coloumns index number
+	 * @param pointNr the chosen columns index number
 	 */
 	private void runRound(int pointNr) {
 		//System.out.println("\trunRound started\tgamover: " + theGame.gameOver + "\tcoloumns: " + theGame.coloumns.size());
@@ -344,8 +342,8 @@ public class GameClass implements GameInterface{//TODO: enum vagy map
 			} while (i < playerNames.length && aiall);
 			int n;
 			if (aiall) {
-				n = 2;
-				//n = panel.gameOverPopup(gameOverString());
+				//n = 2;
+				n = panel.gameOverPopup(gameOverString());
 
 			} else {
 				n = panel.gameOverPopup(gameOverString());
@@ -356,12 +354,7 @@ public class GameClass implements GameInterface{//TODO: enum vagy map
 					reStart();
 					break;
 				case 1:
-					JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(panel);
-					JPanel temppan = (JPanel) temp.getContentPane();
-					JPanel temppan2 = (JPanel) temppan.getComponent(0);
-					JButton tempbutt = (JButton) temppan2.getComponent(temppan2.getComponentCount() - 1);
-					tempbutt.doClick(10);
-					temp.setVisible(false);
+					panel.quitGame();
 					break;
 				case 0:
 					System.exit(0);
@@ -374,15 +367,14 @@ public class GameClass implements GameInterface{//TODO: enum vagy map
 	 */
 	private void reStart() {
 		gameOver = false;
+		prices = Arrays.copyOf(PRICES_AT_START, 6);
 		for (Player player : players) {
 			player.goods.clear();
-			player.setPoints(0);
+			player.setPrices(prices);
 		}
-		int playAgains = playerNames.length;
+		
 		System.out.println("last starter: " + lastStarter);
-		prices = Arrays.copyOf(PRICES_AT_START, 6);
-		//System.out.println("RESTART prices " + Arrays.toString(prices));
-		//System.out.println("RESTART prices " + Arrays.toString(GameClass.PRICES_AT_START));
+
 		coloumns.clear();
 		for (int i = 0; i < START_NR_COLOUMS; i++) {
 			coloumns.add(new Coloumn());
@@ -395,7 +387,7 @@ public class GameClass implements GameInterface{//TODO: enum vagy map
 		panel.start(getTops(), getAllNames(), getColsSizes(), wins);
 //		int nextStarter = (++lastStarter) % playAgains;
 //		actualPlayer = Math.max(nextStarter, Math.min(nextStarter, numPlayers - 1));
-		actualPlayer = (++lastStarter) % playAgains;
+		actualPlayer = (++lastStarter) % playerNames.length;
 		position = 0;
 		runRound(-1);
 		System.out.println("next starter: " + actualPlayer + "\n");

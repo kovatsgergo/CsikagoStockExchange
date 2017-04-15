@@ -5,15 +5,16 @@ import java.util.ArrayList;
 
 public abstract class AI extends Player {
 
-	public AI() {
-		super();
-	}
+	protected ArrayList<ObservedPlayer> observedPlayers;
 
+	public void setObservedPlayers(ArrayList<ObservedPlayer> observedPlayers) {
+		this.observedPlayers = observedPlayers;
+	}
+	
 	public AI(String name) {
 		super(name);
 	}
 
-	//abstract int[] makeMove(GameClass theGame);
 	abstract int[] makeMove(int position, ArrayList<String> tops, int[] prices);
 
 	public int countContain(ArrayList<String> list, String element) {
@@ -25,4 +26,6 @@ public abstract class AI extends Player {
 		}
 		return i;
 	}
+	
+	
 }

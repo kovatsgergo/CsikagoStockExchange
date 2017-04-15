@@ -20,10 +20,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-class MyPanel extends AbstractGamePanel {
+class MyPanel extends JPanel implements AbstractGamePanel {
 
 	//GameClass theGame;
 	GameInterface interf;
@@ -178,6 +181,16 @@ class MyPanel extends AbstractGamePanel {
 		return this;
 	}
 
+	@Override
+	public void quitGame() {
+		JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
+		JPanel temppan = (JPanel) temp.getContentPane();
+		JPanel temppan2 = (JPanel) temppan.getComponent(0);
+		JButton tempbutt = (JButton) temppan2.getComponent(temppan2.getComponentCount() - 1);
+		tempbutt.doClick(10);
+		temp.setVisible(false);
+	}
+
 	private void refreshSizes() {
 		////drawing constants only changing when panel resized
 		//global values
@@ -215,8 +228,8 @@ class MyPanel extends AbstractGamePanel {
 	public void setNrGameCols(int i) {
 		nrGameCols = i;
 	}
-	
-	public void setInterface(GameInterface interf){
+
+	public void setInterface(GameInterface interf) {
 		this.interf = interf;
 	}
 
