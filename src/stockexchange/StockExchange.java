@@ -11,7 +11,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -21,7 +24,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
@@ -38,12 +44,12 @@ public class StockExchange {
 				int[] dimensions = {(int) (screenSize.getWidth() * 0.75),
 					(int) (screenSize.getWidth() * 0.45), (int) screenSize.getWidth(), (int) screenSize.getHeight()};
 
-				createAndShowFirstGUI(2, dimensions);
+				createAndShowStartupGUI(2, dimensions);
 			}
 		});
 	}
 
-	private static void createAndShowFirstGUI(int plyrs, int[] dims, String... namesgiven) {
+	private static void createAndShowStartupGUI(int plyrs, int[] dims, String... namesgiven) {
 
 		final int[] dimensions = dims;
 		String[] names = new String[MAXPLAYERS];
@@ -91,7 +97,7 @@ public class StockExchange {
 			public void componentResized(ComponentEvent evt) {
 				JPanel c = (JPanel) evt.getSource();
 				Dimension dim = c.getSize();
-				c.setFont(c.getFont().deriveFont(Math.min((float) (dim.width / 20f), c.getSize().height)));
+				c.setFont(c.getFont().deriveFont(Math.min((dim.width / 20f), c.getSize().height)));
 				c.repaint();
 			}
 		});
@@ -237,7 +243,7 @@ public class StockExchange {
 					temp[i] = textfields.get(i).getText();
 				}
 				try {
-					createAndShowGUI(temp, dimensions);
+					createAndShowGameGUI(temp, dimensions);
 					tempFrame.setVisible(false);
 				} catch (IOException ex) {
 					Logger.getLogger(StockExchange.class.getName()).
@@ -288,7 +294,7 @@ public class StockExchange {
 	////
 	///
 	//
-	private static void createAndShowGUI(String[] players, int[] dims)
+	private static void createAndShowGameGUI(String[] players, int[] dims)
 					throws IOException {
 		final int[] dimensions = dims;
 		final JFrame f = new JFrame("Stock Exchange");
@@ -319,6 +325,7 @@ public class StockExchange {
 		final AbstractGamePanel aPanel = panel;
 		final GameInterface theGame = new GameClass(0, players, aPanel);
 		panel.setInterface(theGame);
+
 		// Hints toggle
 		final JToggleButton helpTGL = new JToggleButton("hints off");
 		helpTGL.putClientProperty("1", panel);
@@ -338,6 +345,30 @@ public class StockExchange {
 			}
 		}
 		);
+
+		//Rules button
+		final JButton rulesButton = new JButton("Rules");
+		URL textURL = panel.getClass().getResource("/src/images/RuleBook.txt");
+		File rulesFile = new File("./src/images/RuleBook.txt");
+		FileReader fileReader = new FileReader(rulesFile);
+		char[] chB = new char[(int) rulesFile.length()];
+		fileReader.read(chB);
+		final String rulesString = String.valueOf(chB);
+		JTextArea textArea = new JTextArea(40, 42);
+		textArea.setText(rulesString);
+		textArea.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(textArea);
+		final JFrame rulesFrame = new JFrame("Game Rules");
+		rulesFrame.add(scrollPane);
+		rulesFrame.pack();
+		rulesButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane jp = new JOptionPane();
+				rulesFrame.setVisible(true);
+			}
+		});
+
 		// Restart button
 		JButton restart = new JButton("Restart");
 		restart.putClientProperty("1", players);
@@ -346,7 +377,7 @@ public class StockExchange {
 			public void actionPerformed(ActionEvent e) {
 				JButton temp = (JButton) e.getSource();
 				String[] tempStrings = (String[]) temp.getClientProperty("1");
-				createAndShowFirstGUI(tempStrings.length, dimensions, (String[]) tempStrings);
+				createAndShowStartupGUI(tempStrings.length, dimensions, (String[]) tempStrings);
 				f.setVisible(false);
 				panel.setVisible(false);
 				theGame.setGameOver(true);
@@ -362,6 +393,7 @@ public class StockExchange {
 		}
 		// Add components to panel
 		top.add(helpTGL);
+		top.add(rulesButton);
 		top.add(restart);
 
 		//panel.setFocusable(true);

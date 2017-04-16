@@ -47,8 +47,8 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 	Font fontB = new Font("Arial Black", 0, 23);
 	Font fontHint = new Font("Arial", 0, 15);
 
-	Color[] colors = {Color.BLUE, Color.WHITE, Color.BLACK,
-		Color.GREEN, new Color(205, 130, 80), Color.YELLOW};
+	Color[] priceColors = {new Color(0, 0, 255, 170), new Color(255, 255, 255, 170), new Color(0, 0, 0, 170),
+		new Color(0, 255, 0, 170), new Color(205, 130, 80, 170), new Color(255, 255, 0, 170)};
 	final float[] scales = {0.5f, 0.5f, 0.5f, 1f};
 	final float[] offsets = {20, 20, 20, 0};
 	final float[] scalesT = {1.1f, 1.1f, 1.1f, 1.f};
@@ -196,7 +196,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		//global values
 		w = this.getWidth();
 		h = this.getHeight();
-		fifth = w / (playerNames.length * 2 + 1);
+		fifth = w / (playerNames.length * 2 + 2);
 		//font
 		fontB = fontB.deriveFont((float) (w * 0.013) + 8);
 		//coloumns
@@ -205,6 +205,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		goodsSize = Math.round(w / 10f);
 		//figure
 		figureSize = Math.round(goodsSize / 5);
+		//timerAll.start();
 	}
 
 	public int getClickedCol(Point pnt) {//TODO: Human Player
@@ -326,12 +327,12 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		int rectsStepH = Math.round(w * 0.048f);
 		int rectsSize = Math.round(w * 0.03f);
 
-		g.setColor(colors[0]);
+		g.setColor(priceColors[0]);
 		g.fillRect(Math.round(rectsStartW + (8 - pricesDiff[0]) * rectsStepW),
 						rectsStartH + 0 * rectsStepH, rectsSize, rectsSize);
 
 		for (int i = 1; i < 6; i++) {
-			g.setColor(colors[i]);
+			g.setColor(priceColors[i]);
 			g.fillRect(Math.round(rectsStartW + (7 - pricesDiff[i]) * rectsStepW),
 							rectsStartH + i * rectsStepH, rectsSize, rectsSize);
 		}
@@ -402,11 +403,11 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 
 		}
 		//Draw the sinking goods
-		if (sinkImg > -1) {
+		if (sinkImg > -1 & thrownGoodY[0] != thrownGoodY[1]) {//aeigo834wbfklsdbovisebuioghwerl
 			g.drawImage(goodImgs.get(sinkImg), thrownGoodX, Math.round(thrownGoodY[0]), thrownGoodX + goodsSize,
 							Math.round(thrownGoodY[0]) + goodsSize, 0, 0, 370, 370, null);
 		}
-		if (sinkImg2 > -1) {
+		if (sinkImg2 > -1 & keptGoodY[0] != keptGoodY[1]) {
 			g.drawImage(goodImgs.get(sinkImg2), Math.round(keptGoodX[0]), Math.round(keptGoodY[0]),
 							Math.round(keptGoodX[0]) + goodsSize, Math.round(keptGoodY[0]) + goodsSize, 0, 0, 370, 370, null);
 		}
@@ -609,9 +610,9 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		float diff = thrownGoodY[1] - thrownGoodY[0];
 		float diff2 = keptGoodY[0] - keptGoodY[1];
 		float diff3 = keptGoodX[0] - keptGoodX[1];
-		if (diff > 1) {//The good which is thrown away
+		if (diff > 0) {//The good which is thrown away
 			//sinkY[0] += Math.sqrt(diff) / 2;
-			thrownGoodY[0] += diff / 10f;
+			thrownGoodY[0] += Math.max(1, diff / 10f);
 			int extraSpace = (int) Math.round(diff / 10f);
 			repaint(thrownGoodX, Math.round(thrownGoodY[0] - extraSpace), goodsSize, goodsSize + extraSpace);
 		} else {
@@ -621,15 +622,15 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 //			sinkImg = -1;
 //			thrownGoodY[2] = -1;
 		}
-		if (Math.abs(diff3) > 1) {
+		if (Math.abs(diff3) > 0) {
 			//sinkX2[0] -= Math.sqrt(Math.abs(diff3)) * Math.signum(diff3);
-			keptGoodX[0] -= diff3 / 3f;
+			keptGoodX[0] -= Math.max(1, diff3 / 3f);
 			int extraSpace = (int) Math.round(diff3 / 4f);
 			repaint(Math.round(keptGoodX[0]), Math.round(keptGoodY[0]), goodsSize + extraSpace, goodsSize);
 		}
-		if (diff2 > 1) {
+		if (diff2 > 0) {
 			//keptGoodY[0] -= Math.sqrt(diff2);
-			keptGoodY[0] -= diff2 / 7f;
+			keptGoodY[0] -= Math.max(1, diff2 / 7f);
 			int extraSpace = (int) Math.round(diff2 / 2f);
 			repaint(Math.round(keptGoodX[0]), Math.round(keptGoodY[0]) - extraSpace, goodsSize, goodsSize + extraSpace);
 		} else {
@@ -639,9 +640,14 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 //			sinkImg2 = -1;
 //			keptGoodY[2] = -1;
 		}
-		if (diff < 1 && diff2 < 1) {
+		if (diff < 0 && diff2 < 0) {
 			System.out.println("moveGoods has stopped");
 			//timerGoods.stop();
+			thrownGoodY[0] = thrownGoodY[1];
+			keptGoodY[0] = keptGoodY[1];
+			thrownGoodY[2] = -1;
+			keptGoodY[2] = -1;
+			//System.out.println(diff + " " + diff2 + " " + Arrays.toString(thrownGoodY) + " " + Arrays.toString(keptGoodY));
 			finished = true;
 		}
 		return finished;
