@@ -108,7 +108,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 	javax.swing.Timer timerAll = new javax.swing.Timer(0, new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (moveCols() & moveGoods() & movePrices() /*& moveFigure()*/) {
+			if (moveCols() & moveGoods() & movePrices() & moveFigure()) {
 				timerAll.stop();
 				System.out.println("All stopped");
 			} else {
@@ -259,6 +259,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 	public void setPossible(int[] possibleColoumns) {
 		poss = possibleColoumns;
 		System.out.println("possible" + Arrays.toString(poss));
+		choiceStage = true;
 	}
 
 	// Inherited from AbstractGamePanel
@@ -267,7 +268,6 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		angleFig[1] = destination * (Math.PI * 2 / nrGameCols);
 		position = destination;
 		startMoveFigure();
-		choiceStage = true;
 	}
 
 	// Inherited from AbstractGamePanel
@@ -290,7 +290,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 
 		fallenCols = emptiedColoumns;
 		for (int colNr : fallenCols)
-			if (colNr > -1 && colNr < position) {
+			if (colNr > -1 /*&& colNr < position*/) {
 				setFigure(--position);
 			}
 		colSizes = sizes;

@@ -15,7 +15,7 @@ public abstract class AI extends Player {
 		super(name);
 	}
 
-	abstract int[] makeMove(int position, ArrayList<String> tops, int[] prices);
+	abstract int[] makeMove(int position, ArrayList<String> tops, int[] colsSizes);
 
 	public int countContain(ArrayList<String> list, String element) {
 		int i = 0;

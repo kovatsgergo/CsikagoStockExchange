@@ -7,7 +7,7 @@ public class Player {
 
 	private int points;
 	private String name;
-	protected ArrayList<String> goods = new ArrayList();
+	protected ArrayList<String> goods = new ArrayList<>();
 	protected int[] prices;
 
 //	public Player() {

@@ -8,7 +8,7 @@ public class ObservedPlayer {
 	private ArrayList<String> goods = new ArrayList();
 	
 	public ObservedPlayer(Player player){
-		player.goods = goods;
+		this.goods = player.goods;
 	}
 	
 	protected ArrayList<String> getGoods(){

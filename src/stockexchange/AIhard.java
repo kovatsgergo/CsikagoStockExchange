@@ -15,7 +15,7 @@ public class AIhard extends AI {
 	}
 
 	@Override
-	public int[] makeMove(int position, ArrayList<String> tops, int[] prices) {
+	public int[] makeMove(int position, ArrayList<String> tops, int[] colsSizes) {
 		//System.out.println("AIHARD prices" + Arrays.toString(prices));
 		int max = -5;
 		int check = 0;
@@ -39,8 +39,20 @@ public class AIhard extends AI {
 				loss[0] -= 1;
 				loss[1] -= 1;
 			}
-			int forecast1 = nextStepForecast(tops, n, -1, prices);
-			int forecast2 = nextStepForecast(tops, n, +1, prices);
+			ArrayList<String> nextTops = new ArrayList<>();
+			int j = 0;
+			while (j < tops.size()) {
+				if (!(((n - 1) % tops.size() == j || (n + 1) % tops.size() == j) && colsSizes[j] == 1))
+					nextTops.add(tops.get(j));
+				j++;
+			}
+			int forecast1, forecast2;
+			if (nextTops.size() < 3)
+				forecast1 = forecast2 = 0;
+			else {
+				forecast1 = nextStepForecast(nextTops, n, -1, prices);
+				forecast2 = nextStepForecast(nextTops, n, +1, prices);
+			}
 
 			if (gain[0] + loss[0] - forecast1 > gain[1] + loss[1] - forecast2) {
 
@@ -69,13 +81,11 @@ public class AIhard extends AI {
 		return choice;
 	}
 
-	
 //	public void setPlayers(ArrayList<Player> players) {
 //		ObservedPlayer player = new ObservedPlayer(players.get(0));
 //		player.getGoods();
 //		//players.get(0).goods.clear();
 //	}
-
 	public int nextStepForecast(ArrayList<String> tops, int pos, int lessen, int[] prices) {
 		int position = pos;
 		int max = 0;
