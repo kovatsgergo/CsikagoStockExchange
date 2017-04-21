@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-class MyPanel extends JPanel implements AbstractGamePanel {
+class MyPanel extends JPanel implements GamePanelInterface {
 
 	//GameClass theGame;
 	GameInterface interf;
@@ -224,7 +224,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		return new Dimension(950, 550);
 	}
 
-	// Inherited from AbstractGamePanel
+	// Inherited from GamePanelInterface
 	@Override
 	public void setNrGameCols(int i) {
 		nrGameCols = i;
@@ -234,7 +234,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		this.interf = interf;
 	}
 
-	// Inherited from AbstractGamePanel
+	// Inherited from GamePanelInterface
 	@Override
 	public void start(ArrayList<String> topGoods, String[] playerNames, int[] sizes, int[] wins) {
 		this.topGoods = topGoods;
@@ -254,7 +254,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		repaint();
 	}
 
-	// Inherited from AbstractGamePanel
+	// Inherited from GamePanelInterface
 	@Override
 	public void setPossible(int[] possibleColoumns) {
 		poss = possibleColoumns;
@@ -262,7 +262,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		choiceStage = true;
 	}
 
-	// Inherited from AbstractGamePanel
+	// Inherited from GamePanelInterface
 	@Override
 	public void setFigure(int destination) {
 		angleFig[1] = destination * (Math.PI * 2 / nrGameCols);
@@ -270,7 +270,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		startMoveFigure();
 	}
 
-	// Inherited from AbstractGamePanel
+	// Inherited from GamePanelInterface
 	@Override
 	public void makeChoice(int chosenColoumn, int[] emptiedColoumns, int[] prices, ArrayList<String> topGoods, int[] sizes) {
 		setNrGameCols(sizes.length);
@@ -303,7 +303,7 @@ class MyPanel extends JPanel implements AbstractGamePanel {
 		actualPlayer = (actualPlayer + 1) % playerNames.length;
 	}
 
-	// Inherited from AbstractGamePanel
+	// Inherited from GamePanelInterface
 	@Override
 	public void setHint(String[] hintText) {
 		this.hintText = hintText;

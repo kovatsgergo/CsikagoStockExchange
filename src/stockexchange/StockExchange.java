@@ -14,7 +14,6 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -24,7 +23,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -297,33 +295,39 @@ public class StockExchange {
 	private static void createAndShowGameGUI(String[] players, int[] dims)
 					throws IOException {
 		final int[] dimensions = dims;
-		final JFrame f = new JFrame("Stock Exchange");
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setLayout(new BorderLayout());
-		f.setBounds(0, 0, dimensions[0], dimensions[1]);
+		final JFrame gameFrame = new JFrame("Stock Exchange");
+		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		gameFrame.setLayout(new BorderLayout());
+		gameFrame.setBounds(0, 0, dimensions[0], dimensions[1]);
+		Player[] playerArray = new Player[players.length];
 
 		for (int i = 0; i < players.length; i++) {
 			String name = players[i];
 			if (name.length() > 2) {
 				if (!(name.substring(0, 2).equals("AI"))) {
-					continue;
+					//continue;
+					playerArray[i] = new Player(players[i]);
 				} else if (name.substring(2, 3).equals("e")) {
 					players[i] = "AI " + (i + 1) + " (easy)";
+					playerArray[i] = new AIeasy(players[i]);
 				} else if (name.substring(2, 3).equals("m")) {
 					players[i] = "AI " + (i + 1) + " (medium)";
+					playerArray[i] = new AImedium(players[i]);
 				} else if (name.substring(2, 3).equals("h")) {
 					players[i] = "AI " + (i + 1) + " (hard)";
+					playerArray[i] = new AIhard(players[i]);
 				}
 			} else if (name.equals("AI")) {
 				players[i] = "AI " + (i + 1) + " (not set easy)";
+				playerArray[i] = new AIeasy(players[i]);
 			}
 		}
 
 		//panels
 		JPanel top = new JPanel(new GridLayout(1, players.length * 2 + 2));
 		final MyPanel panel = new MyPanel(dimensions);
-		final AbstractGamePanel aPanel = panel;
-		final GameInterface theGame = new GameClass(0, players, aPanel);
+		final GamePanelInterface aPanel = panel;
+		final GameInterface theGame = new GameClass(0, playerArray, aPanel);
 		panel.setInterface(theGame);
 
 		// Hints toggle
@@ -336,11 +340,11 @@ public class StockExchange {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					helpTGL.setText("HINTS ON");
 					((MyPanel) temp.getClientProperty("1")).setHintsOnOff(true);
-					f.setBounds(f.getX(), f.getY(), dimensions[0], dimensions[3]);
+					gameFrame.setBounds(gameFrame.getX(), gameFrame.getY(), dimensions[0], dimensions[3]);
 				} else {
 					helpTGL.setText("hints off");
 					((MyPanel) temp.getClientProperty("1")).setHintsOnOff(false);
-					f.setBounds(f.getX(), f.getY(), dimensions[0], dimensions[1]);
+					gameFrame.setBounds(gameFrame.getX(), gameFrame.getY(), dimensions[0], dimensions[1]);
 				}
 			}
 		}
@@ -348,8 +352,8 @@ public class StockExchange {
 
 		//Rules button
 		final JButton rulesButton = new JButton("Rules");
-		URL textURL = panel.getClass().getResource("/src/images/RuleBook.txt");
-		File rulesFile = new File("./src/images/RuleBook.txt");
+		//URL textURL = panel.getClass().getResource("/images/RuleBook.txt");
+		File rulesFile = new File("./src/images/RuleBook.txt");//nem kerul automatikusan a .jar-ba
 		FileReader fileReader = new FileReader(rulesFile);
 		char[] chB = new char[(int) rulesFile.length()];
 		fileReader.read(chB);
@@ -364,7 +368,7 @@ public class StockExchange {
 		rulesButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane jp = new JOptionPane();
+				//JOptionPane jp = new JOptionPane();
 				rulesFrame.setVisible(true);
 			}
 		});
@@ -378,7 +382,7 @@ public class StockExchange {
 				JButton temp = (JButton) e.getSource();
 				String[] tempStrings = (String[]) temp.getClientProperty("1");
 				createAndShowStartupGUI(tempStrings.length, dimensions, (String[]) tempStrings);
-				f.setVisible(false);
+				gameFrame.setVisible(false);
 				panel.setVisible(false);
 				theGame.setGameOver(true);
 			}
@@ -398,11 +402,11 @@ public class StockExchange {
 
 		//panel.setFocusable(true);
 		panel.requestFocusInWindow();
-		f.add(top, BorderLayout.NORTH);
-		f.add(panel, BorderLayout.CENTER);
-		f.pack();
-		f.setVisible(true);
-		f.setBounds((dimensions[2] - dimensions[0]) / 2, 0, dimensions[0], dimensions[1]);
+		gameFrame.add(top, BorderLayout.NORTH);
+		gameFrame.add(panel, BorderLayout.CENTER);
+		gameFrame.pack();
+		gameFrame.setVisible(true);
+		gameFrame.setBounds((dimensions[2] - dimensions[0]) / 2, 0, dimensions[0], dimensions[1]);
 	}
 
 }

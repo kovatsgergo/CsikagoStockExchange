@@ -3,7 +3,7 @@ package stockexchange;
 
 import java.util.ArrayList;
 
-public interface AbstractGamePanel {
+public interface GamePanelInterface {
 
 	public abstract void start(ArrayList<String> topGoods, String[] playerNames,
 					int[] sizes, int[] wins);

@@ -13,57 +13,37 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	static final int[] PRICES_AT_START = {7, 6, 6, 6, 6, 6};
 	static final int START_NR_COLOUMS = 9;
 	static final int START_HEIGHT_COLOUMNS = 4; //(START_NR_COLOUMS * START_HEIGHT_COLOUMNS)%6=0
+	Player[] players;
 	ArrayList<Coloumn> coloumns = new ArrayList();
-	ArrayList<Player> players = new ArrayList();
 	ArrayList<String> startGoods = new ArrayList();
 	ArrayList<Integer> winner;
-	//Player winner;
-	//ArrayList<Integer> wins = new ArrayList();
 
 	int position = 0;
 
 	int[] prices = {7, 6, 6, 6, 6, 6};
 	boolean gameOver = false;
 	int actualPlayer = 0;
-	int numPlayers;
-	String[] playerNames;
 	int[] wins;
 	final int AI_SPEED = 100;
 	int[] AIchoice = new int[2];
 	boolean choiceStage = false;
-	AbstractGamePanel panel;
+	GamePanelInterface panel;
 	int lastStarter = -1;
 
-	public GameClass(int starter, String[] playerNames, AbstractGamePanel panel) {
-
-		numPlayers = playerNames.length;
-		wins = new int[numPlayers];
-		this.playerNames = playerNames;
+	public GameClass(int starter, Player[] players, GamePanelInterface panel) {
+		this.players = players;
+		//System.out.println(Arrays.toString(this.players));
+		wins = new int[players.length];
 		this.panel = panel;
-
-		for (int i = 0; i < numPlayers; i++) {
-			String name = playerNames[i];
-			if (name.length() > 2) {
-				if (!(name.substring(0, 2).equals("AI"))) {
-					players.add(new Player(playerNames[i]));
-				} else if (name.contains("easy)")) {
-					players.add(new AIeasy(name));
-				} else if (name.contains("(medium)")) {
-					players.add(new AImedium(name));
-				} else if (name.contains("(hard)")) {
-					players.add(new AIhard(name));
-				}
-			} else {
-				players.add(new Player(playerNames[i]));
-			}
-		}
 		reStart();
 	}
 
-//	private AbstractGamePanel getPanel() {
+//	private GamePanelInterface getPanel() {
 //		return panel;
 //	}
-
+	/**
+	 * Deal all the goods to the coloumns
+	 */
 	private void dealGoods() {
 		//System.out.println(startGoods.toString());
 		for (int i = 0; i < START_NR_COLOUMS; i++) {
@@ -87,9 +67,9 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	}
 
 	private String[] getAllNames() {
-		String[] allNames = new String[players.size()];
-		for (int i = 0; i < players.size(); i++) {
-			allNames[i] = players.get(i).getName();
+		String[] allNames = new String[players.length];
+		for (int i = 0; i < players.length; i++) {
+			allNames[i] = players[i].getName();
 		}
 		return allNames;
 	}
@@ -98,9 +78,6 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 		return coloumns.size();
 	}
 
-//	public Coloumn getCol(int nr) {/////////////REMOVE
-//		return coloumns.get(nr % getNrCols());
-//	}
 	private int[] getPossible() {
 		int[] possible = new int[3];
 		possible[0] = (position + 1) % getNrCols();
@@ -123,6 +100,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	}
 
 	//From GameInterFace
+	@Override
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
 	}
@@ -136,8 +114,8 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	}
 
 	private int[] getAIMove() {
-		((AI) players.get(actualPlayer)).setObservedPlayers(makeObservedPlayers());
-		return ((AI) players.get(actualPlayer)).makeMove(position, getTops(), getColsSizes());
+		((AI) players[actualPlayer]).setObservedPlayers(makeObservedPlayers());
+		return ((AI) players[actualPlayer]).makeMove(position, getTops(), getColsSizes());
 	}
 
 	private int[] handleChoice(int keep, int out) {
@@ -149,7 +127,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 		Coloumn actualO = coloumns.get(out);
 		int outIdx = GOOD_TYPES.indexOf(actualO.getTop());
 		//int keepIdx = GOOD_TYPES.indexOf(actualK.getTop());
-		players.get(actualPlayer).add(actualK.getTop());
+		players[actualPlayer].add(actualK.getTop());
 		//System.out.println("actualK.getTop() "+actualK.getTop()+ " \t actualO.getTop()"
 		//+actualO.getTop());
 		actualK.remove();
@@ -196,7 +174,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	}
 
 	private int nextPlayer(int actual) {
-		return (actual + 1) % numPlayers;
+		return (actual + 1) % players.length;
 	}
 
 	/**
@@ -228,7 +206,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 
 	private void aiPoint() {
 		//System.out.println("aiPoint called\t actual: " + players.get(actualPlayer).getName());
-		if (players.get(actualPlayer) instanceof AI && !gameOver) {
+		if (players[actualPlayer] instanceof AI && !gameOver) {
 			timerAI.start();
 		}
 	}
@@ -238,7 +216,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	 */
 	private void aiChoice() {
 		//System.out.println("aiChoice run");
-		if (players.get(actualPlayer) instanceof AI && !gameOver) {
+		if (players[actualPlayer] instanceof AI && !gameOver) {
 			int pointNr;
 			if (!choiceStage) {
 				System.out.println("aiChoice choiceStage");
@@ -257,7 +235,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	/**
 	 * Almost like a "game loop"
 	 *
-	 * @param pointNr the chosen columns index number
+	 * @param pointNr the chosen column's index number
 	 */
 	private void runRound(int pointNr) {
 		//System.out.println("\trunRound started\tgamover: " + theGame.gameOver + "\tcoloumns: " + theGame.coloumns.size());
@@ -306,8 +284,8 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 			boolean aiall = true;
 			int i = 0;
 			do {
-				aiall = aiall && (players.get(i++) instanceof AI);
-			} while (i < playerNames.length && aiall);
+				aiall = aiall && (players[i++] instanceof AI);
+			} while (i < players.length && aiall);
 			int n;
 			if (aiall) {
 				n = 2;
@@ -337,6 +315,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 		gameOver = false;
 		prices = Arrays.copyOf(PRICES_AT_START, 6);
 		for (Player player : players) {
+			System.out.println(player);
 			player.goods.clear();
 			player.setPrices(prices);
 		}
@@ -355,7 +334,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 		panel.start(getTops(), getAllNames(), getColsSizes(), wins);
 //		int nextStarter = (++lastStarter) % playAgains;
 //		actualPlayer = Math.max(nextStarter, Math.min(nextStarter, numPlayers - 1));
-		actualPlayer = (++lastStarter) % playerNames.length;
+		actualPlayer = (++lastStarter) % players.length;
 		position = 0;
 		runRound(-1);
 		System.out.println("next starter: " + actualPlayer + "\n");
@@ -363,9 +342,8 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	}
 
 	private void makeHints() {
-		String[] returnHints = new String[playerNames.length * 2];
-		Player[] hintPlayers = players.toArray(new Player[players.size()]);
-		for (int i = 0; i < playerNames.length; i++) {
+		String[] returnHints = new String[players.length * 2];
+		for (int i = 0; i < players.length; i++) {
 			String stndrdth = "";
 			switch (i) {
 				case 0:
@@ -381,13 +359,13 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 					stndrdth = "th";
 					break;
 			}
-			returnHints[i * 2] = (i + 1) + stndrdth + " player " + hintPlayers[i].getName()
-							+ " has " + hintPlayers[i].getPoints() + " points";
+			returnHints[i * 2] = (i + 1) + stndrdth + " player " + players[i].getName()
+							+ " has " + players[i].getPoints() + " points";
 			String temp = "";
-			for (String good : hintPlayers[i].goods) {
+			for (String good : players[i].goods) {
 				temp += good + " (" + prices[GOOD_TYPES.indexOf(good)] + ") ";
 			}
-			returnHints[i * 2 + 1] = hintPlayers[i].getName() + " has Drawn Yet: " + temp;
+			returnHints[i * 2 + 1] = players[i].getName() + " has Drawn Yet: " + temp;
 		}
 		panel.setHint(returnHints);
 	}
@@ -395,11 +373,11 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	private ArrayList<Integer> getWinner() {
 		ArrayList<Integer> returnWinner = new ArrayList();
 		ArrayList<Integer> points = new ArrayList();
-		for (int i = 0; i < playerNames.length; i++) {
-			points.add(players.get(i).getPoints());
+		for (int i = 0; i < players.length; i++) {
+			points.add(players[i].getPoints());
 		}
 		int max = Collections.max(points);
-		for (int i = 0; i < playerNames.length; i++) {
+		for (int i = 0; i < players.length; i++) {
 			if (points.get(i) == max) {
 				returnWinner.add(i);
 				wins[i] = wins[i] + 1;
@@ -414,15 +392,14 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	private String gameOverString() {
 		String helpString = "";
 		for (int i = 0; i < winner.size() - 1; i++) {
-			helpString += players.get(winner.get(i)).getName() + ", ";
-			//System.out.println(helpString);
+			helpString += players[winner.get(i)].getName() + ", ";
 		}
-		helpString += players.get(winner.get(winner.size() - 1)).getName();
+		helpString += players[winner.get(winner.size() - 1)].getName();
 		helpString += " WINS!\n\n";
 		System.out.println(helpString);
-		for (int i = 0; i < playerNames.length; i++) {
-			int points = players.get(i).getPoints();
-			String name = players.get(i).getName();
+		for (int i = 0; i < players.length; i++) {
+			int points = players[i].getPoints();
+			String name = players[i].getName();
 			helpString += "Player " + (i + 1) + ": " + name + " had " + points + " points\n";
 		}
 		return helpString;
