@@ -14,7 +14,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	static final int START_NR_COLOUMS = 9;
 	static final int START_HEIGHT_COLOUMNS = 4; //(START_NR_COLOUMS * START_HEIGHT_COLOUMNS)%GOOD_TYPES.size()=0
 
-	final int AI_SPEED = 2;
+	final int AI_SPEED = 500;
 	private int[] AIchoice = new int[2];
 
 	private final Player[] players;
