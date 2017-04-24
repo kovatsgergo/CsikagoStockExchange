@@ -24,7 +24,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	boolean gameOver = false;
 	int actualPlayer = 0;
 	int[] wins;
-	final int AI_SPEED = 2;
+	final int AI_SPEED = 1000;
 	int[] AIchoice = new int[2];
 	boolean choiceStage = false;
 	GamePanelInterface panel;

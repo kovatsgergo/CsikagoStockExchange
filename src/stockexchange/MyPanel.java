@@ -330,7 +330,7 @@ class MyPanel extends JPanel implements GamePanelInterface {
 	// Inherited from JPanel
 	@Override
 	public void paintComponent(Graphics g) {
-		if (false) {//to turn off drawing completely so to test AIs
+		if (true) {//to turn off drawing completely so to test AIs
 			//<editor-fold defaultstate="collapsed" desc="comment">
 			super.paintComponent(g);
 
