@@ -79,8 +79,8 @@ class MyPanel extends JPanel implements GamePanelInterface {
 	int thrownGoodX;
 	//int sinkX1;
 	float[] keptGoodX = new float[2];//the kept item
-	float[] thrownGoodY = new float[3];//the thrown good: from, to, hasarrived(-1)
 	float[] keptGoodY = new float[3];
+	float[] thrownGoodY = new float[3];//the thrown good: from, to, hasarrived(-1)
 	String sinkStr;
 	String sinkStr2;
 	float[] pricesDiff;//{7, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6};
@@ -330,7 +330,7 @@ class MyPanel extends JPanel implements GamePanelInterface {
 	// Inherited from JPanel
 	@Override
 	public void paintComponent(Graphics g) {
-		if (true) {//to turn off drawing completely so to test AIs
+		if (false) {//to turn off drawing completely so to test AIs
 			//<editor-fold defaultstate="collapsed" desc="comment">
 			super.paintComponent(g);
 

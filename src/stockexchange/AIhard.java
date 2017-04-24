@@ -2,6 +2,7 @@ package stockexchange;
 
 /* Gergo Kovats */
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class AIhard extends AI {
@@ -41,8 +42,7 @@ public class AIhard extends AI {
 		String lastThrown = tops.get(thrownpos);
 		evilpoint = countContain(observedPlayer.getGoods(), lastThrown);
 		//calculate the hypothetic price list after the hypothetic choice
-		int[] hypotPrices = new int[6];
-		System.arraycopy(prices, 0, hypotPrices, 0, 6);
+		int[] hypotPrices = Arrays.copyOf(prices, prices.length);
 		--hypotPrices[GameClass.GOOD_TYPES.indexOf(lastThrown)];
 		int max = getMakeMoveMax(tops, position);
 		//System.out.println("evilpoint " + evilpoint + "max " + max);

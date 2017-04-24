@@ -16,8 +16,6 @@ public class AIeasy extends AI {
 //		System.out.println("gains " + Arrays.deepToString(gains));
 		int[] choice = getMaxIndex(gains);
 //		System.out.println("array choice " + Arrays.toString(choice));
-//		choice[0] = (choice[0] + position + 1) % tops.size();
-//		choice[1] = getNeighbors(choice[0], tops.size())[choice[1]];
 		convertChoiceToPosition(choice, position, tops.size());
 //		System.out.println("choice " + Arrays.toString(choice));
 		//waitForKey();

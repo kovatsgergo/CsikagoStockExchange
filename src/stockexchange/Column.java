@@ -4,7 +4,7 @@ package stockexchange;
 
 import java.util.ArrayList;
 
-public class Coloumn {
+public class Column {
     ArrayList<String> goods = new ArrayList<String>();
 
     public void add(String good) {
