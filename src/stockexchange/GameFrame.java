@@ -23,9 +23,10 @@ import javax.swing.SwingConstants;
 public class GameFrame extends JFrame {
 
 	public GameFrame(String[] players, int[] dimensions) throws IOException {
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new BorderLayout());
 		setBounds(0, 0, dimensions[0], dimensions[1]);
+
 		Player[] playerArray = new Player[players.length];
 		System.out.println("players at createAndShowGameGUI: " + Arrays.toString(players));
 		for (int i = 0; i < players.length; i++) {
@@ -56,7 +57,7 @@ public class GameFrame extends JFrame {
 
 		//panels
 		JPanel top = new JPanel(new GridLayout(1, players.length * 2 + 2));
-		final MyPanel gamePanel = new MyPanel(dimensions);
+		final GamePanel gamePanel = new GamePanel(dimensions);
 		final GamePanelInterface interfacePanel = gamePanel;
 		final GameInterface theGame = new GameClass(0, playerArray, interfacePanel);
 		gamePanel.setInterface(theGame);
@@ -73,23 +74,40 @@ public class GameFrame extends JFrame {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					tglHints.setText("HINTS ON");
 					gamePanel.setHintsOnOff(true);
-					setBounds(getX(), getY(), dimensions[0], dimensions[3]);
+					setBounds(getX(), getY(), getWidth(), getWidth() * 4 / 5);
 				} else {
 					tglHints.setText("hints off");
 					gamePanel.setHintsOnOff(false);
-					setBounds(getX(), getY(), dimensions[0], dimensions[1]);
+					setBounds(getX(), getY(), getWidth(), getWidth() * 3 / 5);
 				}
 			}
 		}
 		);
 
+//
+//		//fix aspect ratio
+//		gamePanel.addComponentListener(new ComponentAdapter() {
+//			@Override
+//			public void componentResized(ComponentEvent e) {
+//				int w = getWidth();
+//				int h = getHeight();
+//				double ratio = w / (double) h;
+//				if (!tglHints.isSelected()) {
+//					if (ratio - 5. / 3 > 0.001)
+//						setSize(w, Math.round(w * 3 / 5f));
+//					else if (ratio - 5. / 3 < -0.001)
+//						setSize(Math.round(h * 5 / 3f), h);
+//				}
+//			}
+//		});
+//
 		//Rules button
 		final JButton btRules = new JButton("Rules");
 
 		btRules.setFocusable(false);//to have keyboard focus on gamePanel
 
 		//generate Rules text
-		//not improted to .jar
+		//not imported to .jar
 //<editor-fold defaultstate="collapsed" desc="comment">
 /*
 //		File rulesFile = new File("./files/RuleBook.txt");
@@ -113,11 +131,15 @@ public class GameFrame extends JFrame {
 		JScrollPane scrollPane = new JScrollPane(textArea);
 		final JFrame rulesFrame = new JFrame("Game Rules");
 		rulesFrame.add(scrollPane);
-		rulesFrame.pack();
+		rulesFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		rulesFrame.pack();//nem tudok jobbat
 		btRules.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				rulesFrame.setVisible(!rulesFrame.isVisible());
+				if (!rulesFrame.isVisible())
+					rulesFrame.setVisible(true);
+				else
+					rulesFrame.dispose();
 			}
 		});
 

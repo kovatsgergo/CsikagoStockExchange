@@ -28,18 +28,27 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-class MyPanel extends JPanel implements GamePanelInterface {
+class GamePanel extends JPanel implements GamePanelInterface {
 
-	//GameClass theGame;
 	GameInterface interf;
 	double[] center = new double[2];// = {600, 220};
 	int h;
 	int w;
+	//stock image
+	int stockStartV;// = Math.round(w / 10f);
+	int stockWidth;// = Math.round(w * 0.35f);
+	//price indicators
+	int rectsStartW;// = Math.round(w * 0.04f) + w / 15;
+	int rectsStepW;// = Math.round(w * 0.038f);
+	int rectsStartH;// = Math.round(w * 0.169f);
+	int rectsStepH;// = Math.round(w * 0.048f);
+	int rectsSize;// = Math.round(w * 0.03f);
+
 	ArrayList<BufferedImage> goodImgs = new ArrayList();
 	BufferedImage stockImg;
 	BufferedImage figureImg;
 	ArrayList<Rectangle> bounds = new ArrayList();
-	//Point point;
+
 	int[] poss;
 	boolean choiceStage = false;
 	int nrCols = 9;
@@ -140,7 +149,7 @@ class MyPanel extends JPanel implements GamePanelInterface {
 //			movePrices();
 //		}
 //	});
-	public MyPanel(int[] dims) throws IOException {///////////////////////NEM KELL A PACK///////////////////////////////////////////////////////////////////////
+	public GamePanel(int[] dims) throws IOException {///////////////////////NEM KELL A PACK///////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////e.getSource():
 		////////////////////////////////////////////////////////////////////actionListenert adni a panel-hez
 
@@ -192,7 +201,7 @@ class MyPanel extends JPanel implements GamePanelInterface {
 		});
 	}
 
-//	public MyPanel returnThis() {
+//	public GamePanel returnThis() {
 //		return this;
 //	}
 	@Override
@@ -214,9 +223,20 @@ class MyPanel extends JPanel implements GamePanelInterface {
 		//global values
 		w = this.getWidth();
 		h = this.getHeight();
+		//stock image
+		stockStartV = Math.round(w / 10f);
+		stockWidth = Math.round(w * 0.35f);
+		//price indicators
+		rectsStartW = Math.round(w * 0.04f) + w / 15;
+		rectsStepW = Math.round(w * 0.038f);
+		rectsStartH = Math.round(w * 0.169f);
+		rectsStepH = Math.round(w * 0.048f);
+		rectsSize = Math.round(w * 0.03f);
+
 		fifth = w / (playerNames.length * 2 + 2);
 		//font
 		fontB = fontB.deriveFont((float) (w * 0.013) + 8);
+		fontHint = fontHint.deriveFont((float) (w * 0.009) + 8);
 		//coloumns
 		center[0] = w * 2 / 3;
 		center[1] = w * 11 / 50;
@@ -335,18 +355,10 @@ class MyPanel extends JPanel implements GamePanelInterface {
 			super.paintComponent(g);
 
 			//Draw the stock image
-			int stockStartV = Math.round(w / 10f);
-			int stockWidth = Math.round(w * 0.35f);
 			g.drawImage(stockImg, w / 15, stockStartV, stockWidth + w / 15,
 							stockStartV + stockWidth, 0, 0, 1100, 1100, null);
 
 			//Draw the price indicators
-			int rectsStartW = Math.round(w * 0.04f) + w / 15;
-			int rectsStepW = Math.round(w * 0.038f);
-			int rectsStartH = Math.round(w * 0.169f);
-			int rectsStepH = Math.round(w * 0.048f);
-			int rectsSize = Math.round(w * 0.03f);
-
 			g.setColor(priceColors[0]);
 			g.fillRect(Math.round(rectsStartW + (8 - pricesDiff[0]) * rectsStepW),
 							rectsStartH + 0 * rectsStepH, rectsSize, rectsSize);
@@ -391,7 +403,7 @@ class MyPanel extends JPanel implements GamePanelInterface {
 					keptGoodY[2] = y;
 				}
 				if (hints) {
-					g.drawString(height + "", x, y);
+					g.drawString(height + "", x, y + goodsSize);
 				}
 				int imgNr = GameClass.GOOD_TYPES.indexOf(topGood);
 
@@ -433,7 +445,6 @@ class MyPanel extends JPanel implements GamePanelInterface {
 			}
 
 			// Draw the figure
-			//int figureSize = Math.round(goodsSize / 5);
 			x = (int) Math.round(center[0] + coeff * Math.cos(angleFig[0]));
 			y = (int) Math.round(center[1] + coeff * Math.sin(angleFig[0]));
 			g.drawImage(figureImg, x + figureSize, y + figureSize, x + goodsSize - figureSize,

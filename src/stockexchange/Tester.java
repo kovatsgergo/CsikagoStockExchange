@@ -1,10 +1,10 @@
 package stockexchange;
 
 /*Gergo Kovats*/
-
 import java.util.Arrays;
 
 public class Tester {
+
 	static AI ai = new AIeasy("nothing");
 
 	public static void main1(String[] args) {
@@ -19,8 +19,12 @@ public class Tester {
 		int[][] c = ai.matrixAddition(a, b);
 		System.out.println(Arrays.deepToString(c));
 	}
-	
+
 	public static void main(String[] args) {
-		
+		int w = 600;
+		int h = 300;
+		int newW = (w + h) * 5 / 8;
+		int newH = (w + h) * 3 / 8;
+		System.out.println("newW " + newW + " newH " + newH);
 	}
 }
