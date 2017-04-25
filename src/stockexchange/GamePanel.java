@@ -85,11 +85,11 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	int sinking2 = -1;
 	int sinkImg = -1;
 	int sinkImg2 = -1;
-	int thrownGoodX;
+	int soldGoodX;
 	//int sinkX1;
 	float[] keptGoodX = new float[2];//the kept item
 	float[] keptGoodY = new float[3];
-	float[] thrownGoodY = new float[3];//the thrown good: from, to, hasarrived(-1)
+	float[] soldGoodY = new float[3];//the thrown good: from, to, hasarrived(-1)
 	String sinkStr;
 	String sinkStr2;
 	float[] pricesDiff;//{7, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6};
@@ -101,7 +101,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	double[] coordDiff = new double[2];
 
 	int goodsSize;
-	int fifth;
+	int scoreTablePosition;
 	int figureSize;
 
 	final int ANIM_INIT_DELAY = 1;
@@ -208,7 +208,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	public void quitGame() {
 		JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
 		JPanel temppan = (JPanel) temp.getContentPane();
-		JPanel temppan2 = (JPanel) temppan.getComponent(0);
+		JPanel temppan2 = (JPanel) temppan.getComponent(2);
 		JButton tempbutt = (JButton) temppan2.getComponent(temppan2.getComponentCount() - 1);
 		tempbutt.doClick(10);
 		temp.setVisible(false);
@@ -233,13 +233,13 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		rectsStepH = Math.round(w * 0.048f);
 		rectsSize = Math.round(w * 0.03f);
 
-		fifth = w / (playerNames.length * 2 + 2);
+		scoreTablePosition = w / (playerNames.length * 2 - 1);
 		//font
 		fontB = fontB.deriveFont((float) (w * 0.013) + 8);
 		fontHint = fontHint.deriveFont((float) (w * 0.009) + 8);
 		//coloumns
 		center[0] = w * 2 / 3;
-		center[1] = w * 11 / 50;
+		center[1] = w * 13 / 50;
 		goodsSize = Math.round(w / 10f);
 		//figure
 		figureSize = Math.round(goodsSize / 5);
@@ -318,9 +318,9 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		sinking2 = out;
 		sinkStr = this.topGoods.get(sinking);
 		sinkStr2 = this.topGoods.get(sinking2);
-		thrownGoodY[2] = -1;
+		soldGoodY[2] = -1;
 		keptGoodY[2] = -1;
-		keptGoodX[1] = (actualPlayer * 2 * fifth);
+		keptGoodX[1] = ((actualPlayer * 2 + 0.5f) * scoreTablePosition);
 		//Set prices
 		for (int i = 0; i < 6; i++) {
 			pricesDiff[i + 6] = prices[i];
@@ -392,10 +392,10 @@ class GamePanel extends JPanel implements GamePanelInterface {
 				y = (int) (center[1] + coeff * Math.sin(angleCols[i]));
 				String topGood = topGoods.get(i);
 				int height = colSizes[i];
-				if (sinking == i && thrownGoodY[2] == -1) {
+				if (sinking == i && soldGoodY[2] == -1) {
 					//System.out.println("sinking1 " + i);
-					thrownGoodX = x;
-					thrownGoodY[2] = y;
+					soldGoodX = x;
+					soldGoodY[2] = y;
 				}
 				if (sinking2 == i && keptGoodY[2] == -1) {
 					//System.out.println("sinking2 " + i);
@@ -435,9 +435,9 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 			}
 			//Draw the sinking goods
-			if (sinkImg > -1 & thrownGoodY[0] != thrownGoodY[1]) {//aeigo834wbfklsdbovisebuioghwerl
-				g.drawImage(goodImgs.get(sinkImg), thrownGoodX, Math.round(thrownGoodY[0]), thrownGoodX + goodsSize,
-								Math.round(thrownGoodY[0]) + goodsSize, 0, 0, 370, 370, null);
+			if (sinkImg > -1 & soldGoodY[0] != soldGoodY[1]) {//aeigo834wbfklsdbovisebuioghwerl
+				g.drawImage(goodImgs.get(sinkImg), soldGoodX, Math.round(soldGoodY[0]), soldGoodX + goodsSize,
+								Math.round(soldGoodY[0]) + goodsSize, 0, 0, 370, 370, null);
 			}
 			if (sinkImg2 > -1 & keptGoodY[0] != keptGoodY[1]) {
 				g.drawImage(goodImgs.get(sinkImg2), Math.round(keptGoodX[0]), Math.round(keptGoodY[0]),
@@ -452,7 +452,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 			//Draw win counters
 			for (int i = 0; i < playerNames.length; i++) {
-				g.drawString(wins[i] + "", fifth / 2 + i * 2 * fifth, w / 50 + 5);
+				g.drawString(wins[i] + "", scoreTablePosition / 2 + i * 2 * scoreTablePosition, w / 50 + 5);
 			}
 
 			//Draw who's turn it is
@@ -568,7 +568,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		if (Math.abs(sumDiff) > 0.05) {
 			//repaint();
 			for (int i = 0; i < nrGameCols; i++) {
-				angleCols[i] -= colsDiff[i] / 2;
+				angleCols[i] -= colsDiff[i] / 3;
 			}
 		} else {
 			for (int i = 0; i < nrGameCols; i++) {
@@ -609,42 +609,42 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		//System.out.println("moveGoods event " + sinking + " sinking2 " + sinking2);
 		sinkImg = GameClass.GOOD_TYPES.indexOf(sinkStr);
 		sinkImg2 = GameClass.GOOD_TYPES.indexOf(sinkStr2);
-		if (thrownGoodY[2] > 0) {
-			thrownGoodY[0] = thrownGoodY[2];
-			thrownGoodY[2] = 0;
+		if (soldGoodY[2] > 0) {
+			soldGoodY[0] = soldGoodY[2];
+			soldGoodY[2] = 0;
 		}
 		if (keptGoodY[2] > 0) {
 			keptGoodY[0] = keptGoodY[2];
 			keptGoodY[2] = 0;
 		}
-		thrownGoodY[1] = h;
+		soldGoodY[1] = h;
 		keptGoodY[1] = -goodsSize;
-		float diff = thrownGoodY[1] - thrownGoodY[0];
+		float diff = soldGoodY[1] - soldGoodY[0];
 		float diff2 = keptGoodY[0] - keptGoodY[1];
 		float diff3 = keptGoodX[0] - keptGoodX[1];
 		if (diff > 0) {//The good which is thrown away
 			//sinkY[0] += Math.sqrt(diff) / 2;
-			thrownGoodY[0] += Math.max(1, diff / 10f);
+			soldGoodY[0] += Math.max(1, diff / 8f);
 			int extraSpace = (int) Math.round(diff / 10f);
-			repaint(thrownGoodX, Math.round(thrownGoodY[0] - extraSpace), goodsSize, goodsSize + extraSpace);
+			repaint(soldGoodX, Math.round(soldGoodY[0] - extraSpace), goodsSize, goodsSize + extraSpace);
 		} else {
 //			System.out.println("------------sinking1 arrived");
-//			thrownGoodY[0] = thrownGoodY[1];
+//			soldGoodY[0] = soldGoodY[1];
 //			sinking = -1;
 //			sinkImg = -1;
-//			thrownGoodY[2] = -1;
+//			soldGoodY[2] = -1;
 		}
 		if (Math.abs(diff3) > 0) {
 			//sinkX2[0] -= Math.sqrt(Math.abs(diff3)) * Math.signum(diff3);
-			keptGoodX[0] -= Math.max(1, diff3 / 3f);
-			int extraSpace = (int) Math.round(diff3 / 4f);
-			repaint(Math.round(keptGoodX[0]), Math.round(keptGoodY[0]), goodsSize + extraSpace, goodsSize);
+			keptGoodX[0] -= Math.max(1, Math.abs(diff3 / 3f)) * Math.signum(diff3);
+//			int extraSpace = (int) Math.round(diff3 / 4f);
+//			repaint(Math.round(keptGoodX[0]), Math.round(keptGoodY[0]), goodsSize + extraSpace, goodsSize);
 		}
 		if (diff2 > 0) {
 			//keptGoodY[0] -= Math.sqrt(diff2);
-			keptGoodY[0] -= Math.max(1, diff2 / 7f);
-			int extraSpace = (int) Math.round(diff2 / 2f);
-			repaint(Math.round(keptGoodX[0]), Math.round(keptGoodY[0]) - extraSpace, goodsSize, goodsSize + extraSpace);
+			keptGoodY[0] -= Math.max(1, diff2 / 6f);
+//			int extraSpace = (int) Math.round(diff2 / 2f);
+//			repaint(Math.round(keptGoodX[0]), Math.round(keptGoodY[0]) - extraSpace, goodsSize, goodsSize + extraSpace);
 		} else {
 //			System.out.println("------------sinking2 arrived");
 //			keptGoodY[0] = keptGoodY[1];
@@ -655,11 +655,11 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		if (diff < 0 && diff2 < 0) {
 			//System.out.println("moveGoods has stopped");
 			//timerGoods.stop();
-			thrownGoodY[0] = thrownGoodY[1];
+			soldGoodY[0] = soldGoodY[1];
 			keptGoodY[0] = keptGoodY[1];
-			thrownGoodY[2] = -1;
+			soldGoodY[2] = -1;
 			keptGoodY[2] = -1;
-			//System.out.println(diff + " " + diff2 + " " + Arrays.toString(thrownGoodY) + " " + Arrays.toString(keptGoodY));
+			//System.out.println(diff + " " + diff2 + " " + Arrays.toString(soldGoodY) + " " + Arrays.toString(keptGoodY));
 			finished = true;
 		}
 		return finished;

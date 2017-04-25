@@ -302,8 +302,8 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 			} while (i < players.length && aiall);
 			int n;
 			if (aiall) {
-				n = 2;
-				//n = panel.gameOverPopup(gameOverString());
+				//n = 2;
+				n = panel.gameOverPopup(gameOverString(winner));
 
 			} else {
 				n = panel.gameOverPopup(gameOverString(winner));

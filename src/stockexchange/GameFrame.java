@@ -9,7 +9,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,45 +21,15 @@ import javax.swing.SwingConstants;
 
 public class GameFrame extends JFrame {
 
-	public GameFrame(String[] players, int[] dimensions) throws IOException {
+	public GameFrame(Player[] players, int[] dimensions, GamePanel gamePanel, GameInterface theGame) throws IOException {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(new BorderLayout());
-		setBounds(0, 0, dimensions[0], dimensions[1]);
-
-		Player[] playerArray = new Player[players.length];
-		System.out.println("players at createAndShowGameGUI: " + Arrays.toString(players));
-		for (int i = 0; i < players.length; i++) {
-			String name = players[i];
-			if (name.length() > 2) {
-				if (!(name.substring(0, 2).equals("AI"))) {
-					//continue;
-					playerArray[i] = new Player(players[i]);
-				} else if (name.substring(2, 3).equals("e")
-								|| name.contains("easy)")) {
-					players[i] = "AI " + (i + 1) + " (easy)";
-					playerArray[i] = new AIeasy(players[i]);
-				} else if (name.substring(2, 3).equals("m")
-								|| name.contains("(medium)")) {
-					players[i] = "AI " + (i + 1) + " (medium)";
-					playerArray[i] = new AImedium(players[i]);
-				} else if (name.substring(2, 3).equals("h")
-								|| name.contains("(hard)")) {
-					players[i] = "AI " + (i + 1) + " (hard)";
-					playerArray[i] = new AIhard(players[i]);
-				}
-			} else if (name.equals("AI")
-							|| name.contains("(not set")) {
-				players[i] = "AI " + (i + 1) + " (not set easy)";
-				playerArray[i] = new AIeasy(players[i]);
-			}
-		}
+		//setLayout(new BorderLayout());
+		//setBounds(0, 0, dimensions[0], dimensions[1]);
 
 		//panels
-		JPanel top = new JPanel(new GridLayout(1, players.length * 2 + 2));
-		final GamePanel gamePanel = new GamePanel(dimensions);
-		final GamePanelInterface interfacePanel = gamePanel;
-		final GameInterface theGame = new GameClass(0, playerArray, interfacePanel);
-		gamePanel.setInterface(theGame);
+		JPanel top = new JPanel(new GridLayout(1, players.length * 2 - 1));
+		JPanel bottom = new JPanel(new GridLayout(1, 5));
+		
 
 		// Hints toggle
 		final JToggleButton tglHints = new JToggleButton("hints off");
@@ -152,8 +121,8 @@ public class GameFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JButton temp = (JButton) e.getSource();
-				String[] tempStrings = players;
-				StockExchange.createAndShowStartupGUI(tempStrings.length, dimensions, (String[]) tempStrings);
+				//String[] tempStrings = players;
+				StockExchange.createAndShowStartupGUI(players);
 				gamePanel.setVisible(false);
 				theGame.setGameOver(true);
 				setVisible(false);
@@ -163,22 +132,24 @@ public class GameFrame extends JFrame {
 		);
 		// Add Player names to the top
 		for (int i = 0; i < players.length; i++) {
-			top.add(new JLabel(players[i], SwingConstants.CENTER), i * 2);
+			top.add(new JLabel(players[i].getName(), SwingConstants.CENTER), i * 2);
 			if (i < players.length - 1) {
 				top.add(new JLabel("vs", SwingConstants.CENTER), i * 2 + 1);
 			}
 		}
 		// Add components to panel
-		top.add(tglHints);
-		top.add(btRules);
-		top.add(btRestart);
+		bottom.add(tglHints, 0);
+		bottom.add(new JLabel(), 1);
+		bottom.add(btRules, 2);
+		bottom.add(new JLabel(), 3);
+		bottom.add(btRestart, 4);
 
 		gamePanel.setFocusable(true);
 		add(top, BorderLayout.NORTH);
 		add(gamePanel, BorderLayout.CENTER);
+		add(bottom, BorderLayout.SOUTH);
 		//pack();
 		gamePanel.requestFocusInWindow();
-		setVisible(true);
 		setBounds((dimensions[2] - dimensions[0]) / 2, 0, dimensions[0], dimensions[1]);
 	}
 }
