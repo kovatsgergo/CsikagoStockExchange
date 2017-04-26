@@ -16,12 +16,12 @@ public abstract class AI extends Player {
 		super(name);
 	}
 
-	abstract int[] makeMove(int position, ArrayList<String> tops, int[] colsSizes);
+	abstract int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes);
 
 	//Used by Medium and Hard
-	public int countContain(ArrayList<String> list, String element) {
+	public int countContain(ArrayList<Commodity> list, Commodity element) {
 		int i = 0;
-		for (String elem : list) {
+		for (Commodity elem : list) {
 			if (elem.equals(element)) {
 				i++;
 			}
@@ -30,7 +30,7 @@ public abstract class AI extends Player {
 	}
 
 	// Used by all
-	protected int[][] getGains(int position, ArrayList<String> tops) {
+	protected int[][] getGains(int position, ArrayList<Commodity> tops) {
 		int[][] gains = new int[3][2];
 		for (int i = 0; i < 3; i++) {
 			int[] neighbors = getNeighbors(position + (i + 1), tops.size());
@@ -42,14 +42,14 @@ public abstract class AI extends Player {
 	}
 
 	// Used by Medium and Hard
-	protected int[][] getLosses(int position, ArrayList<String> tops, ArrayList<String> goods) {
+	protected int[][] getLosses(int position, ArrayList<Commodity> tops, ArrayList<Commodity> goods) {
 		int[][] losses = new int[3][2];
 		for (int i = 0; i < 3; i++) {
 			int[] neighbors = getNeighbors(position + (i + 1), tops.size());
-			String[] neighborsString = {tops.get(neighbors[0]), tops.get(neighbors[1])};
-			losses[i][0] = countContain(goods, neighborsString[1]) * -1;
-			losses[i][1] = countContain(goods, neighborsString[0]) * -1;
-			if (neighborsString[0].equals(neighborsString[1])) {
+			//String[] neighborsString = {tops.get(neighbors[0]), tops.get(neighbors[1])};
+			losses[i][0] = countContain(goods, tops.get(neighbors[1])) * -1;
+			losses[i][1] = countContain(goods, tops.get(neighbors[0])) * -1;
+			if (tops.get(neighbors[0]).equals(tops.get(neighbors[1]))) {
 				losses[i][0] -= 1;
 				losses[i][1] -= 1;
 			}
@@ -76,10 +76,8 @@ public abstract class AI extends Player {
 	}
 
 	// Used by all
-	private int getPriceAtPosition(int position, ArrayList<String> tops) {
-		String type = tops.get(position);
-		int priceIndex = GameClass.GOOD_TYPES.indexOf(type);
-		return prices[priceIndex];
+	private int getPriceAtPosition(int position, ArrayList<Commodity> tops) {
+		return tops.get(position).getPrice();
 	}
 
 	// Used by all
@@ -122,11 +120,11 @@ public abstract class AI extends Player {
 		String anything = sc.nextLine();
 	}
 
-	protected int[][] getForecasts(int position, ArrayList<String> tops, int[] colsSizes) {
+	protected int[][] getForecasts(int position, ArrayList<Commodity> tops, int[] colsSizes) {
 		int[][] forecasts = new int[3][2];
 		for (int i = 0; i < 3; i++) {
 			int n = (i + position + 1) % tops.size();
-			ArrayList<String> nextTops = new ArrayList<>();
+			ArrayList<Commodity> nextTops = new ArrayList<>();
 			int j = 0;
 			while (j < tops.size()) {
 				//if the coloumn is not emptied after choice
@@ -139,12 +137,44 @@ public abstract class AI extends Player {
 			if (nextTops.size() < 3)
 				forecasts[i][0] = forecasts[i][1] = 0;
 			else {
-				forecasts[i][0] = -((AIhard) this).nextStepForecast(nextTops, n, -1, prices);
-				forecasts[i][1] = -((AIhard) this).nextStepForecast(nextTops, n, +1, prices);
+				forecasts[i][0] = -((AIhard) this).nextStepForecast(nextTops, n, -1);
+				forecasts[i][1] = -((AIhard) this).nextStepForecast(nextTops, n, +1);
 			}
 		}
 		//System.out.println("forecasts: " + Arrays.deepToString(forecasts));
 		return forecasts;
+	}
+	
+		protected int nextStepForecast(ArrayList<Commodity> tops, int position, int lessen) {
+		//evilpoint = the loss of the next player
+		//if the actual would throw a good type which the next has
+		int evilpoint = 0;
+		int thrownpos = (position + lessen);
+		if (thrownpos == -1) {
+			thrownpos = tops.size() - 1;
+		} else {
+			thrownpos = thrownpos % tops.size();
+		}
+		Commodity lastThrown = tops.get(thrownpos);
+		evilpoint = countContain(observedPlayer.getGoods(), lastThrown);
+		//calculate the hypothetic price list after the hypothetic choice
+		//--hypotPrices[GameClass.COMMODITY_TYPES.indexOf(lastThrown)];
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		int max = getMakeMoveMax(tops, position);
+		//System.out.println("evilpoint " + evilpoint + "max " + max);
+		return max - evilpoint;
+	}
+
+	protected int getMakeMoveMax(ArrayList<Commodity> tops, int position) {
+		//System.out.println("getMakeMoveMax " + position);
+		int[][] gains = getGains(position, tops);
+//		System.out.println("gains " + Arrays.deepToString(gains));
+		int[][] losses = getLosses(position, tops, commodities);
+//		System.out.println("losses " + Arrays.deepToString(losses));
+		int maximum = getMaxIndex(matrixAddition(gains, losses), true);
+//		System.out.println("maximum " + maximum);
+		//waitForKey();
+		return maximum;
 	}
 
 }

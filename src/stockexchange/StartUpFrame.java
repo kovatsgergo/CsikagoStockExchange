@@ -132,7 +132,7 @@ public class StartUpFrame extends JFrame implements ActionListener {
 		}
 	}
 
-private void startGame() {
+	private void startGame() {
 		String[][] names = new String[cbNumPlayers.getSelectedIndex() + 1][2];
 		for (int i = 0; i < names.length; i++) {
 			names[i] = rowPs[i].getNameAndType();
@@ -143,76 +143,68 @@ private void startGame() {
 			this.dispose();
 		} catch (IOException ex) {
 			System.out.println("ERROR ALARM ACHTUNG ATTENTION!");
-		
 
-
-
-}
+		}
 	}
 
 	public class RowPanel extends JPanel implements ActionListener {
 
-	JTextField tf;
-	JCheckBox chb;
-	JComboBox cb;
-	int rowNumber;
+		JTextField tf;
+		JCheckBox chb;
+		JComboBox cb;
+		int rowNumber;
 
-	public RowPanel(int i, int w, String... name) {
-		//i = rowNumber;
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		chb = new JCheckBox();
-		if (name.length == 0)
-			tf = new JTextField(defaultNames[i], 10);
-		else
-			tf = new JTextField(name[0]);
-		cb = new JComboBox(new String[]{"Easy", "Medium", "Hard"});
-		tf.setFont(textFont);
-		cb.setFont(textFont);
-		chb.addActionListener(this);
-		cb.addActionListener(this);
-		tf.addActionListener(this);
-		add(chb);
-		add(tf);
-		cb.setVisible(false);
-		add(cb);
-	}
+		public RowPanel(int i, int w, String... name) {
+			//i = rowNumber;
+			setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+			chb = new JCheckBox();
+			if (name.length == 0)
+				tf = new JTextField(defaultNames[i], 10);
+			else
+				tf = new JTextField(name[0]);
+			cb = new JComboBox(new String[]{"Easy", "Medium", "Hard"});
+			tf.setFont(textFont);
+			cb.setFont(textFont);
+			chb.addActionListener(this);
+			cb.addActionListener(this);
+			tf.addActionListener(this);
+			add(chb);
+			add(tf);
+			cb.setVisible(false);
+			add(cb);
+		}
 
-	protected void setName(int i, String name) {
-		names[i] = name;
-	}
+		protected void setName(int i, String name) {
+			names[i] = name;
+		}
 
-	protected void setAI(int type) {
-		chb.setSelected(true);
-		tf.setVisible(false);
-		cb.setVisible(true);
-		cb.setSelectedIndex(type);
-	}
+		protected void setAI(int type) {
+			chb.setSelected(true);
+			tf.setVisible(false);
+			cb.setVisible(true);
+			cb.setSelectedIndex(type);
+		}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		//System.out.println(e.getSource());
-		if (e.getSource() instanceof JCheckBox) {
-			tf.setVisible(!chb.getModel().isSelected());
-			cb.setVisible(chb.getModel().isSelected());
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			//System.out.println(e.getSource());
+			if (e.getSource() instanceof JCheckBox) {
+				tf.setVisible(!chb.getModel().isSelected());
+				cb.setVisible(chb.getModel().isSelected());
+			}
+		}
+
+		protected String[] getNameAndType() {
+			if (tf.isVisible())
+				return new String[]{tf.getText(), "human"};
+			else
+				return new String[]{(String) cb.getSelectedItem(), "ai"};
+		}
+
+		protected void setActive(boolean active) {
+			tf.setEditable(active);
+			cb.setEnabled(active);
+			chb.setEnabled(active);
 		}
 	}
-
-	protected String[] getNameAndType() {
-		if (tf.isVisible())
-			return new String[]{tf.getText(), "human"};
-		else
-			return new String[]{(String) cb.getSelectedItem(), "ai"};
-	}
-
-	protected void setActive(boolean active) {
-		tf.setEditable(active);
-		cb.setEnabled(active);
-		chb.setEnabled(active);
-	}
-}
-//
-//	public static void main(String[] args) {
-//		StartUpFrame stf = new StartUpFrame();
-//		stf.setVisible(true);
-//	}
 }

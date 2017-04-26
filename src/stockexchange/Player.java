@@ -1,27 +1,26 @@
 package stockexchange;
 
 /* Gergo Kovats */
-
 import java.util.ArrayList;
 
 public class Player {
 
 	private int points;
 	private String name;
-	protected ArrayList<String> goods = new ArrayList<>();
-	protected int[] prices;
+	protected ArrayList<Commodity> commodities = new ArrayList<>();
+//	protected int[] prices;
 
 //	public Player() {
 //		points = 0;
 //		name = "Anonymus";
 //	}
 	public Player(String name) {
-		points = 0;
+		setPoints(0);
 		this.name = name;
 	}
 
-	public void add(String good) {
-		goods.add(good);
+	public void add(Commodity good) {
+		commodities.add(good);
 	}
 
 	public String getName() {
@@ -35,22 +34,25 @@ public class Player {
 		return points;
 	}
 
-	private void setPoints(int points) {
-		this.points = points;
-	}
-
-	protected void setPrices(int[] prices) {
-		this.prices = prices;
+	protected void recalcPoints() {
 		int sum = 0;
-		for (String good : goods) {
-			sum += prices[GameClass.GOOD_TYPES.indexOf(good)];
+		for (Commodity commodity : commodities) {
+			sum += commodity.getPrice();
 		}
 		setPoints(sum);
 	}
 
+	private void setPoints(int points) {
+		this.points = points;
+	}
+
+//	protected void setPrices(int[] prices) {
+//		this.prices = prices;
+//	}
+
 	@Override
 	public String toString() {
-		return "Player{" + "points=" + points + ", name=" + name + ", goods=" + goods + '}';
+		return "Player{" + "points=" + points + ", name=" + name + ", goods=" + commodities + '}';
 	}
 
 }

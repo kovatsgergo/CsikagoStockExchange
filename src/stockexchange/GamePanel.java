@@ -44,7 +44,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	int rectsStepH;// = Math.round(w * 0.048f);
 	int rectsSize;// = Math.round(w * 0.03f);
 
-	ArrayList<BufferedImage> goodImgs = new ArrayList();
+	ArrayList<BufferedImage> commodityImgs = new ArrayList();
 	BufferedImage stockImg;
 	BufferedImage figureImg;
 	ArrayList<Rectangle> bounds = new ArrayList();
@@ -71,7 +71,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	String[] playerNames;
 	int[] wins;
 	String[] hintText;
-	ArrayList<String> topGoods;
+	ArrayList<Commodity> topGoods;
 	int actualPlayer;
 
 	Dimension dimensions;
@@ -83,8 +83,8 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	int[] fallenCols = {-1, -1};
 	int sinking = -1;
 	int sinking2 = -1;
-	int sinkImg = -1;
-	int sinkImg2 = -1;
+	BufferedImage sinkImg;// = -1;
+	BufferedImage sinkImg2;// = -1;
 	int soldGoodX;
 	//int sinkX1;
 	float[] keptGoodX = new float[2];//the kept item
@@ -155,17 +155,17 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 		System.out.println(this.getClass().getResource(""));
 		URL imageURL = this.getClass().getResource("/images/Wheat.png");
-		goodImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(ImageIO.read(imageURL));
 		imageURL = this.getClass().getResource("/images/Sugar.png");
-		goodImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(ImageIO.read(imageURL));
 		imageURL = this.getClass().getResource("/images/Coffee.png");
-		goodImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(ImageIO.read(imageURL));
 		imageURL = this.getClass().getResource("/images/Rice.png");
-		goodImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(ImageIO.read(imageURL));
 		imageURL = this.getClass().getResource("/images/Cocoa.png");
-		goodImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(ImageIO.read(imageURL));
 		imageURL = this.getClass().getResource("/images/Corn.png");
-		goodImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(ImageIO.read(imageURL));
 		imageURL = this.getClass().getResource("/images/Stock.jpg");
 		stockImg = ImageIO.read(imageURL);
 		URL imageURL2 = this.getClass().getResource("/images/Figure.png");
@@ -257,6 +257,18 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		return col;
 	}
 
+	private BufferedImage getImage(Commodity comm) {
+		int imageNr = -1;
+		for (int i = 0; i < GameClass.COMMODITY_TYPES.length; i++) {
+			if (comm.equals(GameClass.COMMODITY_TYPES[i]))
+				imageNr = i;
+		}
+		if (imageNr > -1)
+			return commodityImgs.get(imageNr);
+		else
+			return null;
+	}
+
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(950, 550);
@@ -274,7 +286,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 	// Inherited from GamePanelInterface
 	@Override
-	public void start(ArrayList<String> topGoods, String[] playerNames, int[] sizes, int[] wins) {
+	public void start(ArrayList<Commodity> topGoods, String[] playerNames, int[] sizes, int[] wins) {
 		this.topGoods = topGoods;
 		this.wins = wins;
 		this.playerNames = playerNames;
@@ -310,14 +322,18 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 	// Inherited from GamePanelInterface
 	@Override
-	public void makeChoice(int chosenColoumn, int[] emptiedColoumns, int[] prices, ArrayList<String> topGoods, int[] sizes) {
+	public void makeChoice(int chosenColoumn, int[] emptiedColoumns, int[] prices, ArrayList<Commodity> topGoods, int[] sizes) {
 		setNrGameCols(sizes.length);
 		int out = (position + (position - chosenColoumn) + sizes.length) % sizes.length;
 		sinking = chosenColoumn;
 		//System.out.println("makeChoice out " + out + " chosen " + chosenColoumn);
 		sinking2 = out;
-		sinkStr = this.topGoods.get(sinking);
-		sinkStr2 = this.topGoods.get(sinking2);
+//		sinkStr = this.topGoods.get(sinking).toString();
+//		sinkStr2 = this.topGoods.get(sinking2).toString();
+//		sinkImg = GameClass.COMMODITY_TYPES.indexOf(sinkStr);
+//		sinkImg2 = GameClass.COMMODITY_TYPES.indexOf(sinkStr2);
+		sinkImg = getImage(this.topGoods.get(sinking));
+
 		soldGoodY[2] = -1;
 		keptGoodY[2] = -1;
 		keptGoodX[1] = ((actualPlayer * 2 + 0.5f) * scoreTablePosition);
@@ -390,7 +406,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 				angleCols[i + 9] = i * (Math.PI * 2 / nrGameCols);
 				x = (int) (center[0] + coeff * Math.cos(angleCols[i]));
 				y = (int) (center[1] + coeff * Math.sin(angleCols[i]));
-				String topGood = topGoods.get(i);
+				//String topGood = topGoods.get(i).toString();
 				int height = colSizes[i];
 				if (sinking == i && soldGoodY[2] == -1) {
 					//System.out.println("sinking1 " + i);
@@ -405,8 +421,9 @@ class GamePanel extends JPanel implements GamePanelInterface {
 				if (hints) {
 					g.drawString(height + "", x, y + goodsSize);
 				}
-				int imgNr = GameClass.GOOD_TYPES.indexOf(topGood);
-
+				//int imgNr = GameClass.COMMODITY_TYPES.indexOf(topGood);
+				//int imgNr = GameClass.COMMODITY_TYPES.indexOf(topGoods.get(i));
+				/////////////////////////////////////////////////////////////////////
 				// Set the coloumns' top good's coloring based on playability
 				RescaleOp op = new RescaleOp(scales, offsets, null);
 				if (choiceStage) {
@@ -430,17 +447,17 @@ class GamePanel extends JPanel implements GamePanelInterface {
 					g.setColor(Color.DARK_GRAY);
 				}
 				//Draw the coloums's top good
-				g.drawImage(op.filter(goodImgs.get(imgNr), null), x, y, x + goodsSize, y + goodsSize, 0, 0, 370, 370, null);
+				g.drawImage(op.filter(getImage(topGoods.get(i)), null), x, y, x + goodsSize, y + goodsSize, 0, 0, 370, 370, null);
 				bounds.add(new Rectangle(x, y, goodsSize, goodsSize));
 
 			}
 			//Draw the sinking goods
-			if (sinkImg > -1 & soldGoodY[0] != soldGoodY[1]) {//aeigo834wbfklsdbovisebuioghwerl
-				g.drawImage(goodImgs.get(sinkImg), soldGoodX, Math.round(soldGoodY[0]), soldGoodX + goodsSize,
+			if (sinkImg != null & soldGoodY[0] != soldGoodY[1]) {//aeigo834wbfklsdbovisebuioghwerl
+				g.drawImage(sinkImg, soldGoodX, Math.round(soldGoodY[0]), soldGoodX + goodsSize,
 								Math.round(soldGoodY[0]) + goodsSize, 0, 0, 370, 370, null);
 			}
-			if (sinkImg2 > -1 & keptGoodY[0] != keptGoodY[1]) {
-				g.drawImage(goodImgs.get(sinkImg2), Math.round(keptGoodX[0]), Math.round(keptGoodY[0]),
+			if (sinkImg2 != null & keptGoodY[0] != keptGoodY[1]) {
+				g.drawImage(sinkImg2, Math.round(keptGoodX[0]), Math.round(keptGoodY[0]),
 								Math.round(keptGoodX[0]) + goodsSize, Math.round(keptGoodY[0]) + goodsSize, 0, 0, 370, 370, null);
 			}
 
@@ -607,8 +624,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	private boolean moveGoods() {
 		boolean finished = false;
 		//System.out.println("moveGoods event " + sinking + " sinking2 " + sinking2);
-		sinkImg = GameClass.GOOD_TYPES.indexOf(sinkStr);
-		sinkImg2 = GameClass.GOOD_TYPES.indexOf(sinkStr2);
+
 		if (soldGoodY[2] > 0) {
 			soldGoodY[0] = soldGoodY[2];
 			soldGoodY[2] = 0;

@@ -11,7 +11,7 @@ public class AIeasy extends AI {
 	}
 	
 	@Override
-	public int[] makeMove(int position, ArrayList<String> tops, int[] colsSizes) {
+	public int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes) {
 		int[][] gains = getGains(position, tops);
 //		System.out.println("gains " + Arrays.deepToString(gains));
 		int[] choice = getMaxIndex(gains);

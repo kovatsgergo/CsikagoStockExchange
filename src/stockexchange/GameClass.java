@@ -7,27 +7,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class GameClass implements GameInterface {//TODO: enum vagy map
+public class GameClass implements GameInterface {
 
-	static final ArrayList<String> GOOD_TYPES = new ArrayList(Arrays.asList(new String[]{"Wheat", "Sugar", "Coffee", "Rice", "Cocoa", "Corn"}));
-	static final int[] PRICES_AT_START = {7, 6, 6, 6, 6, 6};
+	//static final ArrayList<String> COMMODITY_TYPES = new ArrayList(Arrays.asList(new String[]{"Wheat", "Sugar", "Coffee", "Rice", "Cocoa", "Corn"}));
+	//static final int[] PRICES_AT_START = {7, 6, 6, 6, 6, 6};
+	static final Commodity[] COMMODITY_TYPES = new Commodity[]{new Wheat(), new Sugar(), new Coffee(), new Rice(), new Cocoa(), new Corn()};
 	static final int START_NR_COLOUMS = 9;
-	static final int START_HEIGHT_COLOUMNS = 4; //(START_NR_COLOUMS * START_HEIGHT_COLOUMNS)%GOOD_TYPES.size()=0
+	static final int START_HEIGHT_COLOUMNS = 4; //(START_NR_COLOUMS * START_HEIGHT_COLOUMNS)%COMMODITY_TYPES.size()=0
 
 	final int AI_SPEED = 500;
 	private int[] AIchoice = new int[2];
 
 	private final Player[] players;
 	private ArrayList<Column> columns = new ArrayList();
-	private ArrayList<String> startGoods = new ArrayList();
-	//private ArrayList<Integer> winner;
+	private ArrayList<Commodity> startCommodities = new ArrayList();
 
 	private int[] wins;//number of win points of all players
 	private boolean gameOver = false;//is it game over
 	private boolean choiceStage = false;// is it the choice stage
 	private int lastStarter = -1;//the player('s index, who started the last round)
 	private int actualPlayer;//the player whose turn is is
-	private int[] prices = new int[6];// = {7, 6, 6, 6, 6, 6}; //current prices of goods
+	//private int[] prices = new int[6];// = {7, 6, 6, 6, 6, 6}; //current prices of commodities
 	private int position = 0;//the figure's current position
 
 	private GamePanelInterface panel; // To communicate with GUI
@@ -44,14 +44,14 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	}
 
 	/**
-	 * Deal all the goods to the columns
+	 * Deal all the commodities to the columns
 	 */
 	private void dealGoods() {
 		//System.out.println(startGoods.toString());
 		for (int i = 0; i < START_NR_COLOUMS; i++) {
 			for (int j = 0; j < START_HEIGHT_COLOUMNS; j++) {
 				//columns.get(i).add(startGoods.get(0));
-				columns.get(i).add(startGoods.remove(0));
+				columns.get(i).add(startCommodities.remove(0));
 			}
 		}
 		//System.out.println(startGoods.toString());
@@ -61,9 +61,9 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	 * Add the startGoods to the startGoods variable in type order
 	 */
 	private void makeGoods() {
-		for (int i = 0; i < GOOD_TYPES.size(); i++) {
-			for (int j = 0; j < (START_HEIGHT_COLOUMNS * START_NR_COLOUMS) / GOOD_TYPES.size(); j++) {
-				startGoods.add(GOOD_TYPES.get(i));
+		for (int i = 0; i < COMMODITY_TYPES.length; i++) {
+			for (int j = 0; j < (START_HEIGHT_COLOUMNS * START_NR_COLOUMS) / COMMODITY_TYPES.length; j++) {
+				startCommodities.add(COMMODITY_TYPES[i]);
 			}
 		}
 	}
@@ -127,7 +127,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	}
 
 	/**
-	 * Handle the consequences of a choice phase: removes goods, empty columns
+	 * Handle the consequences of a choice phase: removes commodities, empty columns
 	 *
 	 * @param kept
 	 * @param sold
@@ -140,7 +140,9 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 		int[] ret = {-1, -1};
 		Column actualKept = columns.get(kept);
 		Column actualSold = columns.get(sold);
-		int outIdx = GOOD_TYPES.indexOf(actualSold.getTop());
+//		int outIdx = COMMODITY_TYPES.indexOf(actualSold.getTop());
+//		prices[outIdx] -= 1;
+		actualSold.getTop().lowerPrice();
 		players[actualPlayer].add(actualKept.getTop());
 		//System.out.println("actualK.getTop() "+actualK.getTop()+ " \t actualO.getTop()"
 		actualKept.remove();
@@ -164,7 +166,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 				position--;
 			}
 		}
-		prices[outIdx] -= 1;
+
 		countPoints();
 		//System.out.println(Arrays.toString(prices));
 		if (columns.size() < 3) {
@@ -182,7 +184,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	 */
 	private void countPoints() {
 		for (Player player : players) {
-			player.setPrices(prices);
+			player.recalcPoints();
 		}
 	}
 
@@ -194,8 +196,8 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	 *
 	 * @return the top startGoods of each column
 	 */
-	private ArrayList<String> getTops() {
-		ArrayList<String> topGoods = new ArrayList<>();
+	private ArrayList<Commodity> getTops() {
+		ArrayList<Commodity> topGoods = new ArrayList<>();
 		for (Column column : columns) {
 			topGoods.add(column.getTop());
 		}
@@ -224,6 +226,14 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 		if (players[actualPlayer] instanceof AI && !gameOver) {
 			timerAI.start();
 		}
+	}
+	
+	private int[] getPriceArray(){
+		int[] prices = new int[COMMODITY_TYPES.length];
+		for (int i = 0; i < prices.length; i++) {
+			prices[i] = COMMODITY_TYPES[i].getPrice();
+		}
+		return prices;
 	}
 
 	/**
@@ -281,7 +291,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 					//String takenStr = columns.get().getTop();
 					emptiedColoumns = handleChoice(getNeighbors()[out], getNeighbors()[1 - out]);
 					panel.setNrGameCols(columns.size());
-					panel.makeChoice(getNeighbors()[1 - out], emptiedColoumns, prices, getTops(), getColsSizes());
+					panel.makeChoice(getNeighbors()[1 - out], emptiedColoumns, getPriceArray(), getTops(), getColsSizes());
 					panel.setFigure(position);
 					//panel.setPossible(getPossible());
 				}
@@ -327,11 +337,11 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 	 */
 	private void reStart() {
 		gameOver = false;
-		prices = Arrays.copyOf(PRICES_AT_START, prices.length);
+		//prices = Arrays.copyOf(PRICES_AT_START, prices.length);
 		for (Player player : players) {
 			//System.out.println(player);
-			player.goods.clear();
-			player.setPrices(prices);
+			player.commodities.clear();
+			//player.setPrices(prices);
 		}
 
 		System.out.println("last starter: " + lastStarter);
@@ -342,7 +352,7 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 		}
 		panel.setNrGameCols(START_NR_COLOUMS);
 		makeGoods();
-		Collections.shuffle(startGoods);
+		Collections.shuffle(startCommodities);
 		dealGoods();
 
 		panel.start(getTops(), getAllNames(), getColsSizes(), wins);
@@ -375,11 +385,11 @@ public class GameClass implements GameInterface {//TODO: enum vagy map
 			}
 			returnHints[i * 2] = (i + 1) + stndrdth + " player " + players[i].getName()
 							+ " has " + players[i].getPoints() + " points";
-			String temp = "";
-			for (String good : players[i].goods) {
-				temp += good + " (" + prices[GOOD_TYPES.indexOf(good)] + ") ";
+			StringBuffer temp = new StringBuffer("");
+			for (Commodity commodity : players[i].commodities) {
+				temp.append(commodity.toString(true));
 			}
-			returnHints[i * 2 + 1] = players[i].getName() + " has Drawn Yet: " + temp;
+			returnHints[i * 2 + 1] = players[i].getName() + " has Drawn Yet: " + temp.toString();
 		}
 		panel.setHint(returnHints);
 	}

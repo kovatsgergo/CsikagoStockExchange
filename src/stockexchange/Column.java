@@ -5,9 +5,9 @@ package stockexchange;
 import java.util.ArrayList;
 
 public class Column {
-    ArrayList<String> goods = new ArrayList<String>();
+    ArrayList<Commodity> goods = new ArrayList<>();
 
-    public void add(String good) {
+    public void add(Commodity good) {
         goods.add(good);
     }
 
@@ -19,7 +19,7 @@ public class Column {
         return goods.toString();
     }
     
-    public String getTop(){
+    public Commodity getTop(){
         return goods.get(0);
     }
     

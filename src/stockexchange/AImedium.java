@@ -10,10 +10,10 @@ public class AImedium extends AI {
 	}
 	
 	@Override
-	public int[] makeMove(int position, ArrayList<String> tops, int[] colsSizes) {
+	public int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes) {
 		int[][] gains = getGains(position, tops);
 //		System.out.println("gains " + Arrays.deepToString(gains));
-		int[][] losses = getLosses(position, tops, goods);
+		int[][] losses = getLosses(position, tops, commodities);
 //		System.out.println("losses " + Arrays.deepToString(losses));
 		int[] choice = getMaxIndex(matrixAddition(gains, losses));
 //		System.out.println("array choice " + Arrays.toString(choice));

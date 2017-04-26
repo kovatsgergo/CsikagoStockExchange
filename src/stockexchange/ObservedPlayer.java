@@ -5,13 +5,13 @@ import java.util.ArrayList;
 
 public class ObservedPlayer {
 
-	private ArrayList<String> goods = new ArrayList();
+	private ArrayList<Commodity> goods = new ArrayList();
 
 	public ObservedPlayer(Player player) {
-		this.goods = player.goods;
+		this.goods = player.commodities;
 	}
 
-	protected ArrayList<String> getGoods() {
+	protected ArrayList<Commodity> getGoods() {
 		return goods;
 	}
 
