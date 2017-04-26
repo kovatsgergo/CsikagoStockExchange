@@ -25,4 +25,13 @@ public class Corn extends Commodity {
 		price--;
 	}
 
+	@Override
+	protected void resetPrice() {
+		price = START_PRICE;
+	}
+
+	protected boolean equals(Commodity other) {
+		return this.toString().equals(other.toString());
+	}
+
 }

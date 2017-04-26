@@ -13,6 +13,8 @@ public abstract class Commodity {
 	
 	protected abstract void lowerPrice();
 	
+	protected abstract void resetPrice();
+	
 //	protected void lowerPrice(int type){
 //		prices[type]--;
 //	}

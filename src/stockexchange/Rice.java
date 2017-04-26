@@ -4,6 +4,7 @@ package stockexchange;
 public class Rice extends Commodity {
 
 	static int price = 6;
+	static int START_PRICE = 6;
 
 	@Override
 	public String toString() {
@@ -22,6 +23,15 @@ public class Rice extends Commodity {
 	@Override
 	protected void lowerPrice() {
 		price--;
+	}
+
+	@Override
+	protected void resetPrice() {
+		price = START_PRICE;
+	}
+
+	protected boolean equals(Commodity other) {
+		return this.toString().equals(other.toString());
 	}
 
 }
