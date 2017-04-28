@@ -382,6 +382,8 @@ class GamePanel extends JPanel implements GamePanelInterface {
 			int before = (position + 1) % nrGameCols;
 			int after = (position + nrGameCols - 1) % nrGameCols;
 			int coeff = Math.round(w * (float) Math.sqrt(nrGameCols / 9f) / 5f);
+			/////////////////////////////////////////////////////////nem jo, es nem is itt kellene
+			/////////////////////////////////////////////////////////TODO: kept&sold moving commodities
 			for (int i = 0; i < nrGameCols; i++) {
 				//Calculate values
 				x = (int) (center[0] + coeff * Math.cos(angleCols[i]));
