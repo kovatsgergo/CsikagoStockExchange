@@ -13,7 +13,7 @@ public class GameClass implements GameInterface {
 	//static final int[] PRICES_AT_START = {7, 6, 6, 6, 6, 6};
 	static final Commodity[] COMMODITY_TYPES = new Commodity[]{new Wheat(), new Sugar(), new Coffee(), new Rice(), new Cocoa(), new Corn()};
 	static final int START_NR_COLOUMS = 9;
-	static final int START_HEIGHT_COLOUMNS = 4; //(START_NR_COLOUMS * START_HEIGHT_COLOUMNS)%COMMODITY_TYPES.size()=0
+	static final int START_HEIGHT_COLOUMNS = 2; //(START_NR_COLOUMS * START_HEIGHT_COLOUMNS)%COMMODITY_TYPES.size()=0
 
 	final int AI_SPEED = 500;
 	private int[] AIchoice = new int[2];
@@ -27,7 +27,6 @@ public class GameClass implements GameInterface {
 	private boolean choiceStage = false;// is it the choice stage
 	private int lastStarter = -1;//the player('s index, who started the last round)
 	private int actualPlayer;//the player whose turn is is
-	//private int[] prices = new int[6];// = {7, 6, 6, 6, 6, 6}; //current prices of commodities
 	private int position = 0;//the figure's current position
 
 	private GamePanelInterface panel; // To communicate with GUI
@@ -62,6 +61,7 @@ public class GameClass implements GameInterface {
 	 */
 	private void makeGoods() {
 		for (int i = 0; i < COMMODITY_TYPES.length; i++) {
+			COMMODITY_TYPES[i].resetPrice();
 			for (int j = 0; j < (START_HEIGHT_COLOUMNS * START_NR_COLOUMS) / COMMODITY_TYPES.length; j++) {
 				startCommodities.add(COMMODITY_TYPES[i]);
 			}
@@ -110,11 +110,19 @@ public class GameClass implements GameInterface {
 
 	//From GameInterFace
 	@Override
-	public void pause(boolean paused) {
-		if (paused)
-			timerAI.stop();
-		else
-			timerAI.start();
+	public void pause() {
+		timerAI.stop();
+		int n = panel.pausePopup();
+		switch (n) {
+			case 2:
+				timerAI.start();
+				break;
+			case 1:
+				panel.quitGame();
+				break;
+			case 0:
+				System.exit(0);
+		}
 	}
 
 	private ObservedPlayer makeObservedNextPlayers() {
@@ -127,7 +135,8 @@ public class GameClass implements GameInterface {
 	}
 
 	/**
-	 * Handle the consequences of a choice phase: removes commodities, empty columns
+	 * Handle the consequences of a choice phase: removes commodities, empty
+	 * columns
 	 *
 	 * @param kept
 	 * @param sold
@@ -141,7 +150,7 @@ public class GameClass implements GameInterface {
 		Column actualKept = columns.get(kept);
 		Column actualSold = columns.get(sold);
 //		int outIdx = COMMODITY_TYPES.indexOf(actualSold.getTop());
-//		prices[outIdx] -= 1;
+
 		actualSold.getTop().lowerPrice();
 		players[actualPlayer].add(actualKept.getTop());
 		//System.out.println("actualK.getTop() "+actualK.getTop()+ " \t actualO.getTop()"
@@ -166,16 +175,11 @@ public class GameClass implements GameInterface {
 				position--;
 			}
 		}
-
 		countPoints();
-		//System.out.println(Arrays.toString(prices));
 		if (columns.size() < 3) {
 			gameOver = true;
 		}
 		actualPlayer = nextPlayer(actualPlayer);
-
-		//System.out.printf("keepIdx: %d  outIdx: %d \t prices[keepIdx]: %d \t keep: %d\n",
-		//keepIdx, outIdx, prices[keepIdx], keep);
 		return ret;
 	}
 
@@ -227,8 +231,8 @@ public class GameClass implements GameInterface {
 			timerAI.start();
 		}
 	}
-	
-	private int[] getPriceArray(){
+
+	private int[] getPriceArray() {
 		int[] prices = new int[COMMODITY_TYPES.length];
 		for (int i = 0; i < prices.length; i++) {
 			prices[i] = COMMODITY_TYPES[i].getPrice();
@@ -265,7 +269,7 @@ public class GameClass implements GameInterface {
 	 * @param pointNr the chosen column's index number
 	 */
 	private void runRound(int pointNr) {
-		//System.out.println("\trunRound started\tgamover: " + theGame.gameOver + "\tcolumns: " + theGame.columns.size());
+		//System.out.println("\trunRound started\tgamover: " + gameOver + "\tcolumns: " + columns.size());
 		if (!gameOver) {
 			if (!choiceStage) {
 				//System.out.println("Step Stage started pointNr " + pointNr);
@@ -277,25 +281,25 @@ public class GameClass implements GameInterface {
 				}
 			} else {
 				//System.out.println("Choice Stage started pointNr " + pointNr);
-				int out;
+				int keep;// the kept commodity's index in getNegihbors()
 				int[] emptiedColoumns;
 				if (Arrays.toString(getNeighbors()).contains(pointNr + "")) {
 					if (getNeighbors()[0] == pointNr) {
 						choiceStage = !choiceStage;
-						out = 0;
+						keep = 0;
 					} else {
 						choiceStage = !choiceStage;
-						out = 1;
+						keep = 1;
 					}
-					//String thrownStr = columns.get(getNeighbors()[out]).getTop();
-					//String takenStr = columns.get().getTop();
-					emptiedColoumns = handleChoice(getNeighbors()[out], getNeighbors()[1 - out]);
+					int kept = getNeighbors()[keep];
+					int sold = getNeighbors()[1 - keep];
+					emptiedColoumns = handleChoice(kept, sold);
+					panel.makeChoice(kept, sold, emptiedColoumns, getPriceArray(), getTops(), getColsSizes());
 					panel.setNrGameCols(columns.size());
-					panel.makeChoice(getNeighbors()[1 - out], emptiedColoumns, getPriceArray(), getTops(), getColsSizes());
 					panel.setFigure(position);
 					//panel.setPossible(getPossible());
+					timerAI.stop();
 				}
-				timerAI.stop();
 			}
 			//System.out.println("ai started in runhuman");
 			aiPoint();
@@ -303,33 +307,37 @@ public class GameClass implements GameInterface {
 
 		makeHints();
 
-		if (gameOver) {
-			ArrayList<Integer> winner = getWinner();
-			boolean aiall = true;
-			int i = 0;
-			do {
-				aiall = aiall && (players[i++] instanceof AI);
-			} while (i < players.length && aiall);
-			int n;
-			if (aiall) {
-				//n = 2;
-				n = panel.gameOverPopup(gameOverString(winner));
+		if (gameOver)
+			endGame();
+	}
 
-			} else {
-				n = panel.gameOverPopup(gameOverString(winner));
-			}
+	private void endGame() {
+		ArrayList<Integer> winner = getWinner();
+		boolean aiall = true;
+		int i = 0;
+		do {
+			aiall = aiall && (players[i++] instanceof AI);
+		} while (i < players.length && aiall);
+		int n;
+		if (aiall) {
+			n = 2;//to test AIs
+			//n = panel.gameOverPopup(gameOverString(winner));
 
-			switch (n) {
-				case 2:
-					reStart();
-					break;
-				case 1:
-					panel.quitGame();
-					break;
-				case 0:
-					System.exit(0);
-			}
+		} else {
+			n = panel.gameOverPopup(gameOverString(winner));
 		}
+
+		switch (n) {
+			case 2:
+				reStart();
+				break;
+			case 1:
+				panel.quitGame();
+				break;
+			case 0:
+				System.exit(0);
+		}
+
 	}
 
 	/**
@@ -366,9 +374,9 @@ public class GameClass implements GameInterface {
 	}
 
 	private void makeHints() {
-		String[] returnHints = new String[players.length * 2];
+		String[] returnHints = new String[players.length];
 		for (int i = 0; i < players.length; i++) {
-			String stndrdth = "";
+			String stndrdth;
 			switch (i) {
 				case 0:
 					stndrdth = "st";
@@ -382,14 +390,16 @@ public class GameClass implements GameInterface {
 				case 3:
 					stndrdth = "th";
 					break;
+				default:
+					stndrdth = "st";
 			}
-			returnHints[i * 2] = (i + 1) + stndrdth + " player " + players[i].getName()
-							+ " has " + players[i].getPoints() + " points";
+//			returnHints[i * 2] = (i + 1) + stndrdth + " player " + players[i].getName()
+//							+ " has " + players[i].getPoints() + " points";
 			StringBuffer temp = new StringBuffer("");
 			for (Commodity commodity : players[i].commodities) {
 				temp.append(commodity.toString(true));
 			}
-			returnHints[i * 2 + 1] = players[i].getName() + " has Drawn Yet: " + temp.toString();
+			returnHints[i] = players[i].getName() + " has " + players[i].getPoints() + " points." + " Kept: " + temp.toString();
 		}
 		panel.setHint(returnHints);
 	}

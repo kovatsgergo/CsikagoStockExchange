@@ -2,6 +2,7 @@
 package stockexchange;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -60,6 +61,7 @@ public class StartUpFrame extends JFrame implements ActionListener {
 		//The Center
 		JPanel theRest = new JPanel(new GridLayout(0, 1));
 		JPanel setNumberPanel = new JPanel(new GridLayout(1, 0));
+		//JPanel setNumberPanel = new JPanel();
 		JLabel lbAI = new JLabel("AI/Human");
 		JLabel lbSetName = new JLabel("Names of players");
 		JLabel lbSetNumber = new JLabel("Nr. of players", JLabel.RIGHT);
@@ -139,7 +141,7 @@ public class StartUpFrame extends JFrame implements ActionListener {
 		}
 		try {
 			System.out.println(Arrays.deepToString(names));
-			StockExchange.createAndShowGameGUI(names, new int[]{w / 7 * 5, Math.round(w * 0.45f), w});
+			StockExchange.createAndShowGameGUI(names, new int[]{w / 7 * 5, Math.round(w * 0.45f), w, h});
 			this.dispose();
 		} catch (IOException ex) {
 			System.out.println("ERROR ALARM ACHTUNG ATTENTION!");
@@ -164,6 +166,8 @@ public class StartUpFrame extends JFrame implements ActionListener {
 				tf = new JTextField(name[0]);
 			cb = new JComboBox(new String[]{"Easy", "Medium", "Hard"});
 			tf.setFont(textFont);
+			//tf.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+			//tf.putClientProperty("TextField.inactiveBackground", new ColorUIResource(new Color(255, 0, 0)));
 			cb.setFont(textFont);
 			chb.addActionListener(this);
 			cb.addActionListener(this);
@@ -205,6 +209,11 @@ public class StartUpFrame extends JFrame implements ActionListener {
 			tf.setEditable(active);
 			cb.setEnabled(active);
 			chb.setEnabled(active);
+			if (active)
+				tf.setForeground(Color.BLACK);
+			else
+				tf.setForeground(Color.LIGHT_GRAY);
+			
 		}
 	}
 }

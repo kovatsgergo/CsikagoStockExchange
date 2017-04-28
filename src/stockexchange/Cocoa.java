@@ -3,8 +3,8 @@ package stockexchange;
 
 public class Cocoa extends Commodity {
 
-	static int price = 6;
-	static int START_PRICE = 6;
+	private static int price = 6;
+	private static int START_PRICE = 6;
 
 	@Override
 	public String toString() {
@@ -21,16 +21,21 @@ public class Cocoa extends Commodity {
 	}
 
 	@Override
+	public int getStartPrice() {
+		return START_PRICE;
+	}
+
+	@Override
 	protected void lowerPrice() {
 		price--;
 	}
-	
+
 	@Override
-	protected void resetPrice(){
+	protected void resetPrice() {
 		price = START_PRICE;
 	}
-	
-	protected boolean equals(Commodity other){
+
+	protected boolean equals(Commodity other) {
 		return this.toString().equals(other.toString());
 	}
 

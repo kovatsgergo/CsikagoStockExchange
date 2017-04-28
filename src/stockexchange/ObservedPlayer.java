@@ -5,19 +5,19 @@ import java.util.ArrayList;
 
 public class ObservedPlayer {
 
-	private ArrayList<Commodity> goods = new ArrayList();
+	private ArrayList<Commodity> commodities = new ArrayList();
 
 	public ObservedPlayer(Player player) {
-		this.goods = player.commodities;
+		this.commodities = player.commodities;
 	}
 
-	protected ArrayList<Commodity> getGoods() {
-		return goods;
+	protected ArrayList<Commodity> getCommodities() {
+		return commodities;
 	}
 
 	@Override
 	public String toString() {
-		return "ObservedPlayer{" + goods.toString() + '}';
+		return "ObservedPlayer{" + commodities.toString() + '}';
 	}
 
 }

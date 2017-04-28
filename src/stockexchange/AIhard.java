@@ -16,14 +16,14 @@ public class AIhard extends AI {
 	@Override
 	public int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes) {
 		int[][] gains = getGains(position, tops);
-//		System.out.println("gains " + Arrays.deepToString(gains));
+		//System.out.println("gains " + Arrays.deepToString(gains));
 		int[][] losses = getLosses(position, tops, commodities);
 		int[][] forecasts = getForecasts(position, tops, colsSizes);
-//		System.out.println("losses " + Arrays.deepToString(losses));
+		//System.out.println("losses " + Arrays.deepToString(losses));
 		int[] choice = getMaxIndex(matrixAddition(matrixAddition(gains, losses), forecasts));
-//		System.out.println("array choice " + Arrays.toString(choice));
+		//System.out.println("array choice " + Arrays.toString(choice));
 		convertChoiceToPosition(choice, position, tops.size());
-//		System.out.println("choice " + Arrays.toString(choice));
+		//System.out.println("choice " + Arrays.toString(choice));
 		//waitForKey();
 		return choice;
 	}

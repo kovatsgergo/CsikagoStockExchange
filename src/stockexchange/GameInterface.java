@@ -6,6 +6,6 @@ public interface GameInterface {
 	
 	void setClickedColoumn(int coloumn);
 	void setGameOver(boolean gameOver);
-	void pause(boolean paused);
+	void pause();
 	
 }

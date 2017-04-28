@@ -42,13 +42,13 @@ public abstract class AI extends Player {
 	}
 
 	// Used by Medium and Hard
-	protected int[][] getLosses(int position, ArrayList<Commodity> tops, ArrayList<Commodity> goods) {
+	protected int[][] getLosses(int position, ArrayList<Commodity> tops, ArrayList<Commodity> commodities) {
 		int[][] losses = new int[3][2];
 		for (int i = 0; i < 3; i++) {
 			int[] neighbors = getNeighbors(position + (i + 1), tops.size());
 			//String[] neighborsString = {tops.get(neighbors[0]), tops.get(neighbors[1])};
-			losses[i][0] = countContain(goods, tops.get(neighbors[1])) * -1;
-			losses[i][1] = countContain(goods, tops.get(neighbors[0])) * -1;
+			losses[i][0] = countContain(commodities, tops.get(neighbors[1])) * -1;
+			losses[i][1] = countContain(commodities, tops.get(neighbors[0])) * -1;
 			if (tops.get(neighbors[0]).equals(tops.get(neighbors[1]))) {
 				losses[i][0] -= 1;
 				losses[i][1] -= 1;
@@ -96,16 +96,16 @@ public abstract class AI extends Player {
 
 	// Used by all
 	protected int getMaxIndex(int[][] array, boolean maxonly) {
-			int max = array[0][0];
-			int[] maxIndex = {0, 0};
-			for (int i = 0; i < array.length; i++)
-				for (int j = 0; j < array[0].length; j++)
-					if (max < array[i][j]) {
-						maxIndex[0] = i;
-						maxIndex[1] = j;
-						max = array[i][j];
-					}
-			return max;
+		int max = array[0][0];
+		int[] maxIndex = {0, 0};
+		for (int i = 0; i < array.length; i++)
+			for (int j = 0; j < array[0].length; j++)
+				if (max < array[i][j]) {
+					maxIndex[0] = i;
+					maxIndex[1] = j;
+					max = array[i][j];
+				}
+		return max;
 	}
 
 	// Used by all
@@ -144,10 +144,10 @@ public abstract class AI extends Player {
 		//System.out.println("forecasts: " + Arrays.deepToString(forecasts));
 		return forecasts;
 	}
-	
-		protected int nextStepForecast(ArrayList<Commodity> tops, int position, int lessen) {
-		//evilpoint = the loss of the next player
-		//if the actual would throw a good type which the next has
+
+	protected int nextStepForecast(ArrayList<Commodity> tops, int position, int lessen) {
+		//evilpoint: the loss of the next player
+		//if the actual would throw a commodity type which the next has
 		int evilpoint = 0;
 		int thrownpos = (position + lessen);
 		if (thrownpos == -1) {
@@ -156,25 +156,46 @@ public abstract class AI extends Player {
 			thrownpos = thrownpos % tops.size();
 		}
 		Commodity lastThrown = tops.get(thrownpos);
-		evilpoint = countContain(observedPlayer.getGoods(), lastThrown);
+		evilpoint = countContain(observedPlayer.getCommodities(), lastThrown);
 		//calculate the hypothetic price list after the hypothetic choice
-		//--hypotPrices[GameClass.COMMODITY_TYPES.indexOf(lastThrown)];
+//		int[] hypotPrices = new int[GameClass.COMMODITY_TYPES.length];
+//		for (int i = 0; i < GameClass.COMMODITY_TYPES.length; i++) {
+//			hypotPrices[i] = (lastThrown.equals(GameClass.COMMODITY_TYPES[i]))
+//							? lastThrown.getPrice() - 1 : GameClass.COMMODITY_TYPES[i].getPrice();
+//		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		int max = getMakeMoveMax(tops, position);
+		int max = getMakeMoveMax(tops, position, lastThrown);
 		//System.out.println("evilpoint " + evilpoint + "max " + max);
 		return max - evilpoint;
 	}
 
-	protected int getMakeMoveMax(ArrayList<Commodity> tops, int position) {
-		//System.out.println("getMakeMoveMax " + position);
+	//Used by Hard to estimate the best choice of next player
+	protected int getMakeMoveMax(ArrayList<Commodity> tops, int position, Commodity lastThrown) {
+		//System.out.println("\ngetMakeMoveMax " + position);
 		int[][] gains = getGains(position, tops);
-//		System.out.println("gains " + Arrays.deepToString(gains));
-		int[][] losses = getLosses(position, tops, commodities);
-//		System.out.println("losses " + Arrays.deepToString(losses));
+		//System.out.println("gains " + Arrays.deepToString(gains));
+		int[][] losses = getLosses(position, tops, observedPlayer.getCommodities());
+		//System.out.println("losses " + Arrays.deepToString(losses));
 		int maximum = getMaxIndex(matrixAddition(gains, losses), true);
-//		System.out.println("maximum " + maximum);
+		//System.out.println("maximum " + maximum);
 		//waitForKey();
 		return maximum;
+	}
+
+	protected int[][] getGains(int position, ArrayList<Commodity> tops, Commodity lastThrown) {
+		int[][] gains = new int[3][2];
+		for (int i = 0; i < 3; i++) {
+			int[] neighbors = getNeighbors(position + (i + 1), tops.size());
+			gains[i][0] = getPriceAtPosition(neighbors[0], tops, lastThrown);
+			gains[i][1] = getPriceAtPosition(neighbors[1], tops, lastThrown);
+		}
+		//System.out.println("gains: " + Arrays.deepToString(gains));
+		return gains;
+	}
+
+	private int getPriceAtPosition(int position, ArrayList<Commodity> tops, Commodity lastThrown) {
+		Commodity commAtPos = tops.get(position);
+		return (lastThrown.equals(commAtPos))?commAtPos.getPrice()-1:commAtPos.getPrice();
 	}
 
 }

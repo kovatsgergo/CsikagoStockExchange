@@ -3,8 +3,8 @@ package stockexchange;
 
 public class Corn extends Commodity {
 
-	static int price = 6;
-	static int START_PRICE = 6;
+	private static int price = 6;
+	private static int START_PRICE = 6;
 
 	@Override
 	public String toString() {
@@ -18,6 +18,11 @@ public class Corn extends Commodity {
 	@Override
 	public int getPrice() {
 		return price;
+	}
+
+	@Override
+	public int getStartPrice() {
+		return START_PRICE;
 	}
 
 	@Override
