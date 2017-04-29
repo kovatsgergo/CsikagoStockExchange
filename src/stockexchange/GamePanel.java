@@ -38,15 +38,18 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	int stockStartV;// = Math.round(w / 10f);
 	int stockWidth;// = Math.round(w * 0.35f);
 	//price indicators
-	int rectsStartW;// = Math.round(w * 0.04f) + w / 15;
-	int rectsStepW;// = Math.round(w * 0.038f);
-	int rectsStartH;// = Math.round(w * 0.169f);
-	int rectsStepH;// = Math.round(w * 0.048f);
+	float rectsStartW;// = Math.round(w * 0.04f) + w / 15;
+	float rectsStepW;// = Math.round(w * 0.038f);
+	float rectsStartH;// = Math.round(w * 0.169f);
+	float rectsStepH;// = Math.round(w * 0.048f);
 	int rectsSize;// = Math.round(w * 0.03f);
+	int glowSize;
 
 	private final ArrayList<BufferedImage> commodityImgs = new ArrayList();
 	private final BufferedImage stockImg;
 	private final BufferedImage figureImg;
+	private final BufferedImage glowImg;
+	private final BufferedImage redGlowImg;
 	private ArrayList<Ellipse2D> bounds = new ArrayList();
 
 	int[] possibleCols;
@@ -55,8 +58,8 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	int nrGameCols = GameClass.START_NR_COLOUMS;
 	int[] colSizes;
 
-	Font fontB = new Font("Arial Black", 0, 23);
-	Font fontHint = new Font("Arial", 0, 15);
+	Font fontB = new Font("Arial", Font.PLAIN, 23);
+	Font fontHint = new Font("Arial", Font.PLAIN, 15);
 
 	Color[] priceColors = {new Color(0, 0, 255, 170), new Color(255, 255, 255, 170), new Color(0, 0, 0, 170),
 		new Color(0, 255, 0, 170), new Color(205, 130, 80, 170), new Color(255, 255, 0, 170)};
@@ -64,32 +67,34 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	final float[] offsets = {20, 20, 20, 0};
 	final float[] scalesT = {1.1f, 1.1f, 1.1f, 1.f};
 	final float[] offsetsT = {0, 0, 0, 0};
-	final float[] scalesR = {.5f, .8f, .8f, 1.f};
-	final float[] offsetsR = {150, 10, 10, 0};
+//	final float[] scalesR = {.5f, .8f, .8f, 1.f};
+//	final float[] offsetsR = {150, 10, 10, 0};
+	final float[] scalesR = {1.3f, 1.f, 1.f, 1.f};
+	final float[] offsetsR = {20, 0, 0, 0};
 	final float[] scalesA = {.9f, .9f, .9f, 1.f};
 	final float[] offsetsA = {0, 0, 0, 0};
 	String[] playerNames;
 	int[] wins;
 	String[] hintText;
-	ArrayList<Commodity> topGoods;
+	ArrayList<Commodity> topCommodities;
 	int actualPlayer;
 
 	Dimension dimensions;
 
 	int position;
 	double[] angleFig = new double[2];
-	double[] angleCols = new double[18];
+	double[] angleCols = new double[GameClass.START_NR_COLOUMS * 2];
 
 	int[] fallenCols = {-1, -1};
-	int sinking = -1;
-	int sinking2 = -1;
-	BufferedImage sinkImg;// = -1;
-	BufferedImage sinkImg2;// = -1;
-	int soldGoodX;
+	int sinkingSold = -1;
+	int sinkingKept = -1;
+	BufferedImage sinkSoldImg;// = -1;
+	BufferedImage sinkKeptImg;// = -1;
+	int soldCommodityX;
 	//int sinkX1;
-	float[] keptGoodX = new float[2];//the kept item
-	float[] keptGoodY = new float[3];
-	float[] soldGoodY = new float[3];//the thrown good: from, to, hasarrived(-1)
+	float[] keptCommodityX = new float[2];//the kept item
+	float[] keptCommodityY = new float[2];
+	float[] soldCommodityY = new float[2];//the thrown good: from, to, hasarrived(-1)
 
 	float[] pricesDiff = new float[GameClass.COMMODITY_TYPES.length * 2];//{7, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6};
 
@@ -105,6 +110,10 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 	final int ANIM_INIT_DELAY = 0;
 	final int ANIM_TICK = 10;
+	boolean figureStopped = false;
+	boolean colsStopped = false;
+	boolean goodsStopped = false;
+	boolean pricesStopped = false;
 
 	javax.swing.Timer timerFig = new javax.swing.Timer(ANIM_TICK, new ActionListener() {
 		@Override
@@ -116,13 +125,26 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	});
 
 	javax.swing.Timer timerAll = new javax.swing.Timer(ANIM_TICK, new ActionListener() {
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (moveCols() & moveGoods() & movePrices() & moveFigure()) {
+//			System.out.println(figureStopped + " " + colsStopped + " " + goodsStopped
+//							+ " " + pricesStopped);
+			if (!figureStopped)
+				figureStopped = moveFigure();
+			if (!colsStopped)
+				colsStopped = moveCols();
+			if (!goodsStopped)
+				goodsStopped = moveGoods();
+			if (!pricesStopped)
+				pricesStopped = movePrices();
+			if (figureStopped && colsStopped && goodsStopped && pricesStopped) {
 				timerAll.stop();
+				repaint();
 				System.out.println("All stopped");
 			} else {
 				//System.out.println("All moved");
+				//choiceStage = false;
 				repaint();
 			}
 		}
@@ -149,6 +171,10 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		stockImg = ImageIO.read(imageURL);
 		URL imageURL2 = this.getClass().getResource("/images/Figure.png");
 		figureImg = ImageIO.read(imageURL2);
+		imageURL2 = this.getClass().getResource("/images/glow2.png");
+		glowImg = ImageIO.read(imageURL2);
+		imageURL2 = this.getClass().getResource("/images/glowR2.png");
+		redGlowImg = ImageIO.read(imageURL2);
 
 		addMouseListener(new MouseAdapter() {
 			@Override
@@ -180,6 +206,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		});
 		timerFig.setInitialDelay(ANIM_INIT_DELAY);
 		timerAll.setInitialDelay(ANIM_INIT_DELAY);
+		setBackground(new Color(5, 15, 40));
 	}
 
 //	public GamePanel returnThis() {
@@ -198,7 +225,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	public int pausePopup() {
 		//System.out.println("popup called");
 		Object[] options = {"Quit", "Change players", "Continue"};
-		return JOptionPane.showOptionDialog(SwingUtilities.getWindowAncestor(this), "", "Game Paused",
+		return JOptionPane.showOptionDialog(GamePanel.this, "", "Game Paused",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 	}
 
@@ -211,11 +238,12 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		stockStartV = Math.round(w / 10f);
 		stockWidth = Math.round(w * 0.35f);
 		//price indicators
-		rectsStartW = Math.round(w * 0.04f) + w / 15;
-		rectsStepW = Math.round(w * 0.038f);
-		rectsStartH = Math.round(w * 0.169f);
-		rectsStepH = Math.round(w * 0.048f);
-		rectsSize = Math.round(w * 0.03f);
+		rectsStartW = w * 0.0363f + w / 15;
+		rectsStepW = w * 0.03777f;
+		rectsStartH = w * 0.1633f;
+		rectsStepH = w * 0.0485f;
+		rectsSize = Math.round(w * 0.032f);
+		glowSize = Math.round(w*0.023f);
 
 		scoreTablePosition = w / (playerNames.length * 2 - 1);
 		//font
@@ -272,7 +300,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	// Inherited from GamePanelInterface
 	@Override
 	public void start(ArrayList<Commodity> topGoods, String[] playerNames, int[] sizes, int[] wins) {
-		this.topGoods = topGoods;
+		this.topCommodities = topGoods;
 		this.wins = wins;
 		this.playerNames = playerNames;
 		colSizes = sizes;
@@ -288,6 +316,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 			angleCols[i + GameClass.START_NR_COLOUMS] = i * (Math.PI * 2 / nrGameCols);
 		}
 		possibleCols = new int[]{1, 2, 3};
+		nrCols = nrGameCols;
 		repaint();
 	}
 
@@ -295,36 +324,30 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	@Override
 	public void setPossible(int[] possibleColoumns) {
 		possibleCols = possibleColoumns;
+		//choiceStage = false;
 		//System.out.println("possible" + Arrays.toString(possibleCols));
-		choiceStage = true;
 	}
 
 	// Inherited from GamePanelInterface
 	@Override
 	public void setFigure(int destination) {
-		angleFig[1] = destination * (Math.PI * 2 / nrGameCols);
+		beforeMoveFigure(destination);
+		timerFig.start();
 		position = destination;
-		startMoveFigure();
+		choiceStage = !choiceStage;
 	}
 
 	// Inherited from GamePanelInterface
 	@Override
 	public void makeChoice(int kept, int sold, int[] emptiedColoumns, int[] prices, ArrayList<Commodity> topGoods, int[] sizes) {
-		afterMoveGoods();
 		repaint();
-		sinking = sold;//get the kept commodity
-		sinking2 = kept;//get the sold commodity
-		//System.out.println("kept: " + kept + "\tsold: " + sold);
-		sinkImg = getImage(this.topGoods.get(sold));
-		//int[] rgbA = new int[1000];
-		//Arrays.fill(rgbA, 200);
-		//sinkImg.setRGB(0, 0, 50, 50, rgbA, 0, 0);
-		sinkImg2 = getImage(this.topGoods.get(kept));
+		sinkingSold = sold;//get the kept commodity
+		sinkingKept = kept;//get the sold commodity
+		System.out.println("\nkept: " + kept + "\tsold: " + sold);
+		sinkSoldImg = getImage(this.topCommodities.get(sold));
+		sinkKeptImg = getImage(this.topCommodities.get(kept));
 		setNrGameCols(sizes.length);
 
-		soldGoodY[2] = -1;
-		keptGoodY[2] = -1;
-		keptGoodX[1] = ((actualPlayer * 2 + 0.5f) * scoreTablePosition);
 		//Set prices
 		for (int i = 0; i < 6; i++) {
 			pricesDiff[i + 6] = prices[i];
@@ -332,10 +355,15 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 		fallenCols = emptiedColoumns;
 		colSizes = sizes;
-		this.topGoods = topGoods;
-		choiceStage = false;
+		this.topCommodities = topGoods;
 		//Start animating objects
+		beforeMoveGoods();
 		beforeMoveCols();
+		//repaint();
+		figureStopped = false;
+		colsStopped = false;
+		goodsStopped = false;
+		pricesStopped = false;
 		timerAll.start();
 		actualPlayer = (actualPlayer + 1) % playerNames.length;
 	}
@@ -348,107 +376,83 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 	// Inherited from JPanel
 	@Override
-	public void paintComponent(Graphics g) {
+	public void paint(Graphics g) {
 		if (true) {//to turn off drawing completely so to test AIs
 			//<editor-fold defaultstate="collapsed" desc="comment">
-			super.paintComponent(g);
+			super.paint(g);
 
 			//Draw the stock image
 			g.drawImage(stockImg, w / 15, stockStartV, stockWidth + w / 15,
-							stockStartV + stockWidth, 0, 0, 1100, 1100, null);
+							stockStartV + stockWidth, 10, 10, 1100, 1100, null);
 
 			//Draw the price indicators
 			g.setColor(priceColors[0]);
 			g.fillRect(Math.round(rectsStartW + (8 - pricesDiff[0]) * rectsStepW),
-							rectsStartH + 0 * rectsStepH, rectsSize, rectsSize);
+							Math.round(rectsStartH + 0 * rectsStepH), rectsSize, rectsSize);
 
 			for (int i = 1; i < 6; i++) {
 				g.setColor(priceColors[i]);
 				g.fillRect(Math.round(rectsStartW + (7 - pricesDiff[i]) * rectsStepW),
-								rectsStartH + i * rectsStepH, rectsSize, rectsSize);
+								Math.round(rectsStartH + i * rectsStepH), rectsSize, rectsSize);
 			}
 
-			g.setColor(Color.BLACK);
 			int x;
 			int y;
-			g.setColor(Color.BLACK);
 			g.setFont(fontB);
 
 			bounds.clear();
 
-			//
 			//Draw each coloumns
-			//
 			int before = (position + 1) % nrGameCols;
 			int after = (position + nrGameCols - 1) % nrGameCols;
 			int coeff = Math.round(w * (float) Math.sqrt(nrGameCols / 9f) / 5f);
-			/////////////////////////////////////////////////////////nem jo, es nem is itt kellene
-			/////////////////////////////////////////////////////////TODO: kept&sold moving commodities
 			for (int i = 0; i < nrGameCols; i++) {
 				//Calculate values
 				x = (int) (center[0] + coeff * Math.cos(angleCols[i]));
 				y = (int) (center[1] + coeff * Math.sin(angleCols[i]));
-				//String topGood = topGoods.get(i).toString();
 				int height = colSizes[i];
-				if (sinking == i && soldGoodY[2] == -1) {
-					//System.out.println("sinking1 " + i);
-					soldGoodX = x;
-					soldGoodY[2] = y;
-				}
-				if (sinking2 == i && keptGoodY[2] == -1) {
-					keptGoodX[0] = x;
-					keptGoodY[2] = y;
-				}
+				g.setColor(Color.LIGHT_GRAY);
 				if (hints) {
 					g.drawString(height + "", x, y + goodsSize);
+				}
+
+				//Draw the coloumns' invisible part (height)
+				for (int j = height - 1; j > 0; j--) {
+					g.setColor(Color.BLACK);//Inner
+					g.fillOval(x - j * 0 * goodsSize / 20, y - j * goodsSize / 20, goodsSize - j, goodsSize - j);
+					g.setColor(Color.LIGHT_GRAY);
+					g.drawOval(x - j * 0 * goodsSize / 20, y - j * goodsSize / 20, goodsSize - j, goodsSize - j);
+					g.setColor(Color.DARK_GRAY);
+					g.drawOval(x - j * 0 * goodsSize / 20, y + 1 - j * goodsSize / 20, goodsSize - j, goodsSize - j);
 				}
 				/////////////////////////////////////////////////////////////////////
 				// Set the coloumns' top good's coloring based on playability
 				RescaleOp op = new RescaleOp(scales, offsets, null);
 				if (choiceStage) {
-
 					if (i == before || i == after) {
 						op = new RescaleOp(scalesR, offsetsR, null);
+						g.drawImage(redGlowImg, x - glowSize, y - glowSize, x + glowSize + goodsSize, y + glowSize + goodsSize, 0, 0, 400, 400, null);
 					}
 				} else if (Arrays.toString(possibleCols).contains(i + "")) {
 					op = new RescaleOp(scalesT, offsetsT, null);
+					g.drawImage(glowImg, x - glowSize, y - glowSize, x + glowSize + goodsSize, y + glowSize + goodsSize, 0, 0, 400, 400, null);
 				}
 				if (i == position) {
 					op = new RescaleOp(scalesA, offsetsA, null);
 				}
 
-				//Draw the coloumns' invisible part (height)
-				for (int j = height - 1; j > 0; j--) {
-					g.fillOval(x - j * 0 * goodsSize / 20, y - j * goodsSize / 20, goodsSize - j, goodsSize - j);
-					g.setColor(Color.LIGHT_GRAY);
-					g.drawOval(x - j * 0 * goodsSize / 20, y - j * goodsSize / 20, goodsSize - j, goodsSize - j);
-					g.drawOval(x - j * 0 * goodsSize / 20, y + 1 - j * goodsSize / 20, goodsSize - j, goodsSize - j);
-					g.setColor(Color.DARK_GRAY);
-				}
 				//Draw the coloums's top good
-				g.drawImage(op.filter(getImage(topGoods.get(i)), null), x, y, x + goodsSize, y + goodsSize, 0, 0, 370, 370, null);
-				//bounds.add(new Rectangle(x, y, goodsSize, goodsSize));
+				g.drawImage(op.filter(getImage(topCommodities.get(i)), null), x, y, x + goodsSize, y + goodsSize, 0, 0, 370, 370, null);
 				bounds.add(new Ellipse2D.Float(x, y, goodsSize, goodsSize));
-//				g.drawOval((int)bounds.get(i).getX(), (int)bounds.get(i).getY(),
-//								(int)bounds.get(i).getWidth(), (int)bounds.get(i).getHeight());
-
-			}
-			//Draw the sinking goods
-			if (sinkImg != null & soldGoodY[0] != soldGoodY[1]) {//aeigo834wbfklsdbovisebuioghwerl
-				g.drawImage(sinkImg, soldGoodX, Math.round(soldGoodY[0]), soldGoodX + goodsSize,
-								Math.round(soldGoodY[0]) + goodsSize, 0, 0, 370, 370, null);
-			}
-			if (sinkImg2 != null & keptGoodY[0] != keptGoodY[1]) {
-				g.drawImage(sinkImg2, Math.round(keptGoodX[0]), Math.round(keptGoodY[0]),
-								Math.round(keptGoodX[0]) + goodsSize, Math.round(keptGoodY[0]) + goodsSize, 0, 0, 370, 370, null);
 			}
 
-			// Draw the figure
+			// Draw the figureStopped
 			x = (int) Math.round(center[0] + coeff * Math.cos(angleFig[0]));
 			y = (int) Math.round(center[1] + coeff * Math.sin(angleFig[0]));
 			g.drawImage(figureImg, x + figureSize, y + figureSize, x + goodsSize - figureSize,
 							y + goodsSize - figureSize, 0, 0, 300, 300, null);
 
+			g.setColor(Color.LIGHT_GRAY);
 			//Draw win counters
 			for (int i = 0; i < playerNames.length; i++) {
 				g.drawString(wins[i] + "", scoreTablePosition / 2 + i * 2 * scoreTablePosition, w / 50 + 5);
@@ -458,6 +462,16 @@ class GamePanel extends JPanel implements GamePanelInterface {
 			String turnText = playerNames[actualPlayer] + "\'s turn";
 			g.drawString(turnText, (int) Math.round(w / 15f), stockStartV - g.getFont().getSize());
 
+			//Draw the sinkingSold goods
+			if (sinkSoldImg != null & soldCommodityY[0] != soldCommodityY[1]) {
+				g.drawImage(sinkSoldImg, soldCommodityX, Math.round(soldCommodityY[0]), soldCommodityX + goodsSize,
+								Math.round(soldCommodityY[0]) + goodsSize, 0, 0, 370, 370, null);
+			}
+			if (sinkKeptImg != null & keptCommodityY[0] != keptCommodityY[1]) {
+				g.drawImage(sinkKeptImg, Math.round(keptCommodityX[0]), Math.round(keptCommodityY[0]),
+								Math.round(keptCommodityX[0]) + goodsSize, Math.round(keptCommodityY[0]) + goodsSize, 0, 0, 370, 370, null);
+			}
+
 			//Draw hints
 			if (hints) {
 				g.setFont(fontHint);
@@ -465,6 +479,8 @@ class GamePanel extends JPanel implements GamePanelInterface {
 					g.drawString(hintText[i], w / 15, w * 6 / 10 + i * w / 40);
 				}
 			}
+			//Is is choice stage
+			//g.drawString(Boolean.toString(choiceStage), w / 20, w * 5 / 10);
 		}
 //</editor-fold>
 	}
@@ -485,41 +501,44 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	public int gameOverPopup(String helpString) {
 		//System.out.println("popup called");
 		Object[] options = {"Quit", "Change players", "REVENGE"};
-		return JOptionPane.showOptionDialog(SwingUtilities.getWindowAncestor(this), helpString, "Game Over",
-						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+		return JOptionPane.showOptionDialog(GamePanel.this,
+						helpString,"Game Over",
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
+						null, options, options[0]);
 	}
 
 	/////////////////////////////////////////////
 	//Animation
 	////////////////////////////////////////////
-	private void startMoveFigure() {
-		timerFig.start();
+	private void beforeMoveFigure(int destination) {
+		//Wrap angles around 0 and 2PI
+		angleFig[0] -= ((int) (angleFig[0] / (Math.PI * 2.))) * Math.PI * 2.;
+		angleFig[1] -= ((int) (angleFig[1] / (Math.PI * 2.))) * Math.PI * 2.;
+//		System.out.printf("\nchoice: " + choiceStage + "\tposition: %d\tdestination: %d\n"
+//						+ "angleFig[0]: %2.2f\tangleFig[1]: %2.2f\n",
+//						position, destination, angleFig[0], angleFig[1]);
+		if ((!choiceStage && position > destination)
+						| (destination == position && angleFig[0] > angleFig[1])
+						| (!choiceStage && nrGameCols == 3 && position == destination)) {
+			angleFig[1] = (destination + nrGameCols) / (double) nrGameCols * Math.PI * 2;
+		} else {
+			angleFig[1] = destination * (Math.PI * 2 / nrGameCols);
+		}
+		//System.out.printf("after: angleFig[0]: %2.2f\tangleFig[1]: %2.2f\n",
+		//				angleFig[0], angleFig[1]);
+
 	}
 
 	private boolean moveFigure() {
-		repaint();
-		boolean finished = true;
+		boolean finished;
 		//Rotate the figure
-		//System.out.printf("again: nrCols %d   thegamenrcols %d |  thegameposi %d |  angle0 %1.3f   angle1 %1.3f%n",
-		//        nrCols, nrGameCols, position, angleFig[0], angleFig[1]);
 		double figDiff;
-		//Keep angle between 0 and 2PI
-		angleFig[0] -= ((int) (angleFig[0] / (Math.PI * 2.))) * Math.PI * 2.;
-		//System.out.printf("modif: nrCols %d   thegamenrcols %d |  thegameposi %d |  angle0 %1.3f   angle1 %1.3f%n",
-		//        nrCols, nrGameCols, position, angleFig[0], angleFig[1]);
-		if (angleFig[0] > angleFig[1] && nrCols == nrGameCols) {
-			figDiff = -Math.PI * 2 + angleFig[0] - angleFig[1];
-		} else {
-			figDiff = angleFig[0] - angleFig[1];
-		}
-		if (Math.abs(figDiff) > 0.05) {
-			//repaint();
+		figDiff = angleFig[0] - angleFig[1];
+		//}
+		if (Math.abs(figDiff) > 0.01) {
 			angleFig[0] -= figDiff / 7;
-			//System.out.println("angle0 " + angleFig[0]);
 			finished = false;
 		} else {
-			//    System.out.printf(" last: nrCols %d   thegamenrcols %d |  thegameposi %d |  angle0 %1.3f   angle1 %1.3f%n",
-			//            nrCols, nrGameCols, position, angleFig[0], angleFig[1]);
 			angleFig[0] = angleFig[1];
 			//System.out.println("MoveFig has stopped");
 			timerFig.stop();
@@ -532,7 +551,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		//System.out.println("beforeMove nrCols: " + nrCols + "\tnrGameCols: " + nrGameCols);
 		if (nrCols > nrGameCols /*&& nrGameCols < 9*/) {
 			for (int i = 0; i < nrGameCols; i++) {
-				angleCols[i + GameClass.START_NR_COLOUMS] = i * (Math.PI * 2 / nrGameCols);///////////////////nrGameCols???
+				angleCols[i + GameClass.START_NR_COLOUMS] = i * (Math.PI * 2 / nrGameCols);
 				//System.out.println("fallenCols: " + Arrays.toString(fallenCols));
 				boolean first = (fallenCols[0] >= 0 && i >= fallenCols[0]);
 				boolean second = (fallenCols[1] >= 0 && i >= fallenCols[1]);
@@ -549,7 +568,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 				}
 			}
 		}
-		//nrCols = nrGameCols;
+		nrCols = nrGameCols;
 		fallenCols[0] = -1;
 		fallenCols[1] = -1;
 	}
@@ -576,12 +595,12 @@ class GamePanel extends JPanel implements GamePanelInterface {
 			}
 			//System.out.println(Arrays.toString(colsDiff));
 		} else {
-			for (int i = 0; i < nrGameCols; i++) {//////////////////////////////////////////////////////////////////////////////////
+			for (int i = 0; i < nrGameCols; i++) {
 				angleCols[i] = angleCols[i + GameClass.START_NR_COLOUMS];
 			}
 			//System.out.println("MoveCols has stopped");
 			//timerCols.stop();
-			nrCols = nrGameCols;
+			//nrCols = nrGameCols;
 			finished = true;
 		}
 		return finished;
@@ -610,59 +629,67 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		return finished;
 	}
 
+	private void beforeMoveGoods() {
+//		System.out.printf("sinkingSold %d\tsinkingKept %d\n", sinkingSold, sinkingKept);
+		for (int i = 0; i < nrCols; i++) {
+			int coeff = Math.round(w * (float) Math.sqrt(nrCols / 9f) / 5f);
+			int x = (int) (center[0] + coeff * Math.cos(angleCols[i]));
+			int y = (int) (center[1] + coeff * Math.sin(angleCols[i]));
+			if (sinkingSold == i) {
+				soldCommodityX = x;
+				soldCommodityY[0] = y;
+			}
+			if (sinkingKept == i) {
+				keptCommodityX[0] = x;
+				keptCommodityY[0] = y;
+			}
+		}
+		soldCommodityY[1] = h;
+		keptCommodityX[1] = ((actualPlayer * 2 + 0.5f) * scoreTablePosition);
+		keptCommodityY[1] = -goodsSize;
+//		System.out.println("beforeMove: keptY" + Arrays.toString(keptCommodityY));
+//		System.out.println("beforeMove: keptX" + Arrays.toString(keptCommodityX));
+//		System.out.println("beforeMove: soldY" + Arrays.toString(soldCommodityY));
+	}
+
 	private boolean moveGoods() {
 		boolean finished = false;
-		//System.out.println("moveGoods event " + sinking + " sinking2 " + sinking2);
-
-		if (soldGoodY[2] > 0) {
-			soldGoodY[0] = soldGoodY[2];
-			soldGoodY[2] = 0;
-		}
-		if (keptGoodY[2] > 0) {
-			keptGoodY[0] = keptGoodY[2];
-			keptGoodY[2] = 0;
-		}
-		soldGoodY[1] = h;
-		keptGoodY[1] = -goodsSize;
-		float diff = soldGoodY[1] - soldGoodY[0];
-		float diff2 = keptGoodY[0] - keptGoodY[1];
-		float diff3 = keptGoodX[0] - keptGoodX[1];
+		//System.out.println("moveGoods event " + sinkingSold + " sinkingKept " + sinkingKept);
+		float diff = soldCommodityY[1] - soldCommodityY[0];
+		float diff2 = keptCommodityY[0] - keptCommodityY[1];
+		float diff3 = keptCommodityX[0] - keptCommodityX[1];
 		//System.out.println("diff1 " + diff + "\tdiff2 " + diff2 + "\tdiff3 " + diff3);
 		if (diff > 1) {
 			//sinkY[0] += Math.sqrt(diff) / 2;
-			soldGoodY[0] += Math.max(1, diff / 8f);
+			soldCommodityY[0] += Math.max(1, diff / 8f);
 //			int extraSpace = (int) Math.round(diff / 10f);
-//			repaint(soldGoodX, Math.round(soldGoodY[0] - extraSpace), goodsSize, goodsSize + extraSpace);
+//			repaint(soldCommodityX, Math.round(soldCommodityY[0] - extraSpace), goodsSize, goodsSize + extraSpace);
 		}
 		if (Math.abs(diff3) > 1) {
 			//sinkX2[0] -= Math.sqrt(Math.abs(diff3)) * Math.signum(diff3);
-			keptGoodX[0] -= Math.max(1, Math.abs(diff3 / 3f)) * Math.signum(diff3);
+			keptCommodityX[0] -= Math.max(1, Math.abs(diff3 / 3f)) * Math.signum(diff3);
 //			int extraSpace = (int) Math.round(diff3 / 4f);
-//			repaint(Math.round(keptGoodX[0]), Math.round(keptGoodY[0]), goodsSize + extraSpace, goodsSize);
+//			repaint(Math.round(keptCommodityX[0]), Math.round(keptCommodityY[0]), goodsSize + extraSpace, goodsSize);
 		}
 		if (diff2 > 1) {
 			//keptGoodY[0] -= Math.sqrt(diff2);
-			keptGoodY[0] -= Math.max(1, diff2 / 6f);
+			keptCommodityY[0] -= Math.max(1, diff2 / 6f);
 //			int extraSpace = (int) Math.round(diff2 / 2f);
-//			repaint(Math.round(keptGoodX[0]), Math.round(keptGoodY[0]) - extraSpace, goodsSize, goodsSize + extraSpace);
+//			repaint(Math.round(keptCommodityX[0]), Math.round(keptCommodityY[0]) - extraSpace, goodsSize, goodsSize + extraSpace);
 		}
 		if (diff < 1 && diff2 < 1) {
-			finished = afterMoveGoods();
+			//System.out.println("moveGoods has stopped");
+			//timerGoods.stop();
+			soldCommodityY[0] = soldCommodityY[1];
+			keptCommodityY[0] = keptCommodityY[1];
+			sinkingSold = -1;
+			sinkingKept = -1;
+			sinkSoldImg = null;
+			sinkKeptImg = null;
+			//System.out.println(diff + " " + diff2 + " " + Arrays.toString(soldCommodityY) + " " + Arrays.toString(keptCommodityY));
+			finished = true;
 		}
 		return finished;
-	}
-
-	private boolean afterMoveGoods() {
-		//System.out.println("moveGoods has stopped");
-		//timerGoods.stop();
-		soldGoodY[0] = soldGoodY[1];
-		keptGoodY[0] = keptGoodY[1];
-		soldGoodY[2] = -1;
-		keptGoodY[2] = -1;
-		sinking = -1;
-		sinking2 = -1;
-		//System.out.println(diff + " " + diff2 + " " + Arrays.toString(soldGoodY) + " " + Arrays.toString(keptGoodY));
-		return true;
 	}
 
 }

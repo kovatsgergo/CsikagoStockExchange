@@ -1,17 +1,51 @@
 package stockexchange;
 
 /*Gergo Kovats*/
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
 import java.util.Arrays;
+import javax.swing.JFrame;
+import static javax.swing.JFrame.EXIT_ON_CLOSE;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 public class Tester {
 
 	static AI ai = new AIeasy("nothing");
 
 	public static void main(String[] args) {
+		String fonts[]
+						= GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		JPanel panel = new JPanel(new GridLayout(0,2));
+		//pane.setLayout(new GridLayout(0,1));
+		//JPanel pane = new JPanel();
+		for (int i = 0; i < fonts.length; i++) {
+			JTextField temp = new JTextField(fonts[i]);
+			temp.setFont(new Font("Arial", Font.PLAIN, 20));
+			panel.add(temp);
+			//JLabel temp2 = new JLabel("Árvíztűrő tükörfúrógép");
+			JLabel temp2 = new JLabel("Player 2's turn");
+			temp2.setFont(new Font(fonts[i], Font.PLAIN, 20));
+			panel.add(temp2);
+			//System.out.println(fonts[i]);
+		}
+		JScrollPane scPane = new JScrollPane(panel);
+		frame.add(scPane);
+		frame.pack();
+		frame.setVisible(true);
+	}
+
+	public static void main4(String[] args) {
 		Commodity wheat = new Wheat();
-		System.out.println(wheat.toString()+"before "+wheat.getPrice());
+		System.out.println(wheat.toString() + "before " + wheat.getPrice());
 		wheat.lowerPrice();
-		System.out.println("after "+wheat.getPrice());
+		System.out.println("after " + wheat.getPrice());
 		Commodity wheat2 = new Wheat();
 		System.out.println(wheat2.toString());
 	}

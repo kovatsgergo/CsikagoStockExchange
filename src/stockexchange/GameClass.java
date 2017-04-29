@@ -13,7 +13,7 @@ public class GameClass implements GameInterface {
 	//static final int[] PRICES_AT_START = {7, 6, 6, 6, 6, 6};
 	static final Commodity[] COMMODITY_TYPES = new Commodity[]{new Wheat(), new Sugar(), new Coffee(), new Rice(), new Cocoa(), new Corn()};
 	static final int START_NR_COLOUMS = 9;
-	static final int START_HEIGHT_COLOUMNS = 2; //(START_NR_COLOUMS * START_HEIGHT_COLOUMNS)%COMMODITY_TYPES.size()=0
+	static final int START_HEIGHT_COLOUMNS = 4; //(START_NR_COLOUMS * START_HEIGHT_COLOUMNS)%COMMODITY_TYPES.size()=0
 
 	final int AI_SPEED = 500;
 	private int[] AIchoice = new int[2];
@@ -276,7 +276,7 @@ public class GameClass implements GameInterface {
 				if (Arrays.toString(getPossible()).contains(pointNr + "")) {
 					position = pointNr;
 					panel.setFigure(position);
-					panel.setPossible(getPossible());
+					//panel.setPossible(getPossible());////////////////////////
 					choiceStage = !choiceStage;
 				}
 			} else {
@@ -285,23 +285,24 @@ public class GameClass implements GameInterface {
 				int[] emptiedColoumns;
 				if (Arrays.toString(getNeighbors()).contains(pointNr + "")) {
 					if (getNeighbors()[0] == pointNr) {
-						choiceStage = !choiceStage;
 						keep = 0;
 					} else {
-						choiceStage = !choiceStage;
 						keep = 1;
 					}
+					choiceStage = !choiceStage;
 					int kept = getNeighbors()[keep];
 					int sold = getNeighbors()[1 - keep];
 					emptiedColoumns = handleChoice(kept, sold);
 					panel.makeChoice(kept, sold, emptiedColoumns, getPriceArray(), getTops(), getColsSizes());
 					panel.setNrGameCols(columns.size());
 					panel.setFigure(position);
-					//panel.setPossible(getPossible());
 					timerAI.stop();
+					panel.setPossible(getPossible());
 				}
 			}
 			//System.out.println("ai started in runhuman");
+			///////////////////
+
 			aiPoint();
 		}
 
@@ -352,7 +353,7 @@ public class GameClass implements GameInterface {
 			//player.setPrices(prices);
 		}
 
-		System.out.println("last starter: " + lastStarter);
+		//System.out.println("last starter: " + lastStarter);
 
 		columns.clear();
 		for (int i = 0; i < START_NR_COLOUMS; i++) {
@@ -369,7 +370,7 @@ public class GameClass implements GameInterface {
 		actualPlayer = nextPlayer(lastStarter++);
 		position = 0;
 		runRound(-1);
-		System.out.println("next starter: " + actualPlayer + "\n");
+		//System.out.println("next starter: " + actualPlayer + "\n");
 
 	}
 
