@@ -1,10 +1,11 @@
-package stockexchange;
+package stockexchange.model;
 
 /* Gergo Kovats */
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Column {
+public class Column implements Serializable{
     ArrayList<Commodity> goods = new ArrayList<>();
 
     public void add(Commodity good) {

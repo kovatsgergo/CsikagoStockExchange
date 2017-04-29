@@ -20,13 +20,13 @@ import java.awt.image.RescaleOp;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import stockexchange.model.*;
 
 class GamePanel extends JPanel implements GamePanelInterface {
 
@@ -52,10 +52,10 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	private final BufferedImage redGlowImg;
 	private ArrayList<Ellipse2D> bounds = new ArrayList();
 
-	int[] possibleCols;
+	ArrayList<Integer> possibleCols;
 	boolean choiceStage = false;
-	int nrCols = GameClass.START_NR_COLOUMS;
-	int nrGameCols = GameClass.START_NR_COLOUMS;
+	int nrCols = Model.START_NR_COLOUMS;
+	int nrGameCols = Model.START_NR_COLOUMS;
 	int[] colSizes;
 
 	Font fontB = new Font("Arial", Font.PLAIN, 23);
@@ -83,7 +83,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 	int position;
 	double[] angleFig = new double[2];
-	double[] angleCols = new double[GameClass.START_NR_COLOUMS * 2];
+	double[] angleCols = new double[Model.START_NR_COLOUMS * 2];
 
 	int[] fallenCols = {-1, -1};
 	int sinkingSold = -1;
@@ -96,7 +96,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	float[] keptCommodityY = new float[2];
 	float[] soldCommodityY = new float[2];//the thrown good: from, to, hasarrived(-1)
 
-	float[] pricesDiff = new float[GameClass.COMMODITY_TYPES.length * 2];//{7, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6};
+	float[] pricesDiff = new float[Model.COMMODITY_TYPES.length * 2];//{7, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6};
 
 	boolean hints = false;
 	ArrayList<Integer> winner;
@@ -114,6 +114,8 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	boolean colsStopped = false;
 	boolean goodsStopped = false;
 	boolean pricesStopped = false;
+
+	Model model;
 
 	javax.swing.Timer timerFig = new javax.swing.Timer(ANIM_TICK, new ActionListener() {
 		@Override
@@ -153,7 +155,6 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	public GamePanel(int[] dims) throws IOException {///////////////////////NEM KELL A PACK///////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////e.getSource():
 		////////////////////////////////////////////////////////////////////actionListenert adni a panel-hez
-
 		System.out.println(this.getClass().getResource(""));
 		URL imageURL = this.getClass().getResource("/images/Wheat.png");
 		commodityImgs.add(ImageIO.read(imageURL));
@@ -229,6 +230,15 @@ class GamePanel extends JPanel implements GamePanelInterface {
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 	}
 
+	public void setModel(Model model) {
+		this.model = model;
+	}
+	
+	public void clicketyClack(){
+		interf.setClickedColoumn(-1);
+		repaint();
+	}
+
 	private void refreshSizes() {
 		////drawing constants only changing when panel resized
 		//global values
@@ -243,7 +253,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		rectsStartH = w * 0.1633f;
 		rectsStepH = w * 0.0485f;
 		rectsSize = Math.round(w * 0.032f);
-		glowSize = Math.round(w*0.023f);
+		glowSize = Math.round(w * 0.023f);
 
 		scoreTablePosition = w / (playerNames.length * 2 - 1);
 		//font
@@ -272,8 +282,8 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 	private BufferedImage getImage(Commodity commodity) {
 		int imageNr = -1;
-		for (int i = 0; i < GameClass.COMMODITY_TYPES.length; i++) {
-			if (commodity.equals(GameClass.COMMODITY_TYPES[i]))
+		for (int i = 0; i < Model.COMMODITY_TYPES.length; i++) {
+			if (commodity.equals(Model.COMMODITY_TYPES[i]))
 				imageNr = i;
 		}
 		if (imageNr > -1)
@@ -282,15 +292,14 @@ class GamePanel extends JPanel implements GamePanelInterface {
 			return null;
 	}
 
-	@Override
-	public Dimension getPreferredSize() {
-		return new Dimension(950, 550);
-	}
-
+//	@Override
+//	public Dimension getPreferredSize() {
+//		return new Dimension(950, 550);
+//	}
 	// Inherited from GamePanelInterface
 	@Override
-	public void setNrGameCols(int i) {
-		nrGameCols = i;
+	public void setNrGameCols() {
+		nrGameCols = model.getNrOfCols();
 	}
 
 	public void setInterface(GameInterface interf) {
@@ -299,30 +308,32 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 	// Inherited from GamePanelInterface
 	@Override
-	public void start(ArrayList<Commodity> topGoods, String[] playerNames, int[] sizes, int[] wins) {
-		this.topCommodities = topGoods;
-		this.wins = wins;
-		this.playerNames = playerNames;
-		colSizes = sizes;
-		setNrGameCols(sizes.length);
+	public void start() {
+		topCommodities = model.getTopCommodities();
+		wins = model.getWins();
+		playerNames = model.getAllNames();
+		colSizes = model.getColsSizes();
+		setNrGameCols();
+		System.out.println("wins " + wins.toString());
 		angleFig[0] = angleFig[1] = 0;
-		for (int i = 0; i < GameClass.COMMODITY_TYPES.length; i++) {
-			pricesDiff[i] = pricesDiff[i + GameClass.COMMODITY_TYPES.length] = GameClass.COMMODITY_TYPES[i].getStartPrice();
+		for (int i = 0; i < Model.COMMODITY_TYPES.length; i++) {
+			pricesDiff[i] = pricesDiff[i + Model.COMMODITY_TYPES.length] = Model.COMMODITY_TYPES[i].getStartPrice();
 		}
 		//Move the coloumns to their starting position
 		for (int i = 0; i < nrGameCols; i++) {
 			//Calculate the coloumns' angle values
 			angleCols[i] = i * (Math.PI * 2 / nrGameCols);
-			angleCols[i + GameClass.START_NR_COLOUMS] = i * (Math.PI * 2 / nrGameCols);
+			angleCols[i + Model.START_NR_COLOUMS] = i * (Math.PI * 2 / nrGameCols);
 		}
-		possibleCols = new int[]{1, 2, 3};
+		if (model != null)
+			possibleCols = model.getPossible();//new ArrayList<Integer>();//{1, 2, 3};
 		nrCols = nrGameCols;
 		repaint();
 	}
 
 	// Inherited from GamePanelInterface
 	@Override
-	public void setPossible(int[] possibleColoumns) {
+	public void setPossible(ArrayList<Integer> possibleColoumns) {
 		possibleCols = possibleColoumns;
 		//choiceStage = false;
 		//System.out.println("possible" + Arrays.toString(possibleCols));
@@ -330,32 +341,37 @@ class GamePanel extends JPanel implements GamePanelInterface {
 
 	// Inherited from GamePanelInterface
 	@Override
-	public void setFigure(int destination) {
-		beforeMoveFigure(destination);
+	public void setFigure() {
+		beforeMoveFigure(model.getPosition());
 		timerFig.start();
-		position = destination;
+		position = model.getPosition();
 		choiceStage = !choiceStage;
+//		JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
+//		JPanel temppan = (JPanel) temp.getContentPane();
+//		for (int i = 0; i < temppan.getComponentCount(); i++) {
+//			System.out.println(temppan.getComponent(i));
+//		}
 	}
 
 	// Inherited from GamePanelInterface
 	@Override
-	public void makeChoice(int kept, int sold, int[] emptiedColoumns, int[] prices, ArrayList<Commodity> topGoods, int[] sizes) {
+	public void makeChoice(int kept, int sold, int[] emptiedColoumns) {
 		repaint();
 		sinkingSold = sold;//get the kept commodity
 		sinkingKept = kept;//get the sold commodity
 		System.out.println("\nkept: " + kept + "\tsold: " + sold);
 		sinkSoldImg = getImage(this.topCommodities.get(sold));
 		sinkKeptImg = getImage(this.topCommodities.get(kept));
-		setNrGameCols(sizes.length);
+		setNrGameCols();
 
 		//Set prices
 		for (int i = 0; i < 6; i++) {
-			pricesDiff[i + 6] = prices[i];
+			pricesDiff[i + 6] = model.getPriceArray()[i];
 		}
 
 		fallenCols = emptiedColoumns;
-		colSizes = sizes;
-		this.topCommodities = topGoods;
+		colSizes = model.getColsSizes();
+		this.topCommodities = model.getTopCommodities();
 		//Start animating objects
 		beforeMoveGoods();
 		beforeMoveCols();
@@ -420,9 +436,9 @@ class GamePanel extends JPanel implements GamePanelInterface {
 				for (int j = height - 1; j > 0; j--) {
 					g.setColor(Color.BLACK);//Inner
 					g.fillOval(x - j * 0 * goodsSize / 20, y - j * goodsSize / 20, goodsSize - j, goodsSize - j);
-					g.setColor(new Color(200,200,200));
+					g.setColor(new Color(200, 200, 200));
 					g.drawOval(x - j * 0 * goodsSize / 20, y - j * goodsSize / 20, goodsSize - j, goodsSize - j);
-					g.setColor(new Color(150,150,150));
+					g.setColor(new Color(150, 150, 150));
 					g.drawOval(x - j * 0 * goodsSize / 20, y + 1 - j * goodsSize / 20, goodsSize - j, goodsSize - j);
 				}
 				/////////////////////////////////////////////////////////////////////
@@ -433,7 +449,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 						op = new RescaleOp(scalesR, offsetsR, null);
 						g.drawImage(redGlowImg, x - glowSize, y - glowSize, x + glowSize + goodsSize, y + glowSize + goodsSize, 0, 0, 400, 400, null);
 					}
-				} else if (Arrays.toString(possibleCols).contains(i + "")) {
+				} else if ((possibleCols).contains(i)) {
 					op = new RescaleOp(scalesT, offsetsT, null);
 					g.drawImage(glowImg, x - glowSize, y - glowSize, x + glowSize + goodsSize, y + glowSize + goodsSize, 0, 0, 400, 400, null);
 				}
@@ -497,12 +513,12 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		}
 	}
 
-	//Called from GameClass
+	//Called from Control
 	public int gameOverPopup(String helpString) {
 		//System.out.println("popup called");
 		Object[] options = {"Quit", "Change players", "REVENGE"};
 		return JOptionPane.showOptionDialog(GamePanel.this,
-						helpString,"Game Over",
+						helpString, "Game Over",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
 						null, options, options[0]);
 	}
@@ -551,7 +567,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		//System.out.println("beforeMove nrCols: " + nrCols + "\tnrGameCols: " + nrGameCols);
 		if (nrCols > nrGameCols /*&& nrGameCols < 9*/) {
 			for (int i = 0; i < nrGameCols; i++) {
-				angleCols[i + GameClass.START_NR_COLOUMS] = i * (Math.PI * 2 / nrGameCols);
+				angleCols[i + Model.START_NR_COLOUMS] = i * (Math.PI * 2 / nrGameCols);
 				//System.out.println("fallenCols: " + Arrays.toString(fallenCols));
 				boolean first = (fallenCols[0] >= 0 && i >= fallenCols[0]);
 				boolean second = (fallenCols[1] >= 0 && i >= fallenCols[1]);
@@ -581,7 +597,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		//if (nrCols > nrGameCols /*&& nrGameCols < 9*/) {
 		for (int i = 0; i < nrGameCols; i++) {
 			angleCols[i] -= ((int) (angleCols[i] / (Math.PI * 2.))) * Math.PI * 2.;
-			colsDiff[i] = angleCols[i] - angleCols[i + GameClass.START_NR_COLOUMS];
+			colsDiff[i] = angleCols[i] - angleCols[i + Model.START_NR_COLOUMS];
 			sumDiff += Math.abs(colsDiff[i]);
 		}
 
@@ -596,7 +612,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 			//System.out.println(Arrays.toString(colsDiff));
 		} else {
 			for (int i = 0; i < nrGameCols; i++) {
-				angleCols[i] = angleCols[i + GameClass.START_NR_COLOUMS];
+				angleCols[i] = angleCols[i + Model.START_NR_COLOUMS];
 			}
 			//System.out.println("MoveCols has stopped");
 			//timerCols.stop();

@@ -1,14 +1,16 @@
 /*Gergo Kovats*/
-package stockexchange;
+package stockexchange.model;
 
-public class Cocoa extends Commodity {
+import java.io.Serializable;
+
+public class Cocoa extends Commodity implements Serializable{
 
 	private static int price = 6;
 	private static int START_PRICE = 6;
 
 	@Override
 	public String toString() {
-		return "Cocoa";
+		return "Cocoa{price =" + price + ", START_PRICE="+START_PRICE+'}';
 	}
 
 	public String toString(boolean full) {

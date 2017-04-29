@@ -4,13 +4,14 @@ package stockexchange;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
-import java.util.Arrays;
 import javax.swing.JFrame;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import stockexchange.model.AI;
+import stockexchange.model.AIeasy;
 
 public class Tester {
 
@@ -41,27 +42,27 @@ public class Tester {
 		frame.setVisible(true);
 	}
 
-	public static void main4(String[] args) {
-		Commodity wheat = new Wheat();
-		System.out.println(wheat.toString() + "before " + wheat.getPrice());
-		wheat.lowerPrice();
-		System.out.println("after " + wheat.getPrice());
-		Commodity wheat2 = new Wheat();
-		System.out.println(wheat2.toString());
-	}
+//	public static void main4(String[] args) {
+//		Commodity wheat = new Wheat();
+//		System.out.println(wheat.toString() + "before " + wheat.getPrice());
+//		wheat.lowerPrice();
+//		System.out.println("after " + wheat.getPrice());
+//		Commodity wheat2 = new Wheat();
+//		System.out.println(wheat2.toString());
+//	}
 
-	public static void main1(String[] args) {
-		ai = new AIeasy("nothing");
-		int[] temp = ai.getMaxIndex(new int[][]{{0, 1}, {5, 6}, {9, 9}});
-		System.out.println(Arrays.toString(temp));
-	}
+//	public static void main1(String[] args) {
+//		ai = new AIeasy("nothing");
+//		int[] temp = ai.getMaxIndex(new int[][]{{0, 1}, {5, 6}, {9, 9}});
+//		System.out.println(Arrays.toString(temp));
+//	}
 
-	public static void main2(String[] args) {
-		int[][] a = new int[][]{{1, 2}, {3, 4}, {5, 6}};
-		int[][] b = new int[][]{{5, 2}, {1, 7}, {-1, -5}};
-		int[][] c = ai.matrixAddition(a, b);
-		System.out.println(Arrays.deepToString(c));
-	}
+//	public static void main2(String[] args) {
+//		int[][] a = new int[][]{{1, 2}, {3, 4}, {5, 6}};
+//		int[][] b = new int[][]{{5, 2}, {1, 7}, {-1, -5}};
+//		int[][] c = ai.matrixAddition(a, b);
+//		System.out.println(Arrays.deepToString(c));
+//	}
 
 	public static void main3(String[] args) {
 		int w = 600;

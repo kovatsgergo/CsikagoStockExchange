@@ -1,10 +1,11 @@
-package stockexchange;
+package stockexchange.model;
 
 /* Gergo Kovats */
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class AIhard extends AI {
+public class AIhard extends AI implements Serializable{
 
 	Scanner scanner = new Scanner(System.in);
 	//ArrayList<Player> players;
@@ -12,6 +13,12 @@ public class AIhard extends AI {
 	public AIhard(String name) {
 		super(name);
 	}
+
+	@Override
+	public String toString() {
+		return "AIhard{" +super.toString()+ '}';
+	}
+	
 
 	@Override
 	public int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes) {

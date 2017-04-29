@@ -1,8 +1,8 @@
-package stockexchange;
+package stockexchange.model;
 
 /*Gergo Kovats*/
 
-public abstract class Commodity {
+public abstract class Commodity{
 	//"Wheat", "Sugar", "Coffee", "Rice", "Cocoa", "Corn"
 	
 	@Override

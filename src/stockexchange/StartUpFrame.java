@@ -1,6 +1,10 @@
 /*Gergo Kovats*/
 package stockexchange;
 
+import stockexchange.model.AIeasy;
+import stockexchange.model.AImedium;
+import stockexchange.model.AIhard;
+import stockexchange.model.Player;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;

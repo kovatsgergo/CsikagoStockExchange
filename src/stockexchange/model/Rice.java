@@ -1,18 +1,20 @@
 /*Gergo Kovats*/
-package stockexchange;
+package stockexchange.model;
 
-public class Wheat extends Commodity {
+import java.io.Serializable;
 
-	private static int price = 7;
-	private static int START_PRICE = 7;
+public class Rice extends Commodity implements Serializable{
+
+	private static int price = 6;
+	private static int START_PRICE = 6;
 
 	@Override
 	public String toString() {
-		return "Wheat";
+		return "Rice{price =" + price + ", START_PRICE="+START_PRICE+'}';
 	}
 
 	public String toString(boolean full) {
-		return "Wheat{" + price + "}";
+		return "Rice{" + price + "}";
 	}
 
 	@Override

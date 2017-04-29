@@ -3,12 +3,17 @@ package stockexchange;
 /* Gergo Kovats */
 import java.io.IOException;
 import java.util.Arrays;
+import stockexchange.model.AIeasy;
+import stockexchange.model.AIhard;
+import stockexchange.model.AImedium;
+import stockexchange.model.Player;
 
 public class StockExchange {
 
 	final static int MAXPLAYERS = 4;
 
 	public static void main(String[] args) {
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		createAndShowStartupGUI(new Player[0]);
 	}
 
@@ -21,7 +26,7 @@ public class StockExchange {
 					throws IOException {
 		GamePanel gamePanel = new GamePanel(dims);
 		GamePanelInterface interfacePanel = gamePanel;
-		GameInterface theGame = new GameClass(0, createPlayers(players), interfacePanel);
+		GameInterface theGame = new Control(0, createPlayers(players), interfacePanel);
 		gamePanel.setInterface(theGame);
 		GameFrame gameFrame = new GameFrame(createPlayers(players), dims, gamePanel, theGame);
 		gameFrame.setVisible(true);

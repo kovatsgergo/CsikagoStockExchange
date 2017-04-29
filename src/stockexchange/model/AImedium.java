@@ -1,12 +1,18 @@
-package stockexchange;
+package stockexchange.model;
 
 /* Gergo Kovats */
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class AImedium extends AI {
+public class AImedium extends AI implements Serializable{
 
 	public AImedium(String name) {
 		super(name);
+	}
+
+	@Override
+	public String toString() {
+		return "AImedium{" +super.toString()+ '}';
 	}
 	
 	@Override

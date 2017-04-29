@@ -1,13 +1,15 @@
-package stockexchange;
+package stockexchange.model;
 
 /* Gergo Kovats */
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Player {
+public class Player implements Serializable{
 
 	private int points;
 	private String name;
 	protected ArrayList<Commodity> commodities = new ArrayList<>();
+	//static final long serialVersionUID = 12345L;
 //	protected int[] prices;
 
 //	public Player() {
@@ -34,7 +36,7 @@ public class Player {
 		return points;
 	}
 
-	protected void recalcPoints() {
+	public void recalcPoints() {
 		int sum = 0;
 		for (Commodity commodity : commodities) {
 			sum += commodity.getPrice();
@@ -46,13 +48,9 @@ public class Player {
 		this.points = points;
 	}
 
-//	protected void setPrices(int[] prices) {
-//		this.prices = prices;
-//	}
-
 	@Override
 	public String toString() {
-		return "Player{" + "points=" + points + ", name=" + name + ", goods=" + commodities + '}';
+		return "Player{" + "points=" + points + ", name=" + name + ", goods=" + commodities.toString() + '}';
 	}
 
 }

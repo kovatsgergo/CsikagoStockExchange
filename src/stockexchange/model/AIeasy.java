@@ -1,14 +1,22 @@
-package stockexchange;
+package stockexchange.model;
 
 /* Gergo Kovats */
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class AIeasy extends AI {
+public class AIeasy extends AI implements Serializable{
 
 	public AIeasy(String name) {
 		super(name);
 	}
+
+	@Override
+	public String toString() {
+		return "AIeasy{" +super.toString()+ '}';
+	}
+	
+	
 	
 	@Override
 	public int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes) {

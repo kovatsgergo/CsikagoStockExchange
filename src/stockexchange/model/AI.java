@@ -1,4 +1,4 @@
-package stockexchange;
+package stockexchange.model;
 
 /* Gergo Kovats */
 import java.util.ArrayList;
@@ -16,7 +16,12 @@ public abstract class AI extends Player {
 		super(name);
 	}
 
-	abstract int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes);
+	protected abstract int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes);
+	
+	public int[] makeMove(Model model){
+		return makeMove(model.getPosition(), model.getTopCommodities(), model.getColsSizes());
+	}
+	//
 
 	//Used by Medium and Hard
 	public int countContain(ArrayList<Commodity> list, Commodity element) {

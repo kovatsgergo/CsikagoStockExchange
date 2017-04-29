@@ -1,6 +1,8 @@
-package stockexchange;
+package stockexchange.model;
 
 /*Gergo Kovats*/
+import stockexchange.model.Player;
+import stockexchange.model.Commodity;
 import java.util.ArrayList;
 
 public class ObservedPlayer {

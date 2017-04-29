@@ -17,15 +17,21 @@ import java.net.URL;
 import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayer;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.LayerUI;
+import stockexchange.model.Model;
+import stockexchange.model.Player;
 
 public class GameFrame extends JFrame {
 
@@ -36,6 +42,9 @@ public class GameFrame extends JFrame {
 	JPanel bottom;
 	ComponentListener caFixRatio;
 	boolean allowResizeListener;
+	JMenuBar menuBar;
+	Model model;
+	private JFileChooser fc = new JFileChooser("./");
 
 	public GameFrame(Player[] players, int[] dimensions, GamePanel gamePanel, GameInterface theGame) throws IOException {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,7 +53,27 @@ public class GameFrame extends JFrame {
 		//System.out.println("dimensions: "+Arrays.toString(dimensions));
 		//setLayout(new BorderLayout());
 		//setBounds(0, 0, dimensions[0], dimensions[1]);
-
+		JMenuBar mb = new JMenuBar();
+		JMenu mFile = new JMenu("File");
+		mb.add(mFile);
+		JMenuItem miOpen = new JMenuItem("Open saved game");
+		JMenuItem miSave = new JMenuItem("Save game");
+		mFile.add(miOpen);
+		GamePanel gp = gamePanel;
+		miOpen.addActionListener((ActionEvent e) -> {
+			gp.model.load();
+			gp.start();
+			//fc.showOpenDialog((JFrame) SwingUtilities.getWindowAncestor(this));
+			
+		});
+		mFile.add(miSave);
+		miSave.addActionListener((ActionEvent e) -> {
+			//fc.showSaveDialog((JFrame) SwingUtilities.getWindowAncestor(this));
+			gp.model.save();
+		});
+		setJMenuBar(mb);
+		
+		
 		//panels
 		top = new JPanel(new GridLayout(1, players.length * 2 - 1));
 		bottom = new JPanel(new GridLayout(1, 5));
