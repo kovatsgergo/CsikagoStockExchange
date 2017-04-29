@@ -16,13 +16,16 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Scanner;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayer;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.plaf.LayerUI;
 
 public class GameFrame extends JFrame {
 
@@ -182,13 +185,20 @@ public class GameFrame extends JFrame {
 
 		gamePanel.setFocusable(true);
 		add(top, BorderLayout.NORTH);
-		add(gamePanel, BorderLayout.CENTER);
+		if (false) {//Blur gamePanel 
+			LayerUI<JComponent> layerUI = new BlurLayerUI();
+			JLayer<JComponent> jlayer = new JLayer<JComponent>(gamePanel, layerUI);
+			add(jlayer, BorderLayout.CENTER);
+		}
+		else
+			add(gamePanel, BorderLayout.CENTER);
 		add(bottom, BorderLayout.SOUTH);
 		gamePanel.requestFocusInWindow();
-		setResizable(false);
+		//setResizable(false);
 		setBounds((dimensions[2] - dimensions[0]) / 2, 0, dimensions[0], (int) (dimensions[0] / 1.5));
 //		setMaximumSize(new Dimension((int) (dimensions[3] * 1.7), dimensions[3]));
 //		setMinimumSize(new Dimension(dimensions[0] / 2, dimensions[1] / 2));
+
 	}
 
 }

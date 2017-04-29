@@ -420,9 +420,9 @@ class GamePanel extends JPanel implements GamePanelInterface {
 				for (int j = height - 1; j > 0; j--) {
 					g.setColor(Color.BLACK);//Inner
 					g.fillOval(x - j * 0 * goodsSize / 20, y - j * goodsSize / 20, goodsSize - j, goodsSize - j);
-					g.setColor(Color.LIGHT_GRAY);
+					g.setColor(new Color(200,200,200));
 					g.drawOval(x - j * 0 * goodsSize / 20, y - j * goodsSize / 20, goodsSize - j, goodsSize - j);
-					g.setColor(Color.DARK_GRAY);
+					g.setColor(new Color(150,150,150));
 					g.drawOval(x - j * 0 * goodsSize / 20, y + 1 - j * goodsSize / 20, goodsSize - j, goodsSize - j);
 				}
 				/////////////////////////////////////////////////////////////////////
