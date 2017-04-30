@@ -46,6 +46,7 @@ public class Model {
 	}
 
 	public void save() {
+		propertiesToSave.clear();
 		propertiesToSave.add(gameOver);//0
 		propertiesToSave.add(choiceStage);//1
 		propertiesToSave.add(lastStarter);//2
@@ -60,7 +61,7 @@ public class Model {
 		for (Column column : columns) {
 			propertiesToSave.add(column);
 		}
-		//propertiesToSave.add(getPriceArray());
+		propertiesToSave.add(getPriceArray());
 		System.out.println(propertiesToSave.toString());
 		new GameSaver(propertiesToSave, true);
 	}
@@ -68,8 +69,8 @@ public class Model {
 	public void load() {
 		new GameSaver(propertiesToSave, false);
 		if (propertiesToSave != null) {
-			for (Object object : propertiesToSave) {
-				System.out.println(object.toString());
+			for (int i = 0; i < propertiesToSave.size(); i++) {
+				System.out.println(i + ": " + propertiesToSave.get(i).toString());
 			}
 
 			System.out.println(propertiesToSave.toString());
@@ -81,42 +82,63 @@ public class Model {
 			ArrayList<Object> playersX = new ArrayList<>();
 			int n = (int) propertiesToSave.get(6);
 			for (int i = 7; i < 7 + n; i++) {
+				System.out.println("players: " + i);
 				playersX.add((Object) propertiesToSave.get(i));
 			}
 			//columns = new ArrayList<Column>();
 			ArrayList<Object> columnsX = new ArrayList<>();
 			int j = 7 + n;
 			int m = (int) propertiesToSave.get(j);
-			for (int i = j + 1; i < j + m; i++) {
+			int i = j + 1;
+			for (; i < j + m + 1; i++) {
+				System.out.println("coloumns: " + i);
 				columnsX.add((Object) propertiesToSave.get(i));
 			}
-			players.clear();
-			for (Object object : playersX) {
-				players.add((Player) object);
-			}
-			System.out.println("players after "+players.toString());
 			columns.clear();
-			for (Object object : columnsX) {
+			for (Object object : columnsX)
 				columns.add((Column) object);
-			}
-			System.out.println("columns after "+columns.toString());
-			for (Column column : columns) {
-				System.out.println("top: "+column.getTop());
-			}
-			
-			wins = (ArrayList<Integer>) propertiesToSave.get(4);
+			players.clear();
+			for (Object object : playersX)
+				players.add((Player) object);
+//			System.out.println("columns after "+columns.toString());
+//			System.out.println("players after "+players.toString());	
 
+//			for (Column column : columns) {
+//				System.out.println("top: "+column.getTop());
+//			}
+			wins = (ArrayList<Integer>) propertiesToSave.get(4);
+			ArrayList<Integer> tempPrices = (ArrayList<Integer>) propertiesToSave.get(i);
+			priceSetter(tempPrices);
 			gamePanel.start(choiceStage, position, actualPlayer);
 		}
 	}
 
-	private void priceSetter(int[] priceArray) {
-		for (int i = 0; i < priceArray.length; i++) {
-			int diff = COMMODITY_TYPES[i].getPrice() - priceArray[i];
+	private void priceSetter(ArrayList<Integer> priceArray) {
+		for (int i = 0; i < priceArray.size(); i++) {
+			COMMODITY_TYPES[i].resetPrice();
+			int diff = COMMODITY_TYPES[i].getPrice() - priceArray.get(i);
 			for (int j = 0; j < diff; j++) {
+				//System.out.println(COMMODITY_TYPES[i]+" lowered");
 				COMMODITY_TYPES[i].lowerPrice();
 			}
+			//System.out.println(COMMODITY_TYPES[i].toString());
 		}
+	}
+
+	public ArrayList<Integer> getPriceArray() {
+		ArrayList<Integer> prices = new ArrayList<>();
+		for (int i = 0; i < COMMODITY_TYPES.length; i++) {
+			prices.add(COMMODITY_TYPES[i].getPrice());
+		}
+		return prices;
+	}
+	
+	public boolean getChoiceStage(){
+		return choiceStage;
+	}
+	
+	public void changeStage(){
+		choiceStage = !choiceStage;
 	}
 
 	/**
@@ -282,14 +304,6 @@ public class Model {
 			colSizes[i] = columns.get(i).getHeight();
 		}
 		return colSizes;
-	}
-
-	public int[] getPriceArray() {
-		int[] prices = new int[COMMODITY_TYPES.length];
-		for (int i = 0; i < prices.length; i++) {
-			prices[i] = COMMODITY_TYPES[i].getPrice();
-		}
-		return prices;
 	}
 
 	/**

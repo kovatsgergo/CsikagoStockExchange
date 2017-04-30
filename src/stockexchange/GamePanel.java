@@ -5,7 +5,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -306,22 +308,38 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		this.interf = interf;
 	}
 
+	/**
+	 * Start from a saved position
+	 *
+	 * @param choiceStage
+	 * @param position
+	 * @param actualPlayer
+	 */
 	public void start(boolean choiceStage, int position, int actualPlayer) {
+		start();
 		topCommodities = model.getTopCommodities();
 		wins = model.getWins();
 		playerNames = model.getAllNames();
 		colSizes = model.getColsSizes();
 		setNrGameCols();
+		setFigure();
 		this.choiceStage = choiceStage;
 		this.position = position;//??
 		this.actualPlayer = actualPlayer;
 		possibleCols = model.getPossible();
 		//nrCols = nrGameCols;
-		//setFigure();
+		System.out.println("prajsz: " + model.getPriceArray().toString());
+		for (int i = 0; i < 6; i++) {
+			pricesDiff[i] = model.getPriceArray().get(i);
+			pricesDiff[i + 6] = model.getPriceArray().get(i);
+		}
+		setHint(model.makeHints());
 		beforeMoveCols();
 		beforeMoveFigure(position);
 		beforeMoveGoods();
+		repaint();
 		timerAll.start();
+		System.out.println("choice: " + this.choiceStage);
 	}
 
 	// Inherited from GamePanelInterface
@@ -380,10 +398,9 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		sinkSoldImg = getImage(this.topCommodities.get(sold));
 		sinkKeptImg = getImage(this.topCommodities.get(kept));
 		setNrGameCols();
-
 		//Set prices
 		for (int i = 0; i < 6; i++) {
-			pricesDiff[i + 6] = model.getPriceArray()[i];
+			pricesDiff[i + 6] = model.getPriceArray().get(i);
 		}
 
 		fallenCols = emptiedColoumns;
@@ -410,9 +427,21 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	// Inherited from JPanel
 	@Override
 	public void paint(Graphics g) {
+		paint((Graphics2D) g);
+	}
+
+	public void paint(Graphics2D g) {
 		if (true) {//to turn off drawing completely so to test AIs
 			//<editor-fold defaultstate="collapsed" desc="comment">
 			super.paint(g);
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+							RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//                             RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_DITHERING,
+//							RenderingHints.VALUE_DITHER_ENABLE);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING,
+//                             RenderingHints.VALUE_RENDER_QUALITY);
 
 			//Draw the stock image
 			g.drawImage(stockImg, w / 15, stockStartV, stockWidth + w / 15,

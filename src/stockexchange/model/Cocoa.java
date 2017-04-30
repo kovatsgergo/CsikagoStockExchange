@@ -7,17 +7,18 @@ public class Cocoa extends Commodity implements Serializable {
 
 	private static int price = 6;
 	private static int START_PRICE = 6;
+	private static String name = "Cocoa";
 
 	@Override
 	public String toString() {
-		return "Cocoa{price =" + price + ", START_PRICE=" + START_PRICE + '}';
+		return name + "{price =" + price + ", START_PRICE=" + START_PRICE + '}';
 	}
 
 	public String toString(boolean full) {
 		if (full)
-			return "Cocoa{" + price + "}";
+			return name + "{" + price + "}";
 		else
-			return "Cocoa";
+			return name;
 	}
 
 	@Override

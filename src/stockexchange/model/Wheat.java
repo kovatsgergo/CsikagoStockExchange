@@ -7,17 +7,18 @@ public class Wheat extends Commodity implements Serializable {
 
 	private static int price = 7;
 	private static int START_PRICE = 7;
+	private static String name = "Wheat";
 
 	@Override
 	public String toString() {
-		return "Wheat{price =" + price + ", START_PRICE=" + START_PRICE + '}';
+		return name + "{price =" + price + ", START_PRICE=" + START_PRICE + '}';
 	}
 
 	public String toString(boolean full) {
 		if (full)
-			return "Wheat{" + price + "}";
+			return name + "{" + price + "}";
 		else
-			return "Sugar";
+			return name;
 	}
 
 	@Override

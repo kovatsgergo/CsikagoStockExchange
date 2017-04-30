@@ -63,7 +63,7 @@ public class GameFrame extends JFrame {
 		miOpen.addActionListener((ActionEvent e) -> {
 			gp.model.load();
 			//fc.showOpenDialog((JFrame) SwingUtilities.getWindowAncestor(this));
-			
+
 		});
 		mFile.add(miSave);
 		miSave.addActionListener((ActionEvent e) -> {
@@ -71,8 +71,7 @@ public class GameFrame extends JFrame {
 			gp.model.save();
 		});
 		setJMenuBar(mb);
-		
-		
+
 		//panels
 		top = new JPanel(new GridLayout(1, players.length * 2 - 1));
 		bottom = new JPanel(new GridLayout(1, 5));
@@ -178,9 +177,10 @@ public class GameFrame extends JFrame {
 		rulesFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		rulesFrame.pack();//nem tudok jobbat
 		btRules.addActionListener((ActionEvent e) -> {
-			if (!rulesFrame.isVisible())
+			if (!rulesFrame.isVisible()) {
 				rulesFrame.setVisible(true);
-			else
+				scrollPane.getViewport().setViewPosition(new Point(0, 0));
+			} else
 				rulesFrame.dispose();
 		});
 
@@ -213,12 +213,11 @@ public class GameFrame extends JFrame {
 
 		gamePanel.setFocusable(true);
 		add(top, BorderLayout.NORTH);
-		if (false) {//Blur gamePanel 
+		if (false) {//Blur gamePanel
 			LayerUI<JComponent> layerUI = new BlurLayerUI();
 			JLayer<JComponent> jlayer = new JLayer<JComponent>(gamePanel, layerUI);
 			add(jlayer, BorderLayout.CENTER);
-		}
-		else
+		} else
 			add(gamePanel, BorderLayout.CENTER);
 		add(bottom, BorderLayout.SOUTH);
 		gamePanel.requestFocusInWindow();

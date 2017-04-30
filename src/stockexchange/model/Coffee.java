@@ -7,17 +7,18 @@ public class Coffee extends Commodity implements Serializable {
 
 	private static int price = 6;
 	private static int START_PRICE = 6;
+	private static String name = "Coffee";
 
 	@Override
 	public String toString() {
-		return "Coffee{price =" + price + ", START_PRICE=" + START_PRICE + '}';
+		return name + "{price =" + price + ", START_PRICE=" + START_PRICE + '}';
 	}
 
 	public String toString(boolean full) {
 		if (full)
-			return "Coffee{" + price + "}";
+			return name + "{" + price + "}";
 		else
-			return "Coffee";
+			return name;
 	}
 
 	@Override

@@ -7,17 +7,18 @@ public class Corn extends Commodity implements Serializable {
 
 	private static int price = 6;
 	private static int START_PRICE = 6;
+	private static String name = "Corn";
 
 	@Override
 	public String toString() {
-		return "Corn{price =" + price + ", START_PRICE=" + START_PRICE + '}';
+		return name + "{price =" + price + ", START_PRICE=" + START_PRICE + '}';
 	}
 
 	public String toString(boolean full) {
 		if (full)
-			return "Corn{" + price + "}";
+			return name + "{" + price + "}";
 		else
-			return "Corn";
+			return name;
 	}
 
 	@Override

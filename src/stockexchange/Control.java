@@ -11,7 +11,7 @@ public class Control implements GameInterface {
 	final int AI_SPEED = 500;
 	private int[] AIchoice = new int[2];
 	boolean gameOver;
-	boolean choiceStage;
+	//boolean choiceStage;
 	Model model;
 
 	private GamePanelInterface panel; // To communicate with GUI
@@ -81,7 +81,7 @@ public class Control implements GameInterface {
 		//System.out.println("aiChoice run");
 		if (model.getActualPlayer() instanceof AI && !gameOver) {
 			int pointNr;
-			if (!choiceStage) {
+			if (!model.getChoiceStage()) {
 				//System.out.println("aiChoice choiceStage");
 				AIchoice = getAIMove();
 				pointNr = AIchoice[0];
@@ -105,13 +105,13 @@ public class Control implements GameInterface {
 	public void runRound(int pointNr) {///////////////IDEIGLENES
 		//System.out.println("\trunRound started\tgamover: " + gameOver + "\tcolumns: " + columns.size());
 		if (!gameOver) {
-			if (!choiceStage) {
+			if (!model.getChoiceStage()) {
 				//System.out.println("Step Stage started pointNr " + pointNr);
 				if (model.getPossible().contains(pointNr)) {
 					model.setPosition(pointNr);
 					panel.setFigure();
 					//panel.setPossible(getPossible());////////////////////////
-					choiceStage = !choiceStage;
+					model.changeStage();
 				}
 			} else {
 				//System.out.println("Choice Stage started pointNr " + pointNr);
@@ -119,7 +119,7 @@ public class Control implements GameInterface {
 				int[] emptiedColoumns;
 				if (model.getNeighbors().contains(pointNr)) {
 					keep =model.getNeighbors().indexOf(pointNr);
-					choiceStage = !choiceStage;
+					model.changeStage();
 					int kept = model.getNeighbors().get(keep);
 					int sold = model.getNeighbors().get(1 - keep);
 					emptiedColoumns = model.handleChoice(kept, sold);

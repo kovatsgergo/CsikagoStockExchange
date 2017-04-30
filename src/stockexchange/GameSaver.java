@@ -11,8 +11,6 @@ import java.util.ArrayList;
 
 public class GameSaver {
 
-	static ArrayList<Object> savedProperties;
-
 	public GameSaver(ArrayList<Object> savedProperties, boolean save) {
 		System.out.println("Working Directory = " +
               System.getProperty("user.dir"));
@@ -20,11 +18,14 @@ public class GameSaver {
 		//mentes
 		if (save) {
 			try {
+				if(savedGameFile.exists())
+					savedGameFile.delete();
 				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(savedGameFile));
 				for (Object savedProperty : savedProperties) {
 					oos.writeObject(savedProperty);
 				}
 				oos.close();
+				savedProperties.clear();
 			} catch (IOException e) {
 				System.out.println("I/O hiba: " + e.getMessage());
 			}
