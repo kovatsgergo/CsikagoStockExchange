@@ -233,8 +233,8 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	public void setModel(Model model) {
 		this.model = model;
 	}
-	
-	public void clicketyClack(){
+
+	public void clicketyClack() {
 		interf.setClickedColoumn(-1);
 		repaint();
 	}
@@ -306,6 +306,24 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		this.interf = interf;
 	}
 
+	public void start(boolean choiceStage, int position, int actualPlayer) {
+		topCommodities = model.getTopCommodities();
+		wins = model.getWins();
+		playerNames = model.getAllNames();
+		colSizes = model.getColsSizes();
+		setNrGameCols();
+		this.choiceStage = choiceStage;
+		this.position = position;//??
+		this.actualPlayer = actualPlayer;
+		possibleCols = model.getPossible();
+		//nrCols = nrGameCols;
+		//setFigure();
+		beforeMoveCols();
+		beforeMoveFigure(position);
+		beforeMoveGoods();
+		timerAll.start();
+	}
+
 	// Inherited from GamePanelInterface
 	@Override
 	public void start() {
@@ -314,7 +332,6 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		playerNames = model.getAllNames();
 		colSizes = model.getColsSizes();
 		setNrGameCols();
-		System.out.println("wins " + wins.toString());
 		angleFig[0] = angleFig[1] = 0;
 		for (int i = 0; i < Model.COMMODITY_TYPES.length; i++) {
 			pricesDiff[i] = pricesDiff[i + Model.COMMODITY_TYPES.length] = Model.COMMODITY_TYPES[i].getStartPrice();

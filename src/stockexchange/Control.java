@@ -18,7 +18,7 @@ public class Control implements GameInterface {
 
 	public Control(int starter, Player[] players, GamePanelInterface panel) {
 		this.panel = panel;
-		model = new Model(starter, players);
+		model = new Model(starter, players, panel);
 		panel.setModel(model);
 		reStart();
 	}

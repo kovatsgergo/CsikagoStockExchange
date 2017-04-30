@@ -3,18 +3,21 @@ package stockexchange.model;
 
 import java.io.Serializable;
 
-public class Coffee extends Commodity implements Serializable{
+public class Coffee extends Commodity implements Serializable {
 
 	private static int price = 6;
 	private static int START_PRICE = 6;
 
 	@Override
 	public String toString() {
-		return "Coffee{price =" + price + ", START_PRICE="+START_PRICE+'}';
+		return "Coffee{price =" + price + ", START_PRICE=" + START_PRICE + '}';
 	}
 
 	public String toString(boolean full) {
-		return "Coffee{" + price + "}";
+		if (full)
+			return "Coffee{" + price + "}";
+		else
+			return "Coffee";
 	}
 
 	@Override
@@ -37,8 +40,8 @@ public class Coffee extends Commodity implements Serializable{
 		price = START_PRICE;
 	}
 
-	protected boolean equals(Commodity other) {
-		return this.toString().equals(other.toString());
+	public boolean equals(Commodity other) {
+		return this.toString(false).equals(other.toString(false));
 	}
 
 }

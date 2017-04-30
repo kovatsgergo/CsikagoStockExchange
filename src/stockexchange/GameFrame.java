@@ -62,7 +62,6 @@ public class GameFrame extends JFrame {
 		GamePanel gp = gamePanel;
 		miOpen.addActionListener((ActionEvent e) -> {
 			gp.model.load();
-			gp.start();
 			//fc.showOpenDialog((JFrame) SwingUtilities.getWindowAncestor(this));
 			
 		});

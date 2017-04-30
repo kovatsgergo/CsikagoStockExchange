@@ -17,7 +17,7 @@ public class Column implements Serializable{
     }
     
     public String toString(){
-        return goods.toString();
+        return "Column{goods="+goods.toString()+'}';
     }
     
     public Commodity getTop(){

@@ -8,6 +8,7 @@ import stockexchange.model.Model;
 public interface GamePanelInterface {
 
 	public abstract void start();
+	public abstract void start(boolean choiceStage, int position, int actualPlayer);
 	public abstract void setModel(Model model);
 	public abstract void setPossible(ArrayList<Integer> possibleColoumns);
 	public abstract void setFigure();

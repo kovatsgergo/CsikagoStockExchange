@@ -13,6 +13,7 @@ public abstract class Commodity{
 	public abstract int getPrice();
 	protected abstract void lowerPrice();
 	protected abstract void resetPrice();
+	public abstract boolean equals(Commodity commodity);
 	
 	
 //	protected void lowerPrice(int type){

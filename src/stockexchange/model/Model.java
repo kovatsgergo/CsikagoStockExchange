@@ -4,6 +4,7 @@ package stockexchange.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import stockexchange.GamePanelInterface;
 import stockexchange.GameSaver;
 
 public class Model {
@@ -27,8 +28,9 @@ public class Model {
 	private int position = 0;//the figure's current position
 
 	private ArrayList<Object> propertiesToSave;
+	GamePanelInterface gamePanel;
 
-	public Model(int starter, Player[] players) {
+	public Model(int starter, Player[] players, GamePanelInterface gamePanel) {
 		this.players = new ArrayList<Player>(Arrays.asList(players));
 		for (Player player : players) {
 			System.out.println(player.getClass().getSimpleName());
@@ -40,6 +42,7 @@ public class Model {
 		}
 		reStart();
 		propertiesToSave = new ArrayList<>();
+		this.gamePanel = gamePanel;
 	}
 
 	public void save() {
@@ -66,30 +69,44 @@ public class Model {
 		new GameSaver(propertiesToSave, false);
 		if (propertiesToSave != null) {
 			for (Object object : propertiesToSave) {
-				System.out.println(object.getClass());
+				System.out.println(object.toString());
 			}
-			
+
 			System.out.println(propertiesToSave.toString());
 			gameOver = (boolean) propertiesToSave.get(0);
 			choiceStage = (boolean) propertiesToSave.get(1);
 			lastStarter = (int) propertiesToSave.get(2);
 			actualPlayer = (int) propertiesToSave.get(3);
-			wins = (ArrayList<Integer>) propertiesToSave.get(4);
 			position = (int) propertiesToSave.get(5);
 			ArrayList<Object> playersX = new ArrayList<>();
 			int n = (int) propertiesToSave.get(6);
-			for (int i = 7; i < 6 + n; i++) {
+			for (int i = 7; i < 7 + n; i++) {
 				playersX.add((Object) propertiesToSave.get(i));
 			}
 			//columns = new ArrayList<Column>();
 			ArrayList<Object> columnsX = new ArrayList<>();
 			int j = 7 + n;
 			int m = (int) propertiesToSave.get(j);
-			for (int i = j; i < j + m; i++) {
+			for (int i = j + 1; i < j + m; i++) {
 				columnsX.add((Object) propertiesToSave.get(i));
 			}
-			//int[] priceArray = (int[]) propertiesToSave.get(8);
-			//priceSetter(priceArray);
+			players.clear();
+			for (Object object : playersX) {
+				players.add((Player) object);
+			}
+			System.out.println("players after "+players.toString());
+			columns.clear();
+			for (Object object : columnsX) {
+				columns.add((Column) object);
+			}
+			System.out.println("columns after "+columns.toString());
+			for (Column column : columns) {
+				System.out.println("top: "+column.getTop());
+			}
+			
+			wins = (ArrayList<Integer>) propertiesToSave.get(4);
+
+			gamePanel.start(choiceStage, position, actualPlayer);
 		}
 	}
 
