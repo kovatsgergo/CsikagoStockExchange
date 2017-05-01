@@ -1,5 +1,5 @@
 /*Gergo Kovats*/
-package stockexchange;
+package stockexchange.model;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,8 +34,8 @@ public class GameSaver {
 			ObjectInputStream ois = null;
 			try {
 				ois = new ObjectInputStream(new FileInputStream(savedGameFile));
-				System.out.println(savedGameFile.toString());
-				System.out.println(ois);
+				//System.out.println(savedGameFile.toString());
+				//System.out.println(ois);
 				savedProperties.clear();
 				while (true)
 					savedProperties.add(ois.readObject());

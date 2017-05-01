@@ -1,5 +1,5 @@
 /*Gergo Kovats*/
-package stockexchange;
+package stockexchange.gui;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;

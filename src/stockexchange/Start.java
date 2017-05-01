@@ -1,36 +1,42 @@
+/*Gergo Kovats*/
 package stockexchange;
 
-/* Gergo Kovats */
-import java.io.IOException;
 import java.util.Arrays;
+import stockexchange.gui.ControlGuiInterface;
+import stockexchange.gui.GameContainerPanel;
+import stockexchange.gui.GamePanel;
+import stockexchange.gui.MainFrame;
 import stockexchange.model.AIeasy;
 import stockexchange.model.AIhard;
 import stockexchange.model.AImedium;
+import stockexchange.model.Model;
 import stockexchange.model.Player;
 
-public class StockExchange {
+public class Start {
 
-	final static int MAXPLAYERS = 4;
+	private static MainFrame frame;
 
 	public static void main(String[] args) {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
-		createAndShowStartupGUI(new Player[0]);
+		frame = new MainFrame();
+		frame.setVisible(true);
 	}
 
-	protected static void createAndShowStartupGUI(Player[] players) {
-		//StartUpFrame startUpFrame = new StartUpFrame(plyrs, dims, namesGiven);
-		StartUpFrame startUpFrame = new StartUpFrame(players);
+	public static void switchToGame(String[][] players, int[] dims) {
+		//Model model = new Model();
+		Player[] playersArray = createPlayers(players);
+		Model model = new Model(playersArray);
+		GamePanel gamePanel = new GamePanel(model);
+		ControlGuiInterface interfacePanel = gamePanel;
+		GuiControlInterface control = new Control(playersArray, model, interfacePanel);
+		gamePanel.setInterface(control);
+		frame.setControl(control);
+		GameContainerPanel gameContainerPanel = new GameContainerPanel(createPlayers(players), dims, gamePanel, control);
+		frame.setToGame(gameContainerPanel);
 	}
 
-	protected static void createAndShowGameGUI(String[][] players, int[] dims)
-					throws IOException {
-		GamePanel gamePanel = new GamePanel(dims);
-		GamePanelInterface interfacePanel = gamePanel;
-		GameInterface theGame = new Control(0, createPlayers(players), interfacePanel);
-		gamePanel.setInterface(theGame);
-		GameFrame gameFrame = new GameFrame(createPlayers(players), dims, gamePanel, theGame);
-		gameFrame.setVisible(true);
-
+	public static void switchToSetup() {
+		frame.setToStartup();
 	}
 
 	private static Player[] createPlayers(String[][] players) {

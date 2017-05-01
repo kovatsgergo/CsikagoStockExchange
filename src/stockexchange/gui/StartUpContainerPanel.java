@@ -1,10 +1,6 @@
 /*Gergo Kovats*/
-package stockexchange;
+package stockexchange.gui;
 
-import stockexchange.model.AIeasy;
-import stockexchange.model.AImedium;
-import stockexchange.model.AIhard;
-import stockexchange.model.Player;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,19 +9,22 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.Arrays;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import stockexchange.Start;
+import stockexchange.model.AIeasy;
+import stockexchange.model.AIhard;
+import stockexchange.model.AImedium;
+import stockexchange.model.Player;
 
-public class StartUpFrame extends JFrame implements ActionListener {
+public class StartUpContainerPanel extends JPanel implements ActionListener {
 
 	final int MAX_PLAYERS = 4;
 	final int DEF_NUM_PLAYERS = 2;
@@ -39,12 +38,13 @@ public class StartUpFrame extends JFrame implements ActionListener {
 	int w;
 	int h;
 
-	public StartUpFrame(Player[] playersGiven) {
+	public StartUpContainerPanel(Player[] playersGiven) {
 		System.out.println("namesgiven " + Arrays.toString(playersGiven));
-		setResizable(false);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		w = screenSize.width;
 		h = screenSize.height;
+		setLayout(new BorderLayout());
+
 		titleFont = titleFont.deriveFont(w / 40f);
 		textFont = textFont.deriveFont(w / 70f);
 		names = new String[MAX_PLAYERS];
@@ -52,8 +52,6 @@ public class StartUpFrame extends JFrame implements ActionListener {
 		//setLayout(new GridLayout(4,1));
 		//setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		//setLayout(new FlowLayout());
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-
 		//Title of Frame
 		JPanel titlePanel = new JPanel();
 		JLabel titleText = new JLabel("Set the name of the Pleyers", SwingConstants.CENTER);
@@ -93,10 +91,12 @@ public class StartUpFrame extends JFrame implements ActionListener {
 		JButton btStart = new JButton("Start Game");
 		btStart.addActionListener(this);
 		add(btStart, BorderLayout.SOUTH);
-		int width = w / 2;
-		int height = h / 5 * 3;
+		int width = w / 3;
+		int height = h / 3;
 		setBounds(w / 2 - width / 2, 0, width, height);
+		//setSize(width, height);
 		setVisible(true);
+		System.out.println("startup size "+getSize().toString());
 	}
 
 	@Override
@@ -143,14 +143,8 @@ public class StartUpFrame extends JFrame implements ActionListener {
 		for (int i = 0; i < names.length; i++) {
 			names[i] = rowPs[i].getNameAndType();
 		}
-		try {
-			System.out.println(Arrays.deepToString(names));
-			StockExchange.createAndShowGameGUI(names, new int[]{w / 7 * 5, Math.round(w * 0.45f), w, h});
-			this.dispose();
-		} catch (IOException ex) {
-			System.out.println("ERROR ALARM ACHTUNG ATTENTION!");
-
-		}
+//		System.out.println(Arrays.deepToString(names));
+			Start.switchToGame(names, new int[]{w / 7 * 5, Math.round(w * 0.45f), w, h});
 	}
 
 	public class RowPanel extends JPanel implements ActionListener {
@@ -186,6 +180,11 @@ public class StartUpFrame extends JFrame implements ActionListener {
 			names[i] = name;
 		}
 
+		@Override
+		public Dimension getPreferredSize() {
+			return new Dimension(950, 550);
+		}
+
 		protected void setAI(int type) {
 			chb.setSelected(true);
 			tf.setVisible(false);
@@ -217,7 +216,7 @@ public class StartUpFrame extends JFrame implements ActionListener {
 				tf.setForeground(Color.BLACK);
 			else
 				tf.setForeground(Color.LIGHT_GRAY);
-			
+
 		}
 	}
 }

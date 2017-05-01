@@ -1,3 +1,4 @@
+STOCK EXCHANGE
 A game by PAK CORMIER
 
 Description:
@@ -60,7 +61,7 @@ The player with the most points is the winner!
 
 Instead of moving the Trader forward by 1, 2 or 3 stacks, you can move him
 by as many stacks as you wish, in a clockwise direction, up to a square
-displaying the same commodity as the one shown on the square he just left, ‘
+displaying the same commodity as the one shown on the square he just left,
 without going beyond it. If the next square contains the same commodity,
 in this case he will only move by a single square. If it's behind him, he may
-possibly go all the way around.
+possibly go all the way around.</html>

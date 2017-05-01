@@ -2,42 +2,45 @@ package stockexchange;
 
 /* Gergo Kovats */
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import stockexchange.gui.ControlGuiInterface;
+import stockexchange.gui.MainFrame;
 import stockexchange.model.*;
 
-public class Control implements GameInterface {
+public class Control implements GuiControlInterface {
 
-	final int AI_SPEED = 500;
+	final int AI_SPEED = 1500;
 	private int[] AIchoice = new int[2];
 	boolean gameOver;
 	//boolean choiceStage;
 	Model model;
+	private ControlGuiInterface panel; // To communicate with GUI
+	static MainFrame frame;
 
-	private GamePanelInterface panel; // To communicate with GUI
-
-	public Control(int starter, Player[] players, GamePanelInterface panel) {
-		this.panel = panel;
-		model = new Model(starter, players, panel);
-		panel.setModel(model);
+	public Control(Player[] players, Model model, ControlGuiInterface interfacePanel) {
+		this.model = model;
+		this.panel = interfacePanel;
 		reStart();
 	}
 
-	//From GameInterface
-	@Override
+	@Override //From GuiControlInterface
+	public void load() {
+		if (model.load())
+			panel.start(model.getChoiceStage(), model.getPosition(), model.getActualPlayerIndex());
+	}
+
+	@Override	//From GuiControlInterface
 	public void setClickedColoumn(int column) {
 		if (!(model.getActualPlayer() instanceof AI))
 			runRound(column);
 	}
 
-	//From GameInterFace
-	@Override
+	@Override	//From GuiControlInterFace
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
 	}
 
-	//From GameInterFace
-	@Override
+	@Override 	//From GuiControlInterFace
 	public void pause() {
 		timerAI.stop();
 		int n = panel.pausePopup();
@@ -60,11 +63,8 @@ public class Control implements GameInterface {
 
 	/////////////////////////
 	///////////////////////AI
-	javax.swing.Timer timerAI = new javax.swing.Timer(AI_SPEED, new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			aiChoice();
-		}
+	javax.swing.Timer timerAI = new javax.swing.Timer(AI_SPEED, (ActionEvent e) -> {
+		aiChoice();
 	});
 
 	private void aiPoint() {
@@ -106,7 +106,7 @@ public class Control implements GameInterface {
 		//System.out.println("\trunRound started\tgamover: " + gameOver + "\tcolumns: " + columns.size());
 		if (!gameOver) {
 			if (!model.getChoiceStage()) {
-				//System.out.println("Step Stage started pointNr " + pointNr);
+				System.out.println("Step Stage started pointNr " + pointNr);
 				if (model.getPossible().contains(pointNr)) {
 					model.setPosition(pointNr);
 					panel.setFigure();
@@ -114,11 +114,11 @@ public class Control implements GameInterface {
 					model.changeStage();
 				}
 			} else {
-				//System.out.println("Choice Stage started pointNr " + pointNr);
+				System.out.println("Choice Stage started pointNr " + pointNr);
 				int keep;// the kept commodity's index in getNegihbors()
 				int[] emptiedColoumns;
 				if (model.getNeighbors().contains(pointNr)) {
-					keep =model.getNeighbors().indexOf(pointNr);
+					keep = model.getNeighbors().indexOf(pointNr);
 					model.changeStage();
 					int kept = model.getNeighbors().get(keep);
 					int sold = model.getNeighbors().get(1 - keep);

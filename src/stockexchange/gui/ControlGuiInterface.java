@@ -1,11 +1,12 @@
-package stockexchange;
+package stockexchange.gui;
 
 /*Gergo Kovats*/
 
 import java.util.ArrayList;
+import stockexchange.GuiControlInterface;
 import stockexchange.model.Model;
 
-public interface GamePanelInterface {
+public interface ControlGuiInterface {
 
 	public abstract void start();
 	public abstract void start(boolean choiceStage, int position, int actualPlayer);
@@ -17,7 +18,7 @@ public interface GamePanelInterface {
 	public abstract int gameOverPopup(String gameOverString);
 	public abstract int pausePopup();
 	public abstract void setNrGameCols();
-	public abstract void setInterface(GameInterface interf);
+	public abstract void setInterface(GuiControlInterface interf);
 	public abstract void quitGame();
 
 }

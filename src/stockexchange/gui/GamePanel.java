@@ -1,6 +1,7 @@
-package stockexchange;
+package stockexchange.gui;
 
 /* Gergo Kovats */
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -23,16 +24,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import stockexchange.GuiControlInterface;
+import stockexchange.Start;
 import stockexchange.model.*;
 
-class GamePanel extends JPanel implements GamePanelInterface {
+public class GamePanel extends JPanel implements ControlGuiInterface {
 
-	GameInterface interf;
+	GuiControlInterface interf;
 	double[] center = new double[2];// = {600, 220};
 	int h;
 	int w;
@@ -50,7 +50,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	private final ArrayList<BufferedImage> commodityImgs = new ArrayList();
 	private final BufferedImage stockImg;
 	private final BufferedImage figureImg;
-	private final BufferedImage glowImg;
+	private final BufferedImage whiteGlowImg;
 	private final BufferedImage redGlowImg;
 	private ArrayList<Ellipse2D> bounds = new ArrayList();
 
@@ -61,7 +61,6 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	int[] colSizes;
 
 	Font fontB = new Font("Arial", Font.PLAIN, 23);
-	Font fontHint = new Font("Arial", Font.PLAIN, 15);
 
 	Color[] priceColors = {new Color(0, 0, 255, 170), new Color(255, 255, 255, 170), new Color(0, 0, 0, 170),
 		new Color(0, 255, 0, 170), new Color(205, 130, 80, 170), new Color(255, 255, 0, 170)};
@@ -77,7 +76,6 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	final float[] offsetsA = {0, 0, 0, 0};
 	String[] playerNames;
 	int[] wins;
-	String[] hintText;
 	ArrayList<Commodity> topCommodities;
 	int actualPlayer;
 
@@ -118,6 +116,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	boolean pricesStopped = false;
 
 	Model model;
+	HintPanel hintPanel;
 
 	javax.swing.Timer timerFig = new javax.swing.Timer(ANIM_TICK, new ActionListener() {
 		@Override
@@ -154,30 +153,32 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		}
 	});
 
-	public GamePanel(int[] dims) throws IOException {///////////////////////NEM KELL A PACK///////////////////////////////////////////////////////////////////////
+	public GamePanel(Model model) {///////////////////////NEM KELL A PACK///////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////e.getSource():
 		////////////////////////////////////////////////////////////////////actionListenert adni a panel-hez
+		this.model = model;
 		System.out.println(this.getClass().getResource(""));
+
 		URL imageURL = this.getClass().getResource("/images/Wheat.png");
-		commodityImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(readFromURL(imageURL));
 		imageURL = this.getClass().getResource("/images/Sugar2.png");
-		commodityImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(readFromURL(imageURL));
 		imageURL = this.getClass().getResource("/images/Coffee.png");
-		commodityImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(readFromURL(imageURL));
 		imageURL = this.getClass().getResource("/images/Rice.png");
-		commodityImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(readFromURL(imageURL));
 		imageURL = this.getClass().getResource("/images/Cocoa.png");
-		commodityImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(readFromURL(imageURL));
 		imageURL = this.getClass().getResource("/images/Corn.png");
-		commodityImgs.add(ImageIO.read(imageURL));
+		commodityImgs.add(readFromURL(imageURL));
 		imageURL = this.getClass().getResource("/images/Stock.jpg");
-		stockImg = ImageIO.read(imageURL);
+		stockImg = readFromURL(imageURL);
 		URL imageURL2 = this.getClass().getResource("/images/Figure.png");
-		figureImg = ImageIO.read(imageURL2);
+		figureImg = readFromURL(imageURL2);
 		imageURL2 = this.getClass().getResource("/images/glow2.png");
-		glowImg = ImageIO.read(imageURL2);
+		whiteGlowImg = readFromURL(imageURL2);
 		imageURL2 = this.getClass().getResource("/images/glowR2.png");
-		redGlowImg = ImageIO.read(imageURL2);
+		redGlowImg = readFromURL(imageURL2);
 
 		addMouseListener(new MouseAdapter() {
 			@Override
@@ -210,19 +211,31 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		timerFig.setInitialDelay(ANIM_INIT_DELAY);
 		timerAll.setInitialDelay(ANIM_INIT_DELAY);
 		setBackground(new Color(5, 15, 40));
+		setLayout(new BorderLayout());
+		hintPanel = new HintPanel(commodityImgs, model.getWins().length);
+		//hintPanel.setSize(this.getWidth(), 100);
+		add(hintPanel, BorderLayout.SOUTH);
+		hintPanel.setVisible(false);
+		//invalidate();
 	}
 
-//	public GamePanel returnThis() {
-//		return this;
-//	}
+	private BufferedImage readFromURL(URL url) {
+		BufferedImage temp = null;
+		try {
+			temp = ImageIO.read(url);
+		} catch (IOException e) {
+			System.err.println("Not found file at" + url);
+		}
+		return temp;
+	}
+
+	public ArrayList<BufferedImage> getCommodityImages() {
+		return commodityImgs;
+	}
+
 	@Override
 	public void quitGame() {
-		JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
-		JPanel temppan = (JPanel) temp.getContentPane();
-		JPanel temppan2 = (JPanel) temppan.getComponent(2);
-		JButton tempbutt = (JButton) temppan2.getComponent(temppan2.getComponentCount() - 1);
-		tempbutt.doClick(10);
-		temp.setVisible(false);
+		Start.switchToSetup();
 	}
 
 	public int pausePopup() {
@@ -236,11 +249,10 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		this.model = model;
 	}
 
-	public void clicketyClack() {
-		interf.setClickedColoumn(-1);
-		repaint();
-	}
-
+//	public void clicketyClack() {
+//		interf.setClickedColoumn(-1);
+//		repaint();
+//	}
 	private void refreshSizes() {
 		////drawing constants only changing when panel resized
 		//global values
@@ -260,7 +272,6 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		scoreTablePosition = w / (playerNames.length * 2 - 1);
 		//font
 		fontB = fontB.deriveFont((float) (w * 0.013) + 8);
-		fontHint = fontHint.deriveFont((float) (w * 0.008) + 8);
 		//coloumns
 		center[0] = w * 2 / 3;
 		center[1] = w * 13 / 50;
@@ -268,6 +279,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		//figure
 		figureSize = Math.round(goodsSize / 5);
 		//timerAll.start();
+		hintPanel.resize(w);
 		repaint();
 	}
 
@@ -298,13 +310,13 @@ class GamePanel extends JPanel implements GamePanelInterface {
 //	public Dimension getPreferredSize() {
 //		return new Dimension(950, 550);
 //	}
-	// Inherited from GamePanelInterface
+	// Inherited from ControlGuiInterface
 	@Override
 	public void setNrGameCols() {
 		nrGameCols = model.getNrOfCols();
 	}
 
-	public void setInterface(GameInterface interf) {
+	public void setInterface(GuiControlInterface interf) {
 		this.interf = interf;
 	}
 
@@ -317,11 +329,13 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	 */
 	public void start(boolean choiceStage, int position, int actualPlayer) {
 		start();
-		topCommodities = model.getTopCommodities();
-		wins = model.getWins();
-		playerNames = model.getAllNames();
-		colSizes = model.getColsSizes();
-		setNrGameCols();
+		{//????????
+//			topCommodities = model.getTopCommodities();
+//			wins = model.getWins();
+//			playerNames = model.getAllNames();
+//			colSizes = model.getColsSizes();
+//			setNrGameCols();
+		}
 		setFigure();
 		this.choiceStage = choiceStage;
 		this.position = position;//??
@@ -333,16 +347,20 @@ class GamePanel extends JPanel implements GamePanelInterface {
 			pricesDiff[i] = model.getPriceArray().get(i);
 			pricesDiff[i + 6] = model.getPriceArray().get(i);
 		}
+		remove(hintPanel);
+		hintPanel = new HintPanel(commodityImgs, model.getWins().length);
+		add(hintPanel, BorderLayout.SOUTH);
 		setHint(model.makeHints());
+		hintPanel.setVisible(hints);
 		beforeMoveCols();
 		beforeMoveFigure(position);
 		beforeMoveGoods();
 		repaint();
+		refreshSizes();
 		timerAll.start();
-		System.out.println("choice: " + this.choiceStage);
 	}
 
-	// Inherited from GamePanelInterface
+	// Inherited from ControlGuiInterface
 	@Override
 	public void start() {
 		topCommodities = model.getTopCommodities();
@@ -366,29 +384,23 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		repaint();
 	}
 
-	// Inherited from GamePanelInterface
+	// Inherited from ControlGuiInterface
 	@Override
 	public void setPossible(ArrayList<Integer> possibleColoumns) {
 		possibleCols = possibleColoumns;
-		//choiceStage = false;
 		//System.out.println("possible" + Arrays.toString(possibleCols));
 	}
 
-	// Inherited from GamePanelInterface
+	// Inherited from ControlGuiInterface
 	@Override
 	public void setFigure() {
 		beforeMoveFigure(model.getPosition());
 		timerFig.start();
 		position = model.getPosition();
 		choiceStage = !choiceStage;
-//		JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
-//		JPanel temppan = (JPanel) temp.getContentPane();
-//		for (int i = 0; i < temppan.getComponentCount(); i++) {
-//			System.out.println(temppan.getComponent(i));
-//		}
 	}
 
-	// Inherited from GamePanelInterface
+	// Inherited from ControlGuiInterface
 	@Override
 	public void makeChoice(int kept, int sold, int[] emptiedColoumns) {
 		repaint();
@@ -418,12 +430,20 @@ class GamePanel extends JPanel implements GamePanelInterface {
 		actualPlayer = (actualPlayer + 1) % playerNames.length;
 	}
 
-	// Inherited from GamePanelInterface
+	// Inherited from ControlGuiInterface
 	@Override
 	public void setHint(String[] hintText) {
-		this.hintText = hintText;
+		hintPanel.setHint(hintText);
+		//this.hintText = hintText;
 	}
 
+//	@Override
+//	public Dimension getPreferredSize() {
+//		System.out.println("GETPREFERREDSIZE CALLED");
+//		return new Dimension(900,300);
+//	}
+
+	
 	// Inherited from JPanel
 	@Override
 	public void paint(Graphics g) {
@@ -497,7 +517,7 @@ class GamePanel extends JPanel implements GamePanelInterface {
 					}
 				} else if ((possibleCols).contains(i)) {
 					op = new RescaleOp(scalesT, offsetsT, null);
-					g.drawImage(glowImg, x - glowSize, y - glowSize, x + glowSize + goodsSize, y + glowSize + goodsSize, 0, 0, 400, 400, null);
+					g.drawImage(whiteGlowImg, x - glowSize, y - glowSize, x + glowSize + goodsSize, y + glowSize + goodsSize, 0, 0, 400, 400, null);
 				}
 				if (i == position) {
 					op = new RescaleOp(scalesA, offsetsA, null);
@@ -534,13 +554,6 @@ class GamePanel extends JPanel implements GamePanelInterface {
 								Math.round(keptCommodityX[0]) + goodsSize, Math.round(keptCommodityY[0]) + goodsSize, 0, 0, 370, 370, null);
 			}
 
-			//Draw hints
-			if (hints) {
-				g.setFont(fontHint);
-				for (int i = 0; i < hintText.length; i++) {
-					g.drawString(hintText[i], w / 15, w * 6 / 10 + i * w / 40);
-				}
-			}
 			//Is is choice stage
 			//g.drawString(Boolean.toString(choiceStage), w / 20, w * 5 / 10);
 		}
@@ -551,9 +564,11 @@ class GamePanel extends JPanel implements GamePanelInterface {
 	public void setHintsOnOff(boolean onoff) {
 		if (onoff) {
 			hints = true;
+			hintPanel.setVisible(true);
 			repaint();
 		} else {
 			hints = false;
+			hintPanel.setVisible(false);
 			this.setPreferredSize(new Dimension(950, 550));
 			repaint();
 		}
