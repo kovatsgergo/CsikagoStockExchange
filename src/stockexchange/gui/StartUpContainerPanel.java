@@ -18,25 +18,25 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import stockexchange.Start;
+import stockexchange.Control;
 import stockexchange.model.AIeasy;
 import stockexchange.model.AIhard;
 import stockexchange.model.AImedium;
+import stockexchange.model.Model;
 import stockexchange.model.Player;
 
 public class StartUpContainerPanel extends JPanel implements ActionListener {
 
-	final int MAX_PLAYERS = 4;
-	final int DEF_NUM_PLAYERS = 2;
-	String[] names;
-	final String[] defaultNames = new String[]{"Pleyer 1's name",
+	private final int DEF_NUM_PLAYERS = 2;
+	private String[] names;
+	private final String[] defaultNames = new String[]{"Pleyer 1's name",
 		"Pleyer 2's name", "Pleyer 3's name", "Pleyer 4's name"};
-	Font titleFont = new Font("Arial", Font.BOLD, 25);
-	Font textFont = new Font("Arial", Font.PLAIN, 25);
-	JComboBox cbNumPlayers;
-	RowPanel[] rowPs;
-	int w;
-	int h;
+	private Font titleFont = new Font("Arial", Font.BOLD, 25);
+	private Font textFont = new Font("Arial", Font.PLAIN, 25);
+	private JComboBox cbNumPlayers;
+	private RowPanel[] rowPs;
+	private int w;
+	private int h;
 
 	public StartUpContainerPanel(Player[] playersGiven) {
 		System.out.println("namesgiven " + Arrays.toString(playersGiven));
@@ -47,7 +47,7 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 
 		titleFont = titleFont.deriveFont(w / 40f);
 		textFont = textFont.deriveFont(w / 70f);
-		names = new String[MAX_PLAYERS];
+		names = new String[Model.MAX_NR_PLAYERS];
 
 		//setLayout(new GridLayout(4,1));
 		//setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -78,8 +78,8 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 		setNumberPanel.add(cbNumPlayers);
 		theRest.add(setNumberPanel);
 		cbNumPlayers.setFont(textFont);
-		rowPs = new RowPanel[MAX_PLAYERS];
-		for (int i = 0; i < MAX_PLAYERS; i++) {
+		rowPs = new RowPanel[Model.MAX_NR_PLAYERS];
+		for (int i = 0; i < Model.MAX_NR_PLAYERS; i++) {
 			if (i >= playersGiven.length)
 				rowPs[i] = new RowPanel(i, w);
 			else
@@ -106,7 +106,7 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 			startGame();
 		else if (e.getSource() instanceof JComboBox) {
 			int players = ((JComboBox) e.getSource()).getSelectedIndex() + 1;
-			for (int i = 0; i < MAX_PLAYERS; i++) {
+			for (int i = 0; i < Model.MAX_NR_PLAYERS; i++) {
 				if (i < players)
 					rowPs[i].setActive(true);
 				else
@@ -118,14 +118,14 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 	private void initialize(Player[] players) {
 		int numPlayers = (players.length == 0) ? DEF_NUM_PLAYERS : players.length;
 		if (players.length == 0)
-			names = Arrays.copyOf(defaultNames, MAX_PLAYERS);
+			names = Arrays.copyOf(defaultNames, Model.MAX_NR_PLAYERS);
 		else
 			for (int i = 0; i < players.length; i++)
 				names[i] = players[i].getName();
 		//combobox: number of players
 		cbNumPlayers.setSelectedItem(numPlayers);
 		//activation of rows
-		for (int i = 0; i < MAX_PLAYERS; i++) {
+		for (int i = 0; i < Model.MAX_NR_PLAYERS; i++) {
 			if (i > numPlayers - 1)
 				rowPs[i].setActive(false);
 			if (i < players.length)
@@ -144,7 +144,7 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 			names[i] = rowPs[i].getNameAndType();
 		}
 //		System.out.println(Arrays.deepToString(names));
-			Start.switchToGame(names, new int[]{w / 7 * 5, Math.round(w * 0.45f), w, h});
+			Control.switchToGame(names, new int[]{w / 7 * 5, Math.round(w * 0.45f), w, h});
 	}
 
 	public class RowPanel extends JPanel implements ActionListener {

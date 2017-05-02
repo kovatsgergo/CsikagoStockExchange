@@ -27,138 +27,92 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import stockexchange.GuiControlInterface;
-import stockexchange.Start;
 import stockexchange.model.*;
 
 public class GamePanel extends JPanel implements ControlGuiInterface {
 
-	GuiControlInterface interf;
-	double[] center = new double[2];// = {600, 220};
-	int h;
-	int w;
+//MVC
+	private Model model;
+	HintPanel hintPanel;
+	private GuiControlInterface interf;
+//Game state variables
+	private String[] playerNames;
+	private int[] wins;
+	private ArrayList<Commodity> topCommodities;
+	private int actualPlayer;
+	private int position;
+	private ArrayList<Integer> possibleCols;
+	private boolean choiceStage = false;
+	private int nrCols = Model.START_NR_COLOUMS;
+	private int nrGameCols = Model.START_NR_COLOUMS;
+	private int[] colSizes;
+//Screen-relative sizes
+	private int h;
+	private int w;
+	private double[] center = new double[2];
+	private int goodsSize;
+	private int scoreTablePosition;
+	private int figureSize;
+	private ArrayList<Ellipse2D> bounds = new ArrayList();
 	//stock image
-	int stockStartV;// = Math.round(w / 10f);
-	int stockWidth;// = Math.round(w * 0.35f);
+	private int stockStartV;
+	private int stockWidth;
 	//price indicators
-	float rectsStartW;// = Math.round(w * 0.04f) + w / 15;
-	float rectsStepW;// = Math.round(w * 0.038f);
-	float rectsStartH;// = Math.round(w * 0.169f);
-	float rectsStepH;// = Math.round(w * 0.048f);
-	int rectsSize;// = Math.round(w * 0.03f);
-	int glowSize;
+	private float rectsStartW;
+	private float rectsStepW;
+	private float rectsStartH;
+	private float rectsStepH;
+	private int rectsSize;
+	private int glowSize;
+	private final Color[] priceColors = {new Color(0, 0, 255, 170), new Color(255, 255, 255, 170), new Color(0, 0, 0, 170),
+		new Color(0, 255, 0, 170), new Color(205, 130, 80, 170), new Color(255, 255, 0, 170)};
 
 	private final ArrayList<BufferedImage> commodityImgs = new ArrayList();
 	private final BufferedImage stockImg;
 	private final BufferedImage figureImg;
 	private final BufferedImage whiteGlowImg;
 	private final BufferedImage redGlowImg;
-	private ArrayList<Ellipse2D> bounds = new ArrayList();
 
-	ArrayList<Integer> possibleCols;
-	boolean choiceStage = false;
-	int nrCols = Model.START_NR_COLOUMS;
-	int nrGameCols = Model.START_NR_COLOUMS;
-	int[] colSizes;
+	private Font fontB = new Font("Arial", Font.PLAIN, 23);
+	private final float[] scales = {0.5f, 0.5f, 0.5f, 1f};
+	private final float[] offsets = {20, 20, 20, 0};
+	private final float[] scalesT = {1.1f, 1.1f, 1.1f, 1.f};
+	private final float[] offsetsT = {0, 0, 0, 0};
+	private final float[] scalesR = {1.3f, 1.f, 1.f, 1.f};
+	private final float[] offsetsR = {20, 0, 0, 0};
+	private final float[] scalesA = {.9f, .9f, .9f, 1.f};
+	private final float[] offsetsA = {0, 0, 0, 0};
 
-	Font fontB = new Font("Arial", Font.PLAIN, 23);
+	//Animation variables
+	private double[] angleFig = new double[2];
+	private double[] angleCols = new double[Model.START_NR_COLOUMS * 2];
+	private int[] fallenCols = {-1, -1};
+	private int sinkingSold = -1;
+	private int sinkingKept = -1;
+	private BufferedImage sinkSoldImg;// = -1;
+	private BufferedImage sinkKeptImg;// = -1;
+	private int soldCommodityX;
+	private float[] keptCommodityX = new float[2];//the kept item
+	private float[] keptCommodityY = new float[2];
+	private float[] soldCommodityY = new float[2];//the thrown good: from, to, hasarrived(-1)
+	private float[] pricesDiff = new float[Model.COMMODITY_TYPES.length * 2];//{7, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6};
+	private double[] figureFromTo = new double[4];
+	private double[] coordDiff = new double[2];
+	//for Timer
+	private final javax.swing.Timer timerFig;
+	private final javax.swing.Timer timerAll;
+	private final int ANIM_INIT_DELAY = 0;
+	private final int ANIM_TICK = 10;
+	private boolean figureStopped = false;
+	private boolean colsStopped = false;
+	private boolean goodsStopped = false;
+	private boolean pricesStopped = false;
 
-	Color[] priceColors = {new Color(0, 0, 255, 170), new Color(255, 255, 255, 170), new Color(0, 0, 0, 170),
-		new Color(0, 255, 0, 170), new Color(205, 130, 80, 170), new Color(255, 255, 0, 170)};
-	final float[] scales = {0.5f, 0.5f, 0.5f, 1f};
-	final float[] offsets = {20, 20, 20, 0};
-	final float[] scalesT = {1.1f, 1.1f, 1.1f, 1.f};
-	final float[] offsetsT = {0, 0, 0, 0};
-//	final float[] scalesR = {.5f, .8f, .8f, 1.f};
-//	final float[] offsetsR = {150, 10, 10, 0};
-	final float[] scalesR = {1.3f, 1.f, 1.f, 1.f};
-	final float[] offsetsR = {20, 0, 0, 0};
-	final float[] scalesA = {.9f, .9f, .9f, 1.f};
-	final float[] offsetsA = {0, 0, 0, 0};
-	String[] playerNames;
-	int[] wins;
-	ArrayList<Commodity> topCommodities;
-	int actualPlayer;
+	private boolean hints = false;
 
-	Dimension dimensions;
-
-	int position;
-	double[] angleFig = new double[2];
-	double[] angleCols = new double[Model.START_NR_COLOUMS * 2];
-
-	int[] fallenCols = {-1, -1};
-	int sinkingSold = -1;
-	int sinkingKept = -1;
-	BufferedImage sinkSoldImg;// = -1;
-	BufferedImage sinkKeptImg;// = -1;
-	int soldCommodityX;
-	//int sinkX1;
-	float[] keptCommodityX = new float[2];//the kept item
-	float[] keptCommodityY = new float[2];
-	float[] soldCommodityY = new float[2];//the thrown good: from, to, hasarrived(-1)
-
-	float[] pricesDiff = new float[Model.COMMODITY_TYPES.length * 2];//{7, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6};
-
-	boolean hints = false;
-	ArrayList<Integer> winner;
-
-	double[] figureFromTo = new double[4];
-	double[] coordDiff = new double[2];
-
-	int goodsSize;
-	int scoreTablePosition;
-	int figureSize;
-
-	final int ANIM_INIT_DELAY = 0;
-	final int ANIM_TICK = 10;
-	boolean figureStopped = false;
-	boolean colsStopped = false;
-	boolean goodsStopped = false;
-	boolean pricesStopped = false;
-
-	Model model;
-	HintPanel hintPanel;
-
-	javax.swing.Timer timerFig = new javax.swing.Timer(ANIM_TICK, new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			moveFigure();
-			//System.out.println("Figure moved");
-			repaint();
-		}
-	});
-
-	javax.swing.Timer timerAll = new javax.swing.Timer(ANIM_TICK, new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-//			System.out.println(figureStopped + " " + colsStopped + " " + goodsStopped
-//							+ " " + pricesStopped);
-			if (!figureStopped)
-				figureStopped = moveFigure();
-			if (!colsStopped)
-				colsStopped = moveCols();
-			if (!goodsStopped)
-				goodsStopped = moveGoods();
-			if (!pricesStopped)
-				pricesStopped = movePrices();
-			if (figureStopped && colsStopped && goodsStopped && pricesStopped) {
-				timerAll.stop();
-				repaint();
-				System.out.println("All stopped");
-			} else {
-				//System.out.println("All moved");
-				//choiceStage = false;
-				repaint();
-			}
-		}
-	});
-
-	public GamePanel(Model model) {///////////////////////NEM KELL A PACK///////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////e.getSource():
-		////////////////////////////////////////////////////////////////////actionListenert adni a panel-hez
+	public GamePanel(Model model) {
 		this.model = model;
-		System.out.println(this.getClass().getResource(""));
-
+		//System.out.println(this.getClass().getResource(""));
 		URL imageURL = this.getClass().getResource("/images/Wheat.png");
 		commodityImgs.add(readFromURL(imageURL));
 		imageURL = this.getClass().getResource("/images/Sugar2.png");
@@ -208,15 +162,46 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 				refreshSizes();
 			}
 		});
+		timerAll = new javax.swing.Timer(ANIM_TICK, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+//			System.out.println(figureStopped + " " + colsStopped + " " + goodsStopped
+//							+ " " + pricesStopped);
+				if (!figureStopped)
+					figureStopped = moveFigure();
+				if (!colsStopped)
+					colsStopped = moveCols();
+				if (!goodsStopped)
+					goodsStopped = moveGoods();
+				if (!pricesStopped)
+					pricesStopped = movePrices();
+				if (figureStopped && colsStopped && goodsStopped && pricesStopped) {
+					timerAll.stop();
+					repaint();
+					System.out.println("All stopped");
+				} else {
+					//System.out.println("All moved");
+					repaint();
+				}
+			}
+		});
+
+		timerFig = new javax.swing.Timer(ANIM_TICK, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				moveFigure();
+				//System.out.println("Figure moved");
+				repaint();
+			}
+		});
+
 		timerFig.setInitialDelay(ANIM_INIT_DELAY);
 		timerAll.setInitialDelay(ANIM_INIT_DELAY);
 		setBackground(new Color(5, 15, 40));
 		setLayout(new BorderLayout());
 		hintPanel = new HintPanel(commodityImgs, model.getWins().length);
-		//hintPanel.setSize(this.getWidth(), 100);
 		add(hintPanel, BorderLayout.SOUTH);
 		hintPanel.setVisible(false);
-		//invalidate();
 	}
 
 	private BufferedImage readFromURL(URL url) {
@@ -228,34 +213,16 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		}
 		return temp;
 	}
-
-	public ArrayList<BufferedImage> getCommodityImages() {
-		return commodityImgs;
-	}
-
-	@Override
-	public void quitGame() {
-		Start.switchToSetup();
-	}
-
+	
+	@Override //from ControlGuiInterface
 	public int pausePopup() {
-		//System.out.println("popup called");
 		Object[] options = {"Quit", "Change players", "Continue"};
 		return JOptionPane.showOptionDialog(GamePanel.this, "", "Game Paused",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 	}
 
-	public void setModel(Model model) {
-		this.model = model;
-	}
-
-//	public void clicketyClack() {
-//		interf.setClickedColoumn(-1);
-//		repaint();
-//	}
 	private void refreshSizes() {
 		////drawing constants only changing when panel resized
-		//global values
 		w = this.getWidth();
 		h = this.getHeight();
 		//stock image
@@ -268,7 +235,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		rectsStepH = w * 0.0485f;
 		rectsSize = Math.round(w * 0.032f);
 		glowSize = Math.round(w * 0.023f);
-
+		//win counters
 		scoreTablePosition = w / (playerNames.length * 2 - 1);
 		//font
 		fontB = fontB.deriveFont((float) (w * 0.013) + 8);
@@ -278,12 +245,12 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		goodsSize = Math.round(w / 10f);
 		//figure
 		figureSize = Math.round(goodsSize / 5);
-		//timerAll.start();
+		//timerAll.startFromLoaded();
 		hintPanel.resize(w);
 		repaint();
 	}
 
-	public int getClickedCol(Point pnt) {
+	private int getClickedCol(Point pnt) {
 		int col = -1;
 		for (int i = 0; i < nrGameCols; i++) {
 			if (bounds.get(i).contains(pnt)) {
@@ -306,16 +273,12 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 			return null;
 	}
 
-//	@Override
-//	public Dimension getPreferredSize() {
-//		return new Dimension(950, 550);
-//	}
-	// Inherited from ControlGuiInterface
-	@Override
+	@Override //from ControlGuiInterface
 	public void setNrGameCols() {
 		nrGameCols = model.getNrOfCols();
 	}
 
+	@Override //from ControlGuiInterface
 	public void setInterface(GuiControlInterface interf) {
 		this.interf = interf;
 	}
@@ -327,15 +290,9 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 	 * @param position
 	 * @param actualPlayer
 	 */
-	public void start(boolean choiceStage, int position, int actualPlayer) {
+	public void startFromLoaded(boolean choiceStage, int position, int actualPlayer) {
 		start();
-		{//????????
-//			topCommodities = model.getTopCommodities();
-//			wins = model.getWins();
-//			playerNames = model.getAllNames();
-//			colSizes = model.getColsSizes();
-//			setNrGameCols();
-		}
+		
 		setFigure();
 		this.choiceStage = choiceStage;
 		this.position = position;//??
@@ -350,7 +307,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		remove(hintPanel);
 		hintPanel = new HintPanel(commodityImgs, model.getWins().length);
 		add(hintPanel, BorderLayout.SOUTH);
-		setHint(model.makeHints());
+		setHint();
 		hintPanel.setVisible(hints);
 		beforeMoveCols();
 		beforeMoveFigure(position);
@@ -360,8 +317,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		timerAll.start();
 	}
 
-	// Inherited from ControlGuiInterface
-	@Override
+	@Override //from ControlGuiInterface
 	public void start() {
 		topCommodities = model.getTopCommodities();
 		wins = model.getWins();
@@ -384,15 +340,12 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		repaint();
 	}
 
-	// Inherited from ControlGuiInterface
-	@Override
-	public void setPossible(ArrayList<Integer> possibleColoumns) {
-		possibleCols = possibleColoumns;
-		//System.out.println("possible" + Arrays.toString(possibleCols));
+	@Override //from ControlGuiInterface
+	public void setPossible() {
+		possibleCols = model.getPossible();
 	}
 
-	// Inherited from ControlGuiInterface
-	@Override
+	@Override //from ControlGuiInterface
 	public void setFigure() {
 		beforeMoveFigure(model.getPosition());
 		timerFig.start();
@@ -400,12 +353,11 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		choiceStage = !choiceStage;
 	}
 
-	// Inherited from ControlGuiInterface
-	@Override
+	@Override //from ControlGuiInterface
 	public void makeChoice(int kept, int sold, int[] emptiedColoumns) {
 		repaint();
-		sinkingSold = sold;//get the kept commodity
-		sinkingKept = kept;//get the sold commodity
+		sinkingSold = sold;
+		sinkingKept = kept;
 		System.out.println("\nkept: " + kept + "\tsold: " + sold);
 		sinkSoldImg = getImage(this.topCommodities.get(sold));
 		sinkKeptImg = getImage(this.topCommodities.get(kept));
@@ -430,22 +382,12 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		actualPlayer = (actualPlayer + 1) % playerNames.length;
 	}
 
-	// Inherited from ControlGuiInterface
-	@Override
-	public void setHint(String[] hintText) {
-		hintPanel.setHint(hintText);
-		//this.hintText = hintText;
+	@Override //from ControlGuiInterface
+	public void setHint() {
+		hintPanel.setHint(model.makeHints());
 	}
 
-//	@Override
-//	public Dimension getPreferredSize() {
-//		System.out.println("GETPREFERREDSIZE CALLED");
-//		return new Dimension(900,300);
-//	}
-
-	
-	// Inherited from JPanel
-	@Override
+	@Override	// from JPanel
 	public void paint(Graphics g) {
 		paint((Graphics2D) g);
 	}
@@ -560,8 +502,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 //</editor-fold>
 	}
 
-	//Called from StockExchange
-	public void setHintsOnOff(boolean onoff) {
+	void setHintsOnOff(boolean onoff) {
 		if (onoff) {
 			hints = true;
 			hintPanel.setVisible(true);
@@ -574,9 +515,10 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		}
 	}
 
-	//Called from Control
-	public int gameOverPopup(String helpString) {
+	@Override //from ControlGuiInterface
+	public int gameOverPopup() {
 		//System.out.println("popup called");
+		String helpString = model.gameOverString();
 		Object[] options = {"Quit", "Change players", "REVENGE"};
 		return JOptionPane.showOptionDialog(GamePanel.this,
 						helpString, "Game Over",

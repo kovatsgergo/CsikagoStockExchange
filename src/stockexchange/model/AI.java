@@ -2,14 +2,14 @@ package stockexchange.model;
 
 /* Gergo Kovats */
 import java.util.ArrayList;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 public abstract class AI extends Player {
 
 	protected ObservedPlayer observedPlayer;
 
 	public void setObservedNextPlayer(ObservedPlayer observedPlayer) {
-		this.observedPlayer = observedPlayer;
+		
 	}
 
 	public AI(String name) {
@@ -19,6 +19,7 @@ public abstract class AI extends Player {
 	protected abstract int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes);
 	
 	public int[] makeMove(Model model){
+		this.observedPlayer = model.makeObservedNextPlayers();
 		return makeMove(model.getPosition(), model.getTopCommodities(), model.getColsSizes());
 	}
 	//
@@ -120,7 +121,7 @@ public abstract class AI extends Player {
 	}
 
 	protected void waitForKey() {
-		Scanner sc = new Scanner(System.in);
+		java.util.Scanner sc = new java.util.Scanner(System.in);
 		System.out.println("enter to continue");
 		String anything = sc.nextLine();
 	}

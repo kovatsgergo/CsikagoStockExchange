@@ -1,11 +1,10 @@
 package stockexchange.model;
 
 /*Gergo Kovats*/
-import stockexchange.model.Player;
-import stockexchange.model.Commodity;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ObservedPlayer {
+public class ObservedPlayer implements Serializable{
 
 	private ArrayList<Commodity> commodities = new ArrayList();
 

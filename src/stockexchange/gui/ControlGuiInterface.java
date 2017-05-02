@@ -2,23 +2,19 @@ package stockexchange.gui;
 
 /*Gergo Kovats*/
 
-import java.util.ArrayList;
 import stockexchange.GuiControlInterface;
-import stockexchange.model.Model;
 
 public interface ControlGuiInterface {
 
-	public abstract void start();
-	public abstract void start(boolean choiceStage, int position, int actualPlayer);
-	public abstract void setModel(Model model);
-	public abstract void setPossible(ArrayList<Integer> possibleColoumns);
-	public abstract void setFigure();
-	public abstract void makeChoice(int kept, int sold, int[] emptiedColoumns);
-	public abstract void setHint(String[] hintText);
-	public abstract int gameOverPopup(String gameOverString);
-	public abstract int pausePopup();
-	public abstract void setNrGameCols();
-	public abstract void setInterface(GuiControlInterface interf);
-	public abstract void quitGame();
+	public void start();
+	public void startFromLoaded(boolean choiceStage, int position, int actualPlayer);
+	public void setPossible();
+	public void setFigure();
+	public void makeChoice(int kept, int sold, int[] emptiedColoumns);
+	public void setHint();
+	public int gameOverPopup();
+	public int pausePopup();
+	public void setNrGameCols();
+	public void setInterface(GuiControlInterface interf);
 
 }

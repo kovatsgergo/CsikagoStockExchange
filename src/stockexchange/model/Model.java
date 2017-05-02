@@ -5,14 +5,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class Model {
+public class Model implements ControlModelInterface, GuiModelInterface {
 
 	public static final int MAX_NR_PLAYERS = 4;
 	public static final Commodity[] COMMODITY_TYPES = new Commodity[]{new Wheat(), new Sugar(), new Coffee(), new Rice(), new Cocoa(), new Corn()};
 	public static final int START_NR_COLOUMS = 9;
 	public static final int START_HEIGHT_COLOUMNS = 4; //(START_NR_COLOUMS * START_HEIGHT_COLOUMNS)%COMMODITY_TYPES.size()=0
 
-	final int AI_SPEED = 500;
 	private int[] AIchoice = new int[2];
 
 	private ArrayList<Player> players;
@@ -45,9 +44,7 @@ public class Model {
 		propertiesToSave = new ArrayList<>();
 	}
 
-//	public void setPanel(GamePanel gamePanel) {
-//		this.gamePanel = gamePanel;
-//	}
+	@Override //from ControlGuiInterface
 	public void save() {
 		propertiesToSave.clear();
 		propertiesToSave.add(gameOver);//0
@@ -69,6 +66,7 @@ public class Model {
 		new GameSaver(propertiesToSave, true);
 	}
 
+	@Override //from ControlGuiInterface
 	public boolean load() {
 		new GameSaver(propertiesToSave, false);
 		boolean success = false;
@@ -124,6 +122,7 @@ public class Model {
 		}
 	}
 
+	@Override //from GuiModelInterface
 	public ArrayList<Integer> getPriceArray() {
 		ArrayList<Integer> prices = new ArrayList<>();
 		for (int i = 0; i < COMMODITY_TYPES.length; i++) {
@@ -132,10 +131,12 @@ public class Model {
 		return prices;
 	}
 
+	@Override //from ControlGuiInterface 
 	public boolean getChoiceStage() {
 		return choiceStage;
 	}
 
+	@Override //from ControlGuiInterface 
 	public void changeStage() {
 		choiceStage = !choiceStage;
 	}
@@ -166,6 +167,7 @@ public class Model {
 		}
 	}
 
+	@Override //from GuiModelInterface
 	public String[] getAllNames() {
 		String[] allNames = new String[players.size()];
 		for (int i = 0; i < players.size(); i++) {
@@ -174,6 +176,7 @@ public class Model {
 		return allNames;
 	}
 
+	@Override //from ControlGuiInterface 
 	public boolean isAllPlayersAI() {
 		int i = 0;
 		boolean isAllAi = false;
@@ -183,10 +186,12 @@ public class Model {
 		return isAllAi;
 	}
 
+	@Override //from GuiModelInterface
 	public int getNrOfCols() {
 		return columns.size();
 	}
 
+	@Override //from GuiModelInterface
 	public int[] getWins() {
 		int[] retWins = new int[players.size()];
 		for (int i = 0; i < wins.size(); i++) {
@@ -323,6 +328,13 @@ public class Model {
 		}
 		return colSizes;
 	}
+	
+	public boolean isValidStep(int pointNr){
+		if(!choiceStage)
+			return getPossible().contains(pointNr);
+		else
+			return getNeighbors().contains(pointNr);
+	}
 
 	/**
 	 * Initialization
@@ -380,7 +392,8 @@ public class Model {
 
 	}
 
-	public String gameOverString(ArrayList<Integer> winner) {
+	public String gameOverString() {
+		ArrayList<Integer> winner = getWinner();
 		StringBuffer helpString = new StringBuffer("");
 		for (int i = 0; i < winner.size() - 1; i++) {
 			helpString.append(players.get(winner.get(i)).getName());

@@ -1,11 +1,9 @@
 /*Gergo Kovats*/
 package stockexchange.gui;
 
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
@@ -13,43 +11,38 @@ import java.net.URL;
 import java.util.Scanner;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import stockexchange.Control;
 import stockexchange.GuiControlInterface;
-import stockexchange.Start;
-import stockexchange.model.Player;
 
 public class GameContainerPanel extends JPanel {
 
-	//double ratio = 1.5;
-	Dimension lastSize = new Dimension();
-	final JToggleButton tglHints;
-	JPanel top;
-	JPanel bottom;
-	ComponentListener caFixRatio;
-	boolean allowResizeListener;
-	JMenuBar menuBar;
-	GamePanel gamePanel;
-	HintPanel hintPanel;
-	private JFileChooser fc = new JFileChooser("./");
+//	double ratio = 1.5;
+//	private Dimension lastSize = new Dimension();
+//	private ComponentListener caFixRatio;
+//	private boolean allowResizeListener;
+	private final JToggleButton tglHints;
+	private JPanel top;
+	private JPanel bottom;
+	//private GamePanel gamePanel;
+	private String[] players;
 
-	public GameContainerPanel(Player[] players, int[] dimensions, GamePanel gamePanel, GuiControlInterface theGame) {
-		//ratio = dimensions[0] / (double) dimensions[1];
-		System.out.println("min: " + getMinimumSize().toString());
-		//setLayout();
-		//System.out.println("dimensions: "+Arrays.toString(dimensions));
+	public GameContainerPanel(String[][] players, int[] dimensions, GamePanel gamePanel, GuiControlInterface theGame) {
+		//System.out.println("min: " + getMinimumSize().toString());
+		this.players = new String[players.length];
+		for (int i = 0; i < players.length; i++) {
+			this.players[i] = players[i][0];
+		}
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		//setBounds(0, 0, dimensions[0], dimensions[1]);
 		//panels
-		this.gamePanel = gamePanel;
+		//this.gamePanel = gamePanel;
 		top = new JPanel(new GridLayout(1, players.length * 2 - 1));
 		bottom = new JPanel(new GridLayout(1, 5));
 
@@ -62,7 +55,7 @@ public class GameContainerPanel extends JPanel {
 				/////////////LISTENER KIKAPCS, BEKAPCS
 				int w = gamePanel.getWidth();
 				int h = gamePanel.getHeight();
-				int topAndBottom = getHeight() - h;
+//				int topAndBottom = getHeight() - h;
 
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					tglHints.setText("HINTS ON");
@@ -84,7 +77,7 @@ public class GameContainerPanel extends JPanel {
 					//GameFrame.this.removeComponentListener(caFixRatio);
 					//setBounds(getX(), getY(), getWidth(), (int) (getWidth() / 1.7) + topAndBottom);
 				}
-				allowResizeListener = false;
+				//allowResizeListener = false;
 				//GameFrame.this.addComponentListener(caFixRatio);
 			}
 		});
@@ -169,16 +162,13 @@ public class GameContainerPanel extends JPanel {
 
 		// Restart button
 		JButton btRestart = new JButton("Restart");
-
 		btRestart.setFocusable(false);//to have keyboard focus on gamePanel
-
 		btRestart.addActionListener((ActionEvent e) -> {
 			JButton temp = (JButton) e.getSource();
-			Start.switchToSetup();
-//			theGame.setGameOver(true);
+			Control.switchToSetup();
 		});
 		// Add Player names to the top
-		setTopnames(players);
+		setTopnames(this.players);
 		// Add components to panel
 		bottom.add(tglHints, 0);
 		bottom.add(new JLabel(), 1);
@@ -188,31 +178,14 @@ public class GameContainerPanel extends JPanel {
 
 		gamePanel.setFocusable(true);
 		add(top);//, BorderLayout.NORTH);
-//		if (false) {//Blur gamePanel
-//			LayerUI<JComponent> layerUI = new BlurLayerUI();
-//			JLayer<JComponent> jlayer = new JLayer<JComponent>(gamePanel, layerUI);
-//			add(jlayer, BorderLayout.CENTER);
-//		} else
-//			add(gamePanel, BorderLayout.CENTER);
 		add(gamePanel);//, BorderLayout.CENTER);
 		add(bottom);//, BorderLayout.SOUTH);
 		gamePanel.requestFocusInWindow();
-		//setResizable(false);
-
-//		setMaximumSize(new Dimension((int) (dimensions[3] * 1.7), dimensions[3]));
-//		setMinimumSize(new Dimension(dimensions[0] / 2, dimensions[1] / 2));
 	}
 
-	public void setTopnames(Player[] players) {
-		for (int i = 0; i < players.length; i++) {
-			top.add(new JLabel(players[i].getName(), SwingConstants.CENTER), i * 2);
-			if (i < players.length - 1)
-				top.add(new JLabel("vs", SwingConstants.CENTER), i * 2 + 1);
-		}
-	}
-
-	public void setTopnames() {
-		String[] names = gamePanel.model.getAllNames();
+	void setTopnames(String[] players) {
+		top.removeAll();
+		String[] names = players;//gamePanel.model.getAllNames();
 		for (int i = 0; i < names.length; i++) {
 			top.add(new JLabel(names[i], SwingConstants.CENTER), i * 2);
 			if (i < names.length - 1)

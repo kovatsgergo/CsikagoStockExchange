@@ -2,20 +2,21 @@ package stockexchange;
 
 /* Gergo Kovats */
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
+import java.util.Arrays;
 import stockexchange.gui.ControlGuiInterface;
+import stockexchange.gui.GameContainerPanel;
+import stockexchange.gui.GamePanel;
 import stockexchange.gui.MainFrame;
 import stockexchange.model.*;
 
 public class Control implements GuiControlInterface {
 
-	final int AI_SPEED = 1500;
+	private final int AI_SPEED = 1500;
 	private int[] AIchoice = new int[2];
-	boolean gameOver;
-	//boolean choiceStage;
-	Model model;
+	private boolean gameOver;
+	private Model model;
 	private ControlGuiInterface panel; // To communicate with GUI
-	static MainFrame frame;
+	private static MainFrame frame;
 
 	public Control(Player[] players, Model model, ControlGuiInterface interfacePanel) {
 		this.model = model;
@@ -26,7 +27,7 @@ public class Control implements GuiControlInterface {
 	@Override //From GuiControlInterface
 	public void load() {
 		if (model.load())
-			panel.start(model.getChoiceStage(), model.getPosition(), model.getActualPlayerIndex());
+			panel.startFromLoaded(model.getChoiceStage(), model.getPosition(), model.getActualPlayerIndex());
 	}
 
 	@Override	//From GuiControlInterface
@@ -35,11 +36,10 @@ public class Control implements GuiControlInterface {
 			runRound(column);
 	}
 
-	@Override	//From GuiControlInterFace
-	public void setGameOver(boolean gameOver) {
-		this.gameOver = gameOver;
-	}
-
+//	@Override	//From GuiControlInterFace
+//	public void setGameOver(boolean gameOver) {
+//		this.gameOver = gameOver;
+//	}
 	@Override 	//From GuiControlInterFace
 	public void pause() {
 		timerAI.stop();
@@ -49,23 +49,18 @@ public class Control implements GuiControlInterface {
 				timerAI.start();
 				break;
 			case 1:
-				panel.quitGame();
+				switchToSetup();
 				break;
 			case 0:
 				System.exit(0);
 		}
 	}
 
-	private int[] getAIMove() {
-		((AI) model.getActualPlayer()).setObservedNextPlayer(model.makeObservedNextPlayers());
-		return ((AI) model.getActualPlayer()).makeMove(model);
-	}
-
 	/////////////////////////
 	///////////////////////AI
-	javax.swing.Timer timerAI = new javax.swing.Timer(AI_SPEED, (ActionEvent e) -> {
-		aiChoice();
-	});
+	private int[] getAIMove() {
+		return ((AI) model.getActualPlayer()).makeMove(model);
+	}
 
 	private void aiPoint() {
 		//System.out.println("aiPoint called\t actual: " + players.get(actualPlayer).getName());
@@ -73,6 +68,10 @@ public class Control implements GuiControlInterface {
 			timerAI.start();
 		}
 	}
+
+	javax.swing.Timer timerAI = new javax.swing.Timer(AI_SPEED, (ActionEvent e) -> {
+		aiChoice();
+	});
 
 	/**
 	 * Handles the AIs' turns at both stages
@@ -102,22 +101,22 @@ public class Control implements GuiControlInterface {
 	 *
 	 * @param pointNr the chosen column's index number
 	 */
-	public void runRound(int pointNr) {///////////////IDEIGLENES
+	public void runRound(int pointNr) {
 		//System.out.println("\trunRound started\tgamover: " + gameOver + "\tcolumns: " + columns.size());
 		if (!gameOver) {
 			if (!model.getChoiceStage()) {
 				System.out.println("Step Stage started pointNr " + pointNr);
-				if (model.getPossible().contains(pointNr)) {
+				if (model.isValidStep(pointNr)) {
 					model.setPosition(pointNr);
 					panel.setFigure();
-					//panel.setPossible(getPossible());////////////////////////
 					model.changeStage();
 				}
 			} else {
 				System.out.println("Choice Stage started pointNr " + pointNr);
 				int keep;// the kept commodity's index in getNegihbors()
 				int[] emptiedColoumns;
-				if (model.getNeighbors().contains(pointNr)) {
+				if (model.isValidStep(pointNr)) {
+					timerAI.stop();
 					keep = model.getNeighbors().indexOf(pointNr);
 					model.changeStage();
 					int kept = model.getNeighbors().get(keep);
@@ -129,43 +128,36 @@ public class Control implements GuiControlInterface {
 					panel.makeChoice(kept, sold, emptiedColoumns);
 					panel.setNrGameCols();
 					panel.setFigure();
-					timerAI.stop();
-					panel.setPossible(model.getPossible());
+					panel.setPossible();
 				}
 			}
 			//System.out.println("ai started in runhuman");
-			///////////////////
-
 			aiPoint();
 		}
 
-		panel.setHint(model.makeHints());
+		panel.setHint();
 		if (gameOver)
 			endGame();
 	}
 
 	private void endGame() {
-		ArrayList<Integer> winner = model.getWinner();
 		int n;
 		if (model.isAllPlayersAI()) {
 			n = 2;//to test AIs
 			//n = panel.gameOverPopup(gameOverString(winner));
-
 		} else {
-			n = panel.gameOverPopup(model.gameOverString(winner));
+			n = panel.gameOverPopup();
 		}
-
 		switch (n) {
 			case 2:
 				reStart();
 				break;
 			case 1:
-				panel.quitGame();
+				switchToSetup();
 				break;
 			case 0:
 				System.exit(0);
 		}
-
 	}
 
 	/**
@@ -175,10 +167,56 @@ public class Control implements GuiControlInterface {
 		gameOver = false;
 		model.reStart();
 		//prices = Arrays.copyOf(PRICES_AT_START, prices.length);
-		panel.setNrGameCols();
+		//panel.setNrGameCols();
 		panel.start();
 		runRound(-1);
+	}
 
+	public static void switchToGame(String[][] players, int[] dims) {
+		Player[] playersArray = createPlayers(players);
+		Model model = new Model(playersArray);
+		GamePanel gamePanel = new GamePanel(model);
+		ControlGuiInterface interfacePanel = gamePanel;
+		GuiControlInterface control = new Control(playersArray, model, interfacePanel);
+		gamePanel.setInterface(control);
+		frame.setControl(control);
+		frame.setModel(model);
+		GameContainerPanel gameContainerPanel = new GameContainerPanel(players, dims, gamePanel, control);
+		frame.setToGame(gameContainerPanel);
+	}
+
+	public static void switchToSetup() {
+		frame.setToStartup();
+	}
+
+	private static Player[] createPlayers(String[][] players) {
+		System.out.println("players at createPlayers: " + Arrays.deepToString(players));
+		Player[] playerArray = new Player[players.length];
+		for (int i = 0; i < players.length; i++) {
+			if (players[i][1].equals("human"))
+				playerArray[i] = new Player(players[i][0]);
+			else
+				switch (players[i][0]) {
+					case "Easy":
+						playerArray[i] = new AIeasy("AI " + (i + 1) + " (easy)");
+						break;
+					case "Medium":
+						playerArray[i] = new AImedium("AI " + (i + 1) + " (medium)");
+						break;
+					case "Hard":
+						playerArray[i] = new AIhard("AI " + (i + 1) + " (hard)");
+						break;
+				}
+		}
+		return playerArray;
+	}
+
+	public static void main(String[] args) {
+		if (System.getProperty("os.name").contains("Mac")) {
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+		}
+		frame = new MainFrame();
+		frame.setVisible(true);
 	}
 
 }

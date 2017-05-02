@@ -5,7 +5,6 @@ package stockexchange;
 public interface GuiControlInterface {
 	
 	void setClickedColoumn(int coloumn);
-	void setGameOver(boolean gameOver);
 	void load();
 	void pause();
 	
