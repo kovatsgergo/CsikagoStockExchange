@@ -2,12 +2,16 @@
 package stockexchange.gui;
 
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 import stockexchange.GuiControlInterface;
 import stockexchange.model.Model;
 import stockexchange.model.Player;
@@ -36,15 +40,27 @@ public class MainFrame extends JFrame {
 		mFile.add(miOpen);
 
 		miOpen.addActionListener((ActionEvent e) -> {
-			control.load();
+			FileDialog chooser = new FileDialog(new JFrame());
+			chooser.setVisible(true);
+			String chosenDir = chooser.getDirectory();
+			String chosenFile = chooser.getFile();
+			chooser.dispose();
+			control.load(chosenDir+chosenFile);
 			gameContainerPanel.setTopnames(model.getAllNames());
 			//gameContainerPanel.validate();
-			//fc.showOpenDialog((JFrame) SwingUtilities.getWindowAncestor(this));
+
 		});
 		mFile.add(miSave);
 		miSave.addActionListener((ActionEvent e) -> {
+			JFileChooser chooser = new JFileChooser();
+		int returnVal = chooser.showSaveDialog(SwingUtilities.getWindowAncestor(this));
+		String pathName = "";
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = chooser.getSelectedFile();
+			pathName = file.getPath();
+		}
 			//fc.showSaveDialog((JFrame) SwingUtilities.getWindowAncestor(this));
-			model.save();
+			model.save(pathName);
 		});
 		setJMenuBar(mb);
 

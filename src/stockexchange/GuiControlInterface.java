@@ -5,7 +5,7 @@ package stockexchange;
 public interface GuiControlInterface {
 	
 	void setClickedColoumn(int coloumn);
-	void load();
+	void load(String pathFile);
 	void pause();
 	
 }

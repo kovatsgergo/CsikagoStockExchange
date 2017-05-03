@@ -11,14 +11,13 @@ import java.util.ArrayList;
 
 public class GameSaver {
 
-	public GameSaver(ArrayList<Object> savedProperties, boolean save) {
-		System.out.println("Working Directory = " +
-              System.getProperty("user.dir"));
-		File savedGameFile = new File("./build/classes/images/savedGame.dat");
+	public GameSaver(ArrayList<Object> savedProperties, boolean save, String pathFile) {
+		File savedGameFile = new File(pathFile);
+		//File savedGameFile = new File("./build/classes/images/savedGame.dat");
 		//mentes
 		if (save) {
 			try {
-				if(savedGameFile.exists())
+				if (savedGameFile.exists())
 					savedGameFile.delete();
 				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(savedGameFile));
 				for (Object savedProperty : savedProperties) {

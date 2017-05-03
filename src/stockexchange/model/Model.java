@@ -45,7 +45,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	}
 
 	@Override //from ControlGuiInterface
-	public void save() {
+	public void save(String pathName) {
 		propertiesToSave.clear();
 		propertiesToSave.add(gameOver);//0
 		propertiesToSave.add(choiceStage);//1
@@ -63,19 +63,16 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		}
 		propertiesToSave.add(getPriceArray());
 		//System.out.println(propertiesToSave.toString());
-		new GameSaver(propertiesToSave, true);
+		new GameSaver(propertiesToSave, true, pathName);
 	}
 
-	@Override //from ControlGuiInterface
-	public boolean load() {
-		new GameSaver(propertiesToSave, false);
+	public boolean load(String pathName) {
+		new GameSaver(propertiesToSave, false, pathName);
 		boolean success = false;
 		if (propertiesToSave != null) {
-			for (int i = 0; i < propertiesToSave.size(); i++) {
-				System.out.println(i + ": " + propertiesToSave.get(i).toString());
-			}
-
-			//System.out.println(propertiesToSave.toString());
+//			for (int i = 0; i < propertiesToSave.size(); i++) {
+//				System.out.println(i + ": " + propertiesToSave.get(i).toString());
+//			}
 			gameOver = (boolean) propertiesToSave.get(0);
 			choiceStage = (boolean) propertiesToSave.get(1);
 			lastStarter = (int) propertiesToSave.get(2);
@@ -104,7 +101,6 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 			wins = (ArrayList<Integer>) propertiesToSave.get(4);
 			ArrayList<Integer> tempPrices = (ArrayList<Integer>) propertiesToSave.get(i);
 			priceSetter(tempPrices);
-			//gamePanel.start(choiceStage, position, actualPlayer);
 			success = true;
 		}
 		return success;
@@ -200,6 +196,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return retWins;
 	}
 
+	@Override //from GuiModelInterface
 	public ArrayList<Integer> getPossible() {
 		ArrayList<Integer> possible = new ArrayList<>();
 		if (!expert) {
@@ -223,6 +220,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return possible;
 	}
 
+	@Override //from ControlGuiInterface 
 	public ArrayList<Integer> getNeighbors() {
 		ArrayList<Integer> neighbors = new ArrayList<>();
 		neighbors.add((position + 1) % getNrOfCols());
@@ -230,6 +228,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return neighbors;
 	}
 
+	@Override //from ControlGuiInterface 
 	public Player getActualPlayer() {
 		return players.get(actualPlayer);
 	}
@@ -238,7 +237,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return actualPlayer;
 	}
 
-	public ObservedPlayer makeObservedNextPlayers() {
+	ObservedPlayer makeObservedNextPlayers() {
 		return new ObservedPlayer(players.get(nextPlayer(actualPlayer)));
 	}
 
@@ -256,22 +255,25 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	 * @param sold
 	 * @return
 	 */
-	public int[] handleChoice(int kept, int sold) {
+	public int[] handleChoice(int pointNr) {
+		int kept = pointNr;
+		int keep = getNeighbors().indexOf(pointNr);
+		int sold = getNeighbors().get(1 - keep);
 		//System.out.println("Handle");
 		kept %= getNrOfCols();
 		sold %= getNrOfCols();
-		int[] ret = {-1, -1};
-		Column actualKept = columns.get(kept);
-		Column actualSold = columns.get(sold);
+		int[] emptiedColumn = {-1, -1};
+		Column keptColumn = columns.get(kept);
+		Column soldColumn = columns.get(sold);
 //		int outIdx = COMMODITY_TYPES.indexOf(actualSold.getTop());
 
-		actualSold.getTop().lowerPrice();
-		players.get(actualPlayer).add(actualKept.getTop());
+		soldColumn.getTop().lowerPrice();
+		players.get(actualPlayer).add(keptColumn.getTop());
 		//System.out.println("actualK.getTop() "+actualK.getTop()+ " \t actualO.getTop()"
-		actualKept.remove();
-		if (actualKept.goods.isEmpty()) {
+		keptColumn.remove();
+		if (keptColumn.goods.isEmpty()) {
 			columns.remove(kept);
-			ret[0] = kept;
+			emptiedColumn[0] = kept;
 			if (position > kept) {
 				position--;
 			}
@@ -279,17 +281,20 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 				sold--;
 			}
 		}
-		actualSold.remove();
-		if (actualSold.goods.isEmpty()) {
+		soldColumn.remove();
+		if (soldColumn.goods.isEmpty()) {
 			columns.remove(sold);
-			ret[1] = sold;
+			emptiedColumn[1] = sold;
 			if (position > sold) {
 				position--;
 			}
 		}
 		countPoints();
 		actualPlayer = nextPlayer(actualPlayer);
-		return ret;
+		if (getNrOfCols() < 3) {
+			gameOver = true;
+		}
+		return emptiedColumn;
 	}
 
 	/**
@@ -307,6 +312,10 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 
 	public int getPosition() {
 		return position;
+	}
+
+	public boolean isGameOver() {
+		return gameOver;
 	}
 
 	/**
@@ -328,9 +337,9 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		}
 		return colSizes;
 	}
-	
-	public boolean isValidStep(int pointNr){
-		if(!choiceStage)
+
+	public boolean isValidStep(int pointNr) {
+		if (!choiceStage)
 			return getPossible().contains(pointNr);
 		else
 			return getNeighbors().contains(pointNr);

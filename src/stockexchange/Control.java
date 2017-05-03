@@ -13,7 +13,7 @@ public class Control implements GuiControlInterface {
 
 	private final int AI_SPEED = 1500;
 	private int[] AIchoice = new int[2];
-	private boolean gameOver;
+	//private boolean gameOver;
 	private Model model;
 	private ControlGuiInterface panel; // To communicate with GUI
 	private static MainFrame frame;
@@ -25,9 +25,9 @@ public class Control implements GuiControlInterface {
 	}
 
 	@Override //From GuiControlInterface
-	public void load() {
-		if (model.load())
-			panel.startFromLoaded(model.getChoiceStage(), model.getPosition(), model.getActualPlayerIndex());
+	public void load(String pathFile) {
+		if (model.load(pathFile))
+			panel.startFromLoaded();
 	}
 
 	@Override	//From GuiControlInterface
@@ -36,10 +36,6 @@ public class Control implements GuiControlInterface {
 			runRound(column);
 	}
 
-//	@Override	//From GuiControlInterFace
-//	public void setGameOver(boolean gameOver) {
-//		this.gameOver = gameOver;
-//	}
 	@Override 	//From GuiControlInterFace
 	public void pause() {
 		timerAI.stop();
@@ -64,7 +60,7 @@ public class Control implements GuiControlInterface {
 
 	private void aiPoint() {
 		//System.out.println("aiPoint called\t actual: " + players.get(actualPlayer).getName());
-		if (model.getActualPlayer() instanceof AI && !gameOver) {
+		if (model.getActualPlayer() instanceof AI && !model.isGameOver()) {
 			timerAI.start();
 		}
 	}
@@ -78,7 +74,7 @@ public class Control implements GuiControlInterface {
 	 */
 	private void aiChoice() {
 		//System.out.println("aiChoice run");
-		if (model.getActualPlayer() instanceof AI && !gameOver) {
+		if (model.getActualPlayer() instanceof AI && !model.isGameOver()) {
 			int pointNr;
 			if (!model.getChoiceStage()) {
 				//System.out.println("aiChoice choiceStage");
@@ -103,32 +99,22 @@ public class Control implements GuiControlInterface {
 	 */
 	public void runRound(int pointNr) {
 		//System.out.println("\trunRound started\tgamover: " + gameOver + "\tcolumns: " + columns.size());
-		if (!gameOver) {
+		if (!model.isGameOver()) {
 			if (!model.getChoiceStage()) {
-				System.out.println("Step Stage started pointNr " + pointNr);
+				//System.out.println("Step Stage started pointNr " + pointNr);
 				if (model.isValidStep(pointNr)) {
 					model.setPosition(pointNr);
 					panel.setFigure();
 					model.changeStage();
 				}
 			} else {
-				System.out.println("Choice Stage started pointNr " + pointNr);
-				int keep;// the kept commodity's index in getNegihbors()
-				int[] emptiedColoumns;
+				//System.out.println("Choice Stage started pointNr " + pointNr);
+				int[] emptiedColumns;
 				if (model.isValidStep(pointNr)) {
 					timerAI.stop();
-					keep = model.getNeighbors().indexOf(pointNr);
+					emptiedColumns = model.handleChoice(pointNr);
+					panel.makeChoice(pointNr, emptiedColumns);
 					model.changeStage();
-					int kept = model.getNeighbors().get(keep);
-					int sold = model.getNeighbors().get(1 - keep);
-					emptiedColoumns = model.handleChoice(kept, sold);
-					if (model.getNrOfCols() < 3) {
-						gameOver = true;
-					}
-					panel.makeChoice(kept, sold, emptiedColoumns);
-					panel.setNrGameCols();
-					panel.setFigure();
-					panel.setPossible();
 				}
 			}
 			//System.out.println("ai started in runhuman");
@@ -136,7 +122,7 @@ public class Control implements GuiControlInterface {
 		}
 
 		panel.setHint();
-		if (gameOver)
+		if (model.isGameOver())
 			endGame();
 	}
 
@@ -164,7 +150,6 @@ public class Control implements GuiControlInterface {
 	 * Initialization
 	 */
 	private void reStart() {
-		gameOver = false;
 		model.reStart();
 		//prices = Arrays.copyOf(PRICES_AT_START, prices.length);
 		//panel.setNrGameCols();

@@ -213,7 +213,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		}
 		return temp;
 	}
-	
+
 	@Override //from ControlGuiInterface
 	public int pausePopup() {
 		Object[] options = {"Quit", "Change players", "Continue"};
@@ -285,18 +285,14 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 
 	/**
 	 * Start from a saved position
-	 *
-	 * @param choiceStage
-	 * @param position
-	 * @param actualPlayer
 	 */
-	public void startFromLoaded(boolean choiceStage, int position, int actualPlayer) {
+	public void startFromLoaded() {
 		start();
-		
+
 		setFigure();
-		this.choiceStage = choiceStage;
-		this.position = position;//??
-		this.actualPlayer = actualPlayer;
+		this.choiceStage = model.getChoiceStage();
+		this.position = model.getPosition();
+		this.actualPlayer = model.getActualPlayerIndex();
 		possibleCols = model.getPossible();
 		//nrCols = nrGameCols;
 		System.out.println("prajsz: " + model.getPriceArray().toString());
@@ -354,13 +350,13 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 	}
 
 	@Override //from ControlGuiInterface
-	public void makeChoice(int kept, int sold, int[] emptiedColoumns) {
+	public void makeChoice(int kept, int[] emptiedColoumns) {
 		repaint();
-		sinkingSold = sold;
+		sinkingSold = model.getNeighbors().get(1 - model.getNeighbors().indexOf(kept));
 		sinkingKept = kept;
-		System.out.println("\nkept: " + kept + "\tsold: " + sold);
-		sinkSoldImg = getImage(this.topCommodities.get(sold));
-		sinkKeptImg = getImage(this.topCommodities.get(kept));
+		//System.out.println("\nkept: " + sinkingKept + "\tsold: " + sinkingSold);
+		sinkSoldImg = getImage(this.topCommodities.get(sinkingSold));
+		sinkKeptImg = getImage(this.topCommodities.get(sinkingKept));
 		setNrGameCols();
 		//Set prices
 		for (int i = 0; i < 6; i++) {
@@ -380,6 +376,9 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		pricesStopped = false;
 		timerAll.start();
 		actualPlayer = (actualPlayer + 1) % playerNames.length;
+		setNrGameCols();
+		setFigure();
+		setPossible();
 	}
 
 	@Override //from ControlGuiInterface
