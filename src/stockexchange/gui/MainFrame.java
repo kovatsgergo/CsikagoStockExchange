@@ -5,13 +5,10 @@ import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
 import stockexchange.GuiControlInterface;
 import stockexchange.model.Model;
 import stockexchange.model.Player;
@@ -40,7 +37,8 @@ public class MainFrame extends JFrame {
 		mFile.add(miOpen);
 
 		miOpen.addActionListener((ActionEvent e) -> {
-			FileDialog chooser = new FileDialog(new JFrame());
+			FileDialog chooser = new FileDialog(this, "Open saved game", FileDialog.LOAD);
+			chooser.setFile(".cse");
 			chooser.setVisible(true);
 			String chosenDir = chooser.getDirectory();
 			String chosenFile = chooser.getFile();
@@ -54,15 +52,22 @@ public class MainFrame extends JFrame {
 		});
 		mFile.add(miSave);
 		miSave.addActionListener((ActionEvent e) -> {
-			JFileChooser chooser = new JFileChooser();
-			int returnVal = chooser.showSaveDialog(SwingUtilities.getWindowAncestor(this));
-			String pathName = "";
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File file = chooser.getSelectedFile();
-				pathName = file.getPath();
+			FileDialog chooser = new FileDialog(this, "Save game as", FileDialog.SAVE);
+			chooser.setFile(".cse");
+			chooser.setVisible(true);
+			String chosenDir = chooser.getDirectory();
+			String chosenFile = chooser.getFile();
+			chooser.dispose();
+//			JFileChooser chooser = new JFileChooser();
+//			int returnVal = chooser.showSaveDialog(SwingUtilities.getWindowAncestor(this));
+//			String pathName = "";
+//			if (returnVal == JFileChooser.APPROVE_OPTION) {
+			if (chosenFile != null) {
+//				File file = chooser.getSelectedFile();
+//				pathName = file.getPath();
+//				model.save(pathName);
+				model.save(chosenDir + chosenFile);
 			}
-			//fc.showSaveDialog((JFrame) SwingUtilities.getWindowAncestor(this));
-			model.save(pathName);
 		});
 		setJMenuBar(mb);
 
