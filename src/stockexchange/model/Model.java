@@ -28,7 +28,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	private boolean expert = false;
 
 	private ArrayList<Object> propertiesToSave;
-	//ControlGuiInterface gamePanel;
+	//ControlModelInterface gamePanel;
 
 	public Model(Player[] players) {
 		this.players = new ArrayList<Player>(Arrays.asList(players));
@@ -44,7 +44,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		propertiesToSave = new ArrayList<>();
 	}
 
-	@Override //from ControlGuiInterface
+	@Override //from ControlModelInterface
 	public void save(String pathName) {
 		propertiesToSave.clear();
 		propertiesToSave.add(gameOver);//0
@@ -127,12 +127,12 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return prices;
 	}
 
-	@Override //from ControlGuiInterface 
+	@Override //from ControlModelInterface 
 	public boolean getChoiceStage() {
 		return choiceStage;
 	}
 
-	@Override //from ControlGuiInterface 
+	@Override //from ControlModelInterface 
 	public void changeStage() {
 		choiceStage = !choiceStage;
 	}
@@ -172,7 +172,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return allNames;
 	}
 
-	@Override //from ControlGuiInterface 
+	@Override //from ControlModelInterface 
 	public boolean isAllPlayersAI() {
 		int i = 0;
 		boolean isAllAi = false;
@@ -220,7 +220,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return possible;
 	}
 
-	@Override //from ControlGuiInterface 
+	@Override //from GuiModelInterface
 	public ArrayList<Integer> getNeighbors() {
 		ArrayList<Integer> neighbors = new ArrayList<>();
 		neighbors.add((position + 1) % getNrOfCols());
@@ -228,19 +228,23 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return neighbors;
 	}
 
-	@Override //from ControlGuiInterface 
+	@Override //from ControlModelInterface 
 	public Player getActualPlayer() {
 		return players.get(actualPlayer);
 	}
 
+	@Override //from ControlModelInterface 
 	public int getActualPlayerIndex() {
 		return actualPlayer;
 	}
 
-	ObservedPlayer makeObservedNextPlayers() {
+	//only AI uses
+	@Override //from GuiModelInterface
+	public ObservedPlayer makeObservedNextPlayers() {
 		return new ObservedPlayer(players.get(nextPlayer(actualPlayer)));
 	}
 
+	@Override //from ControlModelInterface 
 	public void setPosition(int position) {
 		if (!choiceStage && getPossible().contains(position))
 			this.position = position;
@@ -251,10 +255,10 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	 * Handle the consequences of a choice phase: removes commodities, empty
 	 * columns
 	 *
-	 * @param kept
-	 * @param sold
+	 * @param pointNr
 	 * @return
 	 */
+	@Override //from ControlModelInterface 
 	public int[] handleChoice(int pointNr) {
 		int kept = pointNr;
 		int keep = getNeighbors().indexOf(pointNr);
@@ -310,18 +314,17 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return (actual + 1) % players.size();
 	}
 
+	@Override// form GuiModelInterface
 	public int getPosition() {
 		return position;
 	}
 
+	@Override //from ControlModelInterface 
 	public boolean isGameOver() {
 		return gameOver;
 	}
 
-	/**
-	 *
-	 * @return the top startGoods of each column
-	 */
+	@Override // form GuiModelInterface
 	public ArrayList<Commodity> getTopCommodities() {
 		ArrayList<Commodity> topGoods = new ArrayList<>();
 		for (Column column : columns) {
@@ -330,6 +333,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return topGoods;
 	}
 
+	@Override // form GuiModelInterface
 	public int[] getColsSizes() {
 		int[] colSizes = new int[columns.size()];
 		for (int i = 0; i < columns.size(); i++) {
@@ -338,6 +342,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return colSizes;
 	}
 
+	@Override //from ControlModelInterface 
 	public boolean isValidStep(int pointNr) {
 		if (!choiceStage)
 			return getPossible().contains(pointNr);
@@ -348,6 +353,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	/**
 	 * Initialization
 	 */
+	@Override //from ControlModelInterface 
 	public void reStart() {
 		gameOver = false;
 		//prices = Arrays.copyOf(PRICES_AT_START, prices.length);
@@ -370,6 +376,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		System.out.println("next starter: " + actualPlayer + "\n");
 	}
 
+	@Override // form GuiModelInterface
 	public String[] makeHints() {
 		String[] returnHints = new String[players.size()];
 		for (int i = 0; i < players.size(); i++) {
@@ -382,7 +389,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		return returnHints;
 	}
 
-	public ArrayList<Integer> getWinner() {
+	private ArrayList<Integer> getWinner() {
 		ArrayList<Integer> returnWinner = new ArrayList();
 		ArrayList<Integer> points = new ArrayList();
 		for (int i = 0; i < players.size(); i++) {
@@ -401,6 +408,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 
 	}
 
+	@Override // form GuiModelInterface
 	public String gameOverString() {
 		ArrayList<Integer> winner = getWinner();
 		StringBuffer helpString = new StringBuffer("");

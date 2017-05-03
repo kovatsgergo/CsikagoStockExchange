@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class GameSaver {
 				}
 				oos.close();
 				savedProperties.clear();
+			}	catch (NotSerializableException e) {
+				System.out.println("Not serializable object");
 			} catch (IOException e) {
 				System.out.println("I/O hiba: " + e.getMessage());
 			}
@@ -39,7 +42,7 @@ public class GameSaver {
 				while (true)
 					savedProperties.add(ois.readObject());
 			} catch (ClassNotFoundException e) {
-				System.out.println("Hibas osztaly!");
+				System.out.println("Class not found");
 			} catch (IOException e) {
 				System.out.println("I/O hiba: " + e.getMessage());
 			} finally {
