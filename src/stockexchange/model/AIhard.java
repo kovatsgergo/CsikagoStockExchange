@@ -3,11 +3,11 @@ package stockexchange.model;
 /* Gergo Kovats */
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 public class AIhard extends AI implements Serializable{
 
-	Scanner scanner = new Scanner(System.in);
+//	Scanner scanner = new Scanner(System.in);
 	//ArrayList<Player> players;
 
 	public AIhard(String name) {

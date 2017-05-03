@@ -120,11 +120,11 @@ public abstract class AI extends Player {
 		choice[1] = getNeighbors(choice[0], topsSize)[choice[1]];
 	}
 
-	protected void waitForKey() {
-		java.util.Scanner sc = new java.util.Scanner(System.in);
-		System.out.println("enter to continue");
-		String anything = sc.nextLine();
-	}
+//	protected void waitForKey() {
+//		java.util.Scanner sc = new java.util.Scanner(System.in);
+//		System.out.println("enter to continue");
+//		String anything = sc.nextLine();
+//	}
 
 	protected int[][] getForecasts(int position, ArrayList<Commodity> tops, int[] colsSizes) {
 		int[][] forecasts = new int[3][2];

@@ -70,9 +70,9 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		new GameSaver(propertiesToSave, false, pathName);
 		boolean success = false;
 		if (propertiesToSave != null) {
-//			for (int i = 0; i < propertiesToSave.size(); i++) {
-//				System.out.println(i + ": " + propertiesToSave.get(i).toString());
-//			}
+			for (int i = 0; i < propertiesToSave.size(); i++) {
+				System.out.println(i + ": " + propertiesToSave.get(i).toString());
+			}
 			gameOver = (boolean) propertiesToSave.get(0);
 			choiceStage = (boolean) propertiesToSave.get(1);
 			lastStarter = (int) propertiesToSave.get(2);

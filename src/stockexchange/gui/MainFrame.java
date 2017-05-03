@@ -45,20 +45,22 @@ public class MainFrame extends JFrame {
 			String chosenDir = chooser.getDirectory();
 			String chosenFile = chooser.getFile();
 			chooser.dispose();
-			control.load(chosenDir+chosenFile);
-			gameContainerPanel.setTopnames(model.getAllNames());
+			if (chosenFile != null) {
+				control.load(chosenDir + chosenFile);
+				gameContainerPanel.setTopnames(model.getAllNames());
+			}
 			//gameContainerPanel.validate();
 
 		});
 		mFile.add(miSave);
 		miSave.addActionListener((ActionEvent e) -> {
 			JFileChooser chooser = new JFileChooser();
-		int returnVal = chooser.showSaveDialog(SwingUtilities.getWindowAncestor(this));
-		String pathName = "";
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File file = chooser.getSelectedFile();
-			pathName = file.getPath();
-		}
+			int returnVal = chooser.showSaveDialog(SwingUtilities.getWindowAncestor(this));
+			String pathName = "";
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = chooser.getSelectedFile();
+				pathName = file.getPath();
+			}
 			//fc.showSaveDialog((JFrame) SwingUtilities.getWindowAncestor(this));
 			model.save(pathName);
 		});
