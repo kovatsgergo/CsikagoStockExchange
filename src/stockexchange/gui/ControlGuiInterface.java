@@ -7,7 +7,7 @@ import stockexchange.GuiControlInterface;
 public interface ControlGuiInterface {
 
 	public void start();
-	public void startFromLoaded();
+	public void startFromLoaded(boolean choiceStage);
 	public void setPossible();
 	public void setFigure();
 	public void makeChoice(int kept, int[] emptiedColoumns);

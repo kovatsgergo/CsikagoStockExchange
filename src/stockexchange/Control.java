@@ -2,7 +2,6 @@ package stockexchange;
 
 /* Gergo Kovats */
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
 import stockexchange.gui.ControlGuiInterface;
 import stockexchange.gui.GameContainerPanel;
 import stockexchange.gui.GamePanel;
@@ -11,35 +10,39 @@ import stockexchange.model.*;
 
 public class Control implements GuiControlInterface {
 
-	private final int AI_SPEED = 1500;
+	private final int AI_SPEED = 1000;
 	private int[] AIchoice = new int[2];
 	//private boolean gameOver;
-	private Model model;
-	private ControlGuiInterface panel; // To communicate with GUI
+	private ControlModelInterface iControlModel;
+	private ControlGuiInterface iControlGui; // To communicate with GUI
 	private static MainFrame frame;
 
-	public Control(Player[] players, Model model, ControlGuiInterface interfacePanel) {
-		this.model = model;
-		this.panel = interfacePanel;
+	public Control(Model model, ControlGuiInterface interfacePanel) {
+		this.iControlModel = model;
+		this.iControlGui = interfacePanel;
 		reStart();
 	}
 
 	@Override //From GuiControlInterface
 	public void load(String pathFile) {
-		if (model.load(pathFile))
-			panel.startFromLoaded();
+		if (iControlModel.load(pathFile))
+			iControlGui.startFromLoaded(iControlModel.getChoiceStage());
+	}
+	
+	public void save(String pathFile){
+		iControlModel.save(pathFile);
 	}
 
 	@Override	//From GuiControlInterface
 	public void setClickedColoumn(int column) {
-		if (!(model.getActualPlayer() instanceof AI))
+		if (!(iControlModel.getActualPlayer() instanceof AI))
 			runRound(column);
 	}
 
 	@Override 	//From GuiControlInterFace
 	public void pause() {
 		timerAI.stop();
-		int n = panel.pausePopup();
+		int n = iControlGui.pausePopup();
 		switch (n) {
 			case 2:
 				timerAI.start();
@@ -55,12 +58,12 @@ public class Control implements GuiControlInterface {
 	/////////////////////////
 	///////////////////////AI
 	private int[] getAIMove() {
-		return ((AI) model.getActualPlayer()).makeMove(model);
+		return ((AI) iControlModel.getActualPlayer()).makeMove();
 	}
 
 	private void aiPoint() {
 		//System.out.println("aiPoint called\t actual: " + players.get(actualPlayer).getName());
-		if (model.getActualPlayer() instanceof AI && !model.isGameOver()) {
+		if (iControlModel.getActualPlayer() instanceof AI && !iControlModel.isGameOver()) {
 			timerAI.start();
 		}
 	}
@@ -74,9 +77,9 @@ public class Control implements GuiControlInterface {
 	 */
 	private void aiChoice() {
 		//System.out.println("aiChoice run");
-		if (model.getActualPlayer() instanceof AI && !model.isGameOver()) {
+		if (iControlModel.getActualPlayer() instanceof AI && !iControlModel.isGameOver()) {
 			int pointNr;
-			if (!model.getChoiceStage()) {
+			if (!iControlModel.getChoiceStage()) {
 				//System.out.println("aiChoice choiceStage");
 				AIchoice = getAIMove();
 				pointNr = AIchoice[0];
@@ -99,40 +102,40 @@ public class Control implements GuiControlInterface {
 	 */
 	public void runRound(int pointNr) {
 		//System.out.println("\trunRound started\tgamover: " + gameOver + "\tcolumns: " + columns.size());
-		if (!model.isGameOver()) {
-			if (!model.getChoiceStage()) {
+		if (!iControlModel.isGameOver()) {
+			if (!iControlModel.getChoiceStage()) {
 				//System.out.println("Step Stage started pointNr " + pointNr);
-				if (model.isValidStep(pointNr)) {
-					model.setPosition(pointNr);
-					panel.setFigure();
-					model.changeStage();
+				if (iControlModel.isValidStep(pointNr)) {
+					iControlModel.setPosition(pointNr);
+					iControlGui.setFigure();
+					iControlModel.changeStage();
 				}
 			} else {
 				//System.out.println("Choice Stage started pointNr " + pointNr);
 				int[] emptiedColumns;
-				if (model.isValidStep(pointNr)) {
+				if (iControlModel.isValidStep(pointNr)) {
 					timerAI.stop();
-					emptiedColumns = model.handleChoice(pointNr);
-					panel.makeChoice(pointNr, emptiedColumns);
-					model.changeStage();
+					emptiedColumns = iControlModel.handleChoice(pointNr);
+					iControlGui.makeChoice(pointNr, emptiedColumns);
+					iControlModel.changeStage();
 				}
 			}
 			//System.out.println("ai started in runhuman");
 			aiPoint();
 		}
 
-		panel.setHint();
-		if (model.isGameOver())
+		iControlGui.setHint();
+		if (iControlModel.isGameOver())
 			endGame();
 	}
 
 	private void endGame() {
 		int n;
-		if (model.isAllPlayersAI()) {
+		if (iControlModel.isAllPlayersAI()) {
 			n = 2;//to test AIs
 			//n = panel.gameOverPopup(gameOverString(winner));
 		} else {
-			n = panel.gameOverPopup();
+			n = iControlGui.gameOverPopup();
 		}
 		switch (n) {
 			case 2:
@@ -150,50 +153,30 @@ public class Control implements GuiControlInterface {
 	 * Initialization
 	 */
 	private void reStart() {
-		model.reStart();
+		iControlModel.reStart();
 		//prices = Arrays.copyOf(PRICES_AT_START, prices.length);
 		//panel.setNrGameCols();
-		panel.start();
+		iControlGui.start();
 		runRound(-1);
 	}
 
 	public static void switchToGame(String[][] players, int[] dims) {
-		Player[] playersArray = createPlayers(players);
-		Model model = new Model(playersArray);
-		GamePanel gamePanel = new GamePanel(model);
-		ControlGuiInterface interfacePanel = gamePanel;
-		GuiControlInterface control = new Control(playersArray, model, interfacePanel);
-		gamePanel.setInterface(control);
-		frame.setControl(control);
-		frame.setModel(model);
-		GameContainerPanel gameContainerPanel = new GameContainerPanel(players, dims, gamePanel, control);
+		//Player[] playersArray = createPlayers(players);
+		Model model = new Model(players);
+		GuiModelInterface iGuiModel = model;
+		ControlModelInterface iControlModel = model;
+		GamePanel gamePanel = new GamePanel(iGuiModel);
+		ControlGuiInterface iControlGui = gamePanel;
+		GuiControlInterface iGuiControl = new Control(model, iControlGui);
+		gamePanel.setInterface(iGuiControl);
+		frame.setControl(iGuiControl);
+		frame.setModel(iGuiModel);
+		GameContainerPanel gameContainerPanel = new GameContainerPanel(players, dims, gamePanel, iGuiControl);
 		frame.setToGame(gameContainerPanel);
 	}
 
 	public static void switchToSetup() {
 		frame.setToStartup();
-	}
-
-	private static Player[] createPlayers(String[][] players) {
-		System.out.println("players at createPlayers: " + Arrays.deepToString(players));
-		Player[] playerArray = new Player[players.length];
-		for (int i = 0; i < players.length; i++) {
-			if (players[i][1].equals("human"))
-				playerArray[i] = new Player(players[i][0]);
-			else
-				switch (players[i][0]) {
-					case "Easy":
-						playerArray[i] = new AIeasy("AI " + (i + 1) + " (easy)");
-						break;
-					case "Medium":
-						playerArray[i] = new AImedium("AI " + (i + 1) + " (medium)");
-						break;
-					case "Hard":
-						playerArray[i] = new AIhard("AI " + (i + 1) + " (hard)");
-						break;
-				}
-		}
-		return playerArray;
 	}
 
 	public static void main(String[] args) {

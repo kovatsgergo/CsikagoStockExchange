@@ -168,7 +168,7 @@ public class GameContainerPanel extends JPanel {
 			Control.switchToSetup();
 		});
 		// Add Player names to the top
-		setTopnames(this.players);
+		setTopNames(this.players);
 		// Add components to panel
 		bottom.add(tglHints, 0);
 		bottom.add(new JLabel(), 1);
@@ -183,7 +183,7 @@ public class GameContainerPanel extends JPanel {
 		gamePanel.requestFocusInWindow();
 	}
 
-	void setTopnames(String[] players) {
+	void setTopNames(String[] players) {
 		top.removeAll();
 		String[] names = players;//gamePanel.model.getAllNames();
 		for (int i = 0; i < names.length; i++) {

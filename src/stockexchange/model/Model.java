@@ -24,24 +24,52 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	private int lastStarter = -1;//the player('s index, who started the last round)
 	private int actualPlayer;//the player whose turn is is
 	private int position = 0;//the figure's current position
+	private int lastSoldColumn;
 
 	private boolean expert = false;
 
 	private ArrayList<Object> propertiesToSave;
 	//ControlModelInterface gamePanel;
 
-	public Model(Player[] players) {
-		this.players = new ArrayList<Player>(Arrays.asList(players));
-		for (Player player : players) {
+	public Model(String[][] players) {
+		this.players = createPlayers(players);
+		for (Player player : this.players) {
 			System.out.println(player.getClass().getSimpleName());
 		}
 		//System.out.println("constructor players: " + Arrays.toString(players));
 		wins = new ArrayList<>();
-		for (Player player : players) {
+		for (Player player : this.players) {
 			wins.add(0);
 		}
 		//reStart();
 		propertiesToSave = new ArrayList<>();
+	}
+
+	private ArrayList<Player> createPlayers(String[][] players) {
+		System.out.println("players at createPlayers: " + Arrays.deepToString(players));
+		ArrayList<Player> playerArray = new ArrayList<>();
+		boolean isThereAnyAI = false;
+		for (int i = 0; i < players.length; i++) {
+			if (players[i][1].equals("human"))
+				playerArray.add(new Player(players[i][0]));
+			else {
+				isThereAnyAI = true;
+				switch (players[i][0]) {
+					case "Easy":
+						playerArray.add(new AIeasy("AI " + (i + 1) + " (easy)"));
+						break;
+					case "Medium":
+						playerArray.add(new AImedium("AI " + (i + 1) + " (medium)"));
+						break;
+					case "Hard":
+						playerArray.add(new AIhard("AI " + (i + 1) + " (hard)"));
+						break;
+				}
+			}
+			GuiModelInterface iGuiModel = this;
+			AI.setModelInterface(iGuiModel);
+		}
+		return playerArray;
 	}
 
 	@Override //from ControlModelInterface
@@ -62,7 +90,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 			propertiesToSave.add(column);
 		}
 		propertiesToSave.add(getPriceArray());
-		//System.out.println(propertiesToSave.toString());
+//		System.out.println(propertiesToSave.toString());
 		new GameSaver(propertiesToSave, true, pathName);
 	}
 
@@ -70,9 +98,9 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		new GameSaver(propertiesToSave, false, pathName);
 		boolean success = false;
 		if (propertiesToSave != null) {
-			for (int i = 0; i < propertiesToSave.size(); i++) {
-				System.out.println(i + ": " + propertiesToSave.get(i).toString());
-			}
+//			for (int i = 0; i < propertiesToSave.size(); i++) {
+//				System.out.println(i + ": " + propertiesToSave.get(i).toString());
+//			}
 			gameOver = (boolean) propertiesToSave.get(0);
 			choiceStage = (boolean) propertiesToSave.get(1);
 			lastStarter = (int) propertiesToSave.get(2);
@@ -101,6 +129,8 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 			wins = (ArrayList<Integer>) propertiesToSave.get(4);
 			ArrayList<Integer> tempPrices = (ArrayList<Integer>) propertiesToSave.get(i);
 			priceSetter(tempPrices);
+			GuiModelInterface iGuiModel = this;
+			AI.setModelInterface(iGuiModel);
 			success = true;
 		}
 		return success;
@@ -264,20 +294,20 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		int keep = getNeighbors().indexOf(pointNr);
 		int sold = getNeighbors().get(1 - keep);
 		//System.out.println("Handle");
-		kept %= getNrOfCols();
-		sold %= getNrOfCols();
-		int[] emptiedColumn = {-1, -1};
+//		kept %= getNrOfCols();
+//		sold %= getNrOfCols();
+		int[] emptiedColumns = {-1, -1};
 		Column keptColumn = columns.get(kept);
 		Column soldColumn = columns.get(sold);
 //		int outIdx = COMMODITY_TYPES.indexOf(actualSold.getTop());
-
+		lastSoldColumn = sold;
 		soldColumn.getTop().lowerPrice();
 		players.get(actualPlayer).add(keptColumn.getTop());
 		//System.out.println("actualK.getTop() "+actualK.getTop()+ " \t actualO.getTop()"
 		keptColumn.remove();
 		if (keptColumn.goods.isEmpty()) {
 			columns.remove(kept);
-			emptiedColumn[0] = kept;
+			emptiedColumns[0] = kept;
 			if (position > kept) {
 				position--;
 			}
@@ -288,7 +318,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		soldColumn.remove();
 		if (soldColumn.goods.isEmpty()) {
 			columns.remove(sold);
-			emptiedColumn[1] = sold;
+			emptiedColumns[1] = sold;
 			if (position > sold) {
 				position--;
 			}
@@ -298,7 +328,11 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		if (getNrOfCols() < 3) {
 			gameOver = true;
 		}
-		return emptiedColumn;
+		return emptiedColumns;
+	}
+	
+	public int getLastSoldColumn(){
+		return lastSoldColumn;
 	}
 
 	/**

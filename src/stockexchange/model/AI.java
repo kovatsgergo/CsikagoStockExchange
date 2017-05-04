@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public abstract class AI extends Player {
 
 	protected ObservedPlayer observedPlayer;
+	private static GuiModelInterface iGuiModel;
 
 	public void setObservedNextPlayer(ObservedPlayer observedPlayer) {
 		
@@ -18,11 +19,14 @@ public abstract class AI extends Player {
 
 	protected abstract int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes);
 	
-	public int[] makeMove(Model model){
-		this.observedPlayer = model.makeObservedNextPlayers();
-		return makeMove(model.getPosition(), model.getTopCommodities(), model.getColsSizes());
+	public int[] makeMove(){
+		this.observedPlayer = iGuiModel.makeObservedNextPlayers();
+		return makeMove(iGuiModel.getPosition(), iGuiModel.getTopCommodities(), iGuiModel.getColsSizes());
 	}
-	//
+	
+	protected static void setModelInterface(GuiModelInterface GuiModelint){
+		iGuiModel = GuiModelint;
+	}
 
 	//Used by Medium and Hard
 	public int countContain(ArrayList<Commodity> list, Commodity element) {

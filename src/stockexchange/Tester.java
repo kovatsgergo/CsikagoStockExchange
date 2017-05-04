@@ -10,12 +10,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import stockexchange.model.AI;
-import stockexchange.model.AIeasy;
 
 public class Tester {
 
-	static AI ai = new AIeasy("nothing");
+	//static AI ai = new AIeasy("nothing");
 
 	public static void main(String[] args) {
 		String fonts[]

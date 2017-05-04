@@ -10,7 +10,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import stockexchange.GuiControlInterface;
-import stockexchange.model.Model;
+import stockexchange.model.GuiModelInterface;
 import stockexchange.model.Player;
 
 public class MainFrame extends JFrame {
@@ -18,7 +18,7 @@ public class MainFrame extends JFrame {
 	private GameContainerPanel gameContainerPanel;
 	private final StartUpContainerPanel startupPanel;
 	private GuiControlInterface control;
-	private Model model;
+	private GuiModelInterface model;
 
 	private int w;
 	private int h;
@@ -45,7 +45,7 @@ public class MainFrame extends JFrame {
 			chooser.dispose();
 			if (chosenFile != null) {
 				control.load(chosenDir + chosenFile);
-				gameContainerPanel.setTopnames(model.getAllNames());
+				gameContainerPanel.setTopNames(model.getAllNames());
 			}
 			//gameContainerPanel.validate();
 
@@ -66,7 +66,7 @@ public class MainFrame extends JFrame {
 //				File file = chooser.getSelectedFile();
 //				pathName = file.getPath();
 //				model.save(pathName);
-				model.save(chosenDir + chosenFile);
+				control.save(chosenDir + chosenFile);
 			}
 		});
 		setJMenuBar(mb);
@@ -81,7 +81,7 @@ public class MainFrame extends JFrame {
 		this.control = control;
 	}
 
-	public void setModel(Model model) {
+	public void setModel(GuiModelInterface model) {
 		this.model = model;
 	}
 

@@ -4,7 +4,6 @@ package stockexchange.model;
 import java.util.ArrayList;
 
 public interface GuiModelInterface {
-
 	public ArrayList<Integer> getPriceArray();//ok
 	public String[] getAllNames();//frame, panel
 	public int getNrOfCols();//ok
@@ -18,4 +17,5 @@ public interface GuiModelInterface {
 	public String[] makeHints();//ok
 	public String gameOverString();//ok
 	public ObservedPlayer makeObservedNextPlayers();//AI
+	public int getLastSoldColumn();//ok
 }

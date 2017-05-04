@@ -32,7 +32,7 @@ import stockexchange.model.*;
 public class GamePanel extends JPanel implements ControlGuiInterface {
 
 //MVC
-	private Model model;
+	private GuiModelInterface model;
 	HintPanel hintPanel;
 	private GuiControlInterface interf;
 //Game state variables
@@ -110,7 +110,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 
 	private boolean hints = false;
 
-	public GamePanel(Model model) {
+	public GamePanel(GuiModelInterface model) {
 		this.model = model;
 		//System.out.println(this.getClass().getResource(""));
 		URL imageURL = this.getClass().getResource("/images/Wheat.png");
@@ -286,11 +286,11 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 	/**
 	 * Start from a saved position
 	 */
-	public void startFromLoaded() {
+	public void startFromLoaded(boolean choiceStage) {
 		start();
 
 		setFigure();
-		this.choiceStage = model.getChoiceStage();
+		this.choiceStage = choiceStage;//model.getChoiceStage();
 		this.position = model.getPosition();
 		this.actualPlayer = model.getActualPlayerIndex();
 		possibleCols = model.getPossible();
@@ -350,12 +350,13 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 	}
 
 	@Override //from ControlGuiInterface
-	public void makeChoice(int kept, int[] emptiedColoumns) {
+	public void makeChoice(int kept, int[] emptiedColumns) {
 		repaint();
-		sinkingSold = model.getNeighbors().get(1 - model.getNeighbors().indexOf(kept));
+		sinkingSold = model.getLastSoldColumn();//model.getNeighbors().get(1 - model.getNeighbors().indexOf(kept));
 		sinkingKept = kept;
 		//System.out.println("\nkept: " + sinkingKept + "\tsold: " + sinkingSold);
 		sinkSoldImg = getImage(this.topCommodities.get(sinkingSold));
+		//System.out.println(model.getLastSoldCommodity());
 		sinkKeptImg = getImage(this.topCommodities.get(sinkingKept));
 		setNrGameCols();
 		//Set prices
@@ -363,7 +364,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 			pricesDiff[i + 6] = model.getPriceArray().get(i);
 		}
 
-		fallenCols = emptiedColoumns;
+		fallenCols = emptiedColumns;
 		colSizes = model.getColsSizes();
 		this.topCommodities = model.getTopCommodities();
 		//Start animating objects

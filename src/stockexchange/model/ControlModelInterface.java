@@ -13,6 +13,4 @@ public interface ControlModelInterface {
 	public boolean isGameOver();//ok
 	public boolean isValidStep(int pointNr);//ok
 	public void reStart();//ok
-	
-
 }
