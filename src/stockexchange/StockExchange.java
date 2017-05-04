@@ -2,13 +2,12 @@ package stockexchange;
 
 /* Gergo Kovats */
 import java.awt.event.ActionEvent;
-import stockexchange.gui.ControlGuiInterface;
 import stockexchange.gui.GameContainerPanel;
 import stockexchange.gui.GamePanel;
 import stockexchange.gui.MainFrame;
 import stockexchange.model.*;
 
-public class Control implements GuiControlInterface {
+public class StockExchange implements GuiControlInterface {
 
 	private final int AI_SPEED = 1000;
 	private int[] AIchoice = new int[2];
@@ -17,19 +16,22 @@ public class Control implements GuiControlInterface {
 	private ControlGuiInterface iControlGui; // To communicate with GUI
 	private static MainFrame frame;
 
-	public Control(Model model, ControlGuiInterface interfacePanel) {
+	public StockExchange(Model model, ControlGuiInterface interfacePanel) {
 		this.iControlModel = model;
 		this.iControlGui = interfacePanel;
 		reStart();
 	}
 
 	@Override //From GuiControlInterface
-	public void load(String pathFile) {
-		if (iControlModel.load(pathFile))
+	public boolean load(String pathFile) {
+		if (iControlModel.load(pathFile)){
 			iControlGui.startFromLoaded(iControlModel.getChoiceStage());
+			return true;
+		}
+		return false;
 	}
-	
-	public void save(String pathFile){
+
+	public void save(String pathFile) {
 		iControlModel.save(pathFile);
 	}
 
@@ -40,18 +42,20 @@ public class Control implements GuiControlInterface {
 	}
 
 	@Override 	//From GuiControlInterFace
-	public void pause() {
+	public void pause(boolean popup) {
 		timerAI.stop();
-		int n = iControlGui.pausePopup();
-		switch (n) {
-			case 2:
-				timerAI.start();
-				break;
-			case 1:
-				switchToSetup();
-				break;
-			case 0:
-				System.exit(0);
+		if (popup) {
+			int n = iControlGui.pausePopup();
+			switch (n) {
+				case 2:
+					timerAI.start();
+					break;
+				case 1:
+					switchToSetup();
+					break;
+				case 0:
+					System.exit(0);
+			}
 		}
 	}
 
@@ -167,10 +171,10 @@ public class Control implements GuiControlInterface {
 		ControlModelInterface iControlModel = model;
 		GamePanel gamePanel = new GamePanel(iGuiModel);
 		ControlGuiInterface iControlGui = gamePanel;
-		GuiControlInterface iGuiControl = new Control(model, iControlGui);
+		GuiControlInterface iGuiControl = new StockExchange(model, iControlGui);
 		gamePanel.setInterface(iGuiControl);
-		frame.setControl(iGuiControl);
-		frame.setModel(iGuiModel);
+		frame.setiGuiControl(iGuiControl);
+		frame.setiGuiModel(iGuiModel);
 		GameContainerPanel gameContainerPanel = new GameContainerPanel(players, dims, gamePanel, iGuiControl);
 		frame.setToGame(gameContainerPanel);
 	}

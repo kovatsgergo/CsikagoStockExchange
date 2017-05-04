@@ -5,20 +5,26 @@ import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import stockexchange.GuiControlInterface;
-import stockexchange.model.GuiModelInterface;
+import stockexchange.GuiModelInterface;
 import stockexchange.model.Player;
 
 public class MainFrame extends JFrame {
 
 	private GameContainerPanel gameContainerPanel;
-	private final StartUpContainerPanel startupPanel;
-	private GuiControlInterface control;
-	private GuiModelInterface model;
+	private StartUpContainerPanel startupPanel = null;
+	private GuiControlInterface iGuiControl;
+	private GuiModelInterface iGuiModel;
+
+	private JMenuItem miSave;
 
 	private int w;
 	private int h;
@@ -28,24 +34,46 @@ public class MainFrame extends JFrame {
 		w = screenSize.width;
 		h = screenSize.height;
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setTitle("Stock Exchange");
+
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				if(JOptionPane.showConfirmDialog(MainFrame.this,
+								"Are you sure you want to exit?",
+								"Confirm Exit",JOptionPane.OK_CANCEL_OPTION,
+								JOptionPane.QUESTION_MESSAGE) == 0)
+					System.exit(0);
+			}
+		});
+
 		JMenuBar mb = new JMenuBar();
 		JMenu mFile = new JMenu("File");
 		mb.add(mFile);
 		JMenuItem miOpen = new JMenuItem("Open saved game");
-		JMenuItem miSave = new JMenuItem("Save game");
+		miSave = new JMenuItem("Save game");
+		miSave.setEnabled(false);
 		mFile.add(miOpen);
 
 		miOpen.addActionListener((ActionEvent e) -> {
 			FileDialog chooser = new FileDialog(this, "Open saved game", FileDialog.LOAD);
+			chooser.setFilenameFilter((File dir, String name1) -> name1.substring(name1.length() - 4).equals(".cse"));
 			chooser.setFile(".cse");
 			chooser.setVisible(true);
 			String chosenDir = chooser.getDirectory();
 			String chosenFile = chooser.getFile();
 			chooser.dispose();
 			if (chosenFile != null) {
-				control.load(chosenDir + chosenFile);
-				gameContainerPanel.setTopNames(model.getAllNames());
+				if (startupPanel.isVisible())
+					startupPanel.startGame();
+				if (!iGuiControl.load(chosenDir + chosenFile)) {
+					JOptionPane.showMessageDialog(MainFrame.this,
+									"Error while loading saved game",
+									"Load error", JOptionPane.ERROR_MESSAGE);
+
+				} else
+					gameContainerPanel.setTopNames(iGuiModel.getAllNames());
 			}
 			//gameContainerPanel.validate();
 
@@ -65,8 +93,8 @@ public class MainFrame extends JFrame {
 			if (chosenFile != null) {
 //				File file = chooser.getSelectedFile();
 //				pathName = file.getPath();
-//				model.save(pathName);
-				control.save(chosenDir + chosenFile);
+//				iGuiModel.save(pathName);
+				iGuiControl.save(chosenDir + chosenFile);
 			}
 		});
 		setJMenuBar(mb);
@@ -77,26 +105,29 @@ public class MainFrame extends JFrame {
 		setResizable(false);
 	}
 
-	public void setControl(GuiControlInterface control) {
-		this.control = control;
+	public void setiGuiControl(GuiControlInterface iGuiControl) {
+		this.iGuiControl = iGuiControl;
 	}
 
-	public void setModel(GuiModelInterface model) {
-		this.model = model;
+	public void setiGuiModel(GuiModelInterface iGuiModel) {
+		this.iGuiModel = iGuiModel;
 	}
 
 	public void setToStartup() {
 		gameContainerPanel.setVisible(false);
 		startupPanel.setVisible(true);
 		setBounds(w / 4, 0, w / 2, h / 2);
+		miSave.setEnabled(false);
 		//this.setResizable(false);
 	}
 
 	public void setToGame(GameContainerPanel gameContainerPanel) {
 		//setResizable(true);
 		startupPanel.setVisible(false);
+		miSave.setEnabled(true);
 		setContainerPanel(gameContainerPanel);
-		setBounds(w / 2 - w / 14 * 5, 0, w / 7 * 5, Math.round(w * 0.45f));
+		int frameWidth = w * 5 / 7;
+		setBounds(w / 2 - frameWidth / 2, 0, frameWidth, Math.round(frameWidth / 1.5f));
 	}
 
 	protected void setContainerPanel(GameContainerPanel gameContainerPanel) {

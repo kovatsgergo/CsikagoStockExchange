@@ -1,7 +1,9 @@
 /*Gergo Kovats*/
-package stockexchange.model;
+package stockexchange;
 
 import java.util.ArrayList;
+import stockexchange.model.Commodity;
+import stockexchange.model.ObservedPlayer;
 
 public interface GuiModelInterface {
 	public ArrayList<Integer> getPriceArray();//ok

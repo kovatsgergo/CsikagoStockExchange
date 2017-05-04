@@ -19,7 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import stockexchange.Control;
+import stockexchange.StockExchange;
 import stockexchange.GuiControlInterface;
 
 public class GameContainerPanel extends JPanel {
@@ -59,8 +59,9 @@ public class GameContainerPanel extends JPanel {
 
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					tglHints.setText("HINTS ON");
+					double hintRatio = 1.5 - (1.5 - 1.35) / 4 * (players.length);
+					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / hintRatio));
 					gamePanel.setHintsOnOff(true);
-					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / 1.35));
 					//gamePanel.setSize(getWidth(), (int) (getWidth() / 1.35));
 					System.out.println("size: " + gamePanel.getSize().toString());
 					//GameFrame.this.addCompList(false);
@@ -70,8 +71,8 @@ public class GameContainerPanel extends JPanel {
 					//setBounds(getX(), getY(), getWidth(), (int) (getWidth() / 1.4) + topAndBottom);
 				} else {
 					tglHints.setText("hints off");
-					gamePanel.setHintsOnOff(false);
 					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / 1.5));
+					gamePanel.setHintsOnOff(false);
 					//gamePanel.setSize(getWidth(), (int) (getWidth() / 1.7));
 					System.out.println("size: " + gamePanel.getSize().toString());
 					//GameFrame.this.removeComponentListener(caFixRatio);
@@ -165,7 +166,7 @@ public class GameContainerPanel extends JPanel {
 		btRestart.setFocusable(false);//to have keyboard focus on gamePanel
 		btRestart.addActionListener((ActionEvent e) -> {
 			JButton temp = (JButton) e.getSource();
-			Control.switchToSetup();
+			StockExchange.switchToSetup();
 		});
 		// Add Player names to the top
 		setTopNames(this.players);

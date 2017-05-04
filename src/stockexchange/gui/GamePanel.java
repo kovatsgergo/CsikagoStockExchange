@@ -26,7 +26,9 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import stockexchange.ControlGuiInterface;
 import stockexchange.GuiControlInterface;
+import stockexchange.GuiModelInterface;
 import stockexchange.model.*;
 
 public class GamePanel extends JPanel implements ControlGuiInterface {
@@ -147,12 +149,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyChar() == 'p')
-					interf.pause();
-			}
-
-			public void keyReleased(KeyEvent e) {
-				if (e.getKeyChar() == 'p')
-					/*pause(false)*/;
+					interf.pause(true);
 			}
 		});
 

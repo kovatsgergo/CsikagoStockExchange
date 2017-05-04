@@ -1,6 +1,7 @@
 package stockexchange.model;
 
 /* Gergo Kovats */
+import stockexchange.GuiModelInterface;
 import java.util.ArrayList;
 //import java.util.Scanner;
 

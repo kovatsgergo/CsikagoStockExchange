@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import stockexchange.Control;
+import stockexchange.StockExchange;
 import stockexchange.model.AIeasy;
 import stockexchange.model.AIhard;
 import stockexchange.model.AImedium;
@@ -138,13 +138,13 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 		}
 	}
 
-	private void startGame() {
+	protected void startGame() {
 		String[][] names = new String[cbNumPlayers.getSelectedIndex() + 1][2];
 		for (int i = 0; i < names.length; i++) {
 			names[i] = rowPs[i].getNameAndType();
 		}
 //		System.out.println(Arrays.deepToString(names));
-			Control.switchToGame(names, new int[]{w / 7 * 5, Math.round(w * 0.45f), w, h});
+			StockExchange.switchToGame(names, new int[]{w / 7 * 5, Math.round(w * 0.45f), w, h});
 	}
 
 	public class RowPanel extends JPanel implements ActionListener {

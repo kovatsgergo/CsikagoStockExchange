@@ -1,5 +1,7 @@
 /*Gergo Kovats*/
-package stockexchange.model;
+package stockexchange;
+
+import stockexchange.model.Player;
 
 public interface ControlModelInterface {
 	public void save(String pathFile);

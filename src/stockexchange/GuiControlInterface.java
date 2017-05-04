@@ -5,8 +5,8 @@ package stockexchange;
 public interface GuiControlInterface {
 	
 	void setClickedColoumn(int coloumn);
-	void load(String pathFile);
+	boolean load(String pathFile);
 	void save(String pathFile);
-	void pause();
+	void pause(boolean popup);
 	
 }

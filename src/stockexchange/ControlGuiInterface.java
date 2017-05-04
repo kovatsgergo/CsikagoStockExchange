@@ -1,4 +1,4 @@
-package stockexchange.gui;
+package stockexchange;
 
 /*Gergo Kovats*/
 

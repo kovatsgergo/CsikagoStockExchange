@@ -4,6 +4,8 @@ package stockexchange.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import stockexchange.ControlModelInterface;
+import stockexchange.GuiModelInterface;
 
 public class Model implements ControlModelInterface, GuiModelInterface {
 
@@ -97,10 +99,10 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	public boolean load(String pathName) {
 		new GameSaver(propertiesToSave, false, pathName);
 		boolean success = false;
-		if (propertiesToSave != null) {
-//			for (int i = 0; i < propertiesToSave.size(); i++) {
-//				System.out.println(i + ": " + propertiesToSave.get(i).toString());
-//			}
+		for (int i = 0; i < propertiesToSave.size(); i++) {
+			System.out.println(i + ": " + propertiesToSave.get(i).toString());
+		}
+		if (propertiesToSave != null & isStructured(propertiesToSave)) {
 			gameOver = (boolean) propertiesToSave.get(0);
 			choiceStage = (boolean) propertiesToSave.get(1);
 			lastStarter = (int) propertiesToSave.get(2);
@@ -134,6 +136,37 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 			success = true;
 		}
 		return success;
+	}
+
+	private boolean isStructured(ArrayList<Object> list) {
+		boolean structured = true;
+		int size = list.size();
+		if (size > 7)
+			if (list.get(0) instanceof Boolean
+							& list.get(1) instanceof Boolean
+							& list.get(2) instanceof Integer
+							& list.get(3) instanceof Integer
+							& list.get(4) instanceof ArrayList
+							& list.get(5) instanceof Integer
+							& list.get(6) instanceof Integer) {
+				int n = 7 + (int) list.get(6);
+				if (size > n)
+					for (int i = 7; structured & i < n; i++)
+						structured = list.get(i) instanceof Player;
+				else structured = false;
+				if (list.get(n) instanceof Integer) {
+					int m = n + (int) list.get(n) + 1;
+					if (size == m + 1)
+						for (int i = n + 1; structured & i < m; i++)
+							structured = list.get(i) instanceof Column;
+					structured = structured & list.get(m) instanceof ArrayList;
+				}
+				else structured = false;
+			}
+			else structured = false;
+		else
+				structured = false;
+		return structured;
 	}
 
 	private void priceSetter(ArrayList<Integer> priceArray) {
@@ -330,8 +363,8 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		}
 		return emptiedColumns;
 	}
-	
-	public int getLastSoldColumn(){
+
+	public int getLastSoldColumn() {
 		return lastSoldColumn;
 	}
 
