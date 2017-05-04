@@ -8,5 +8,6 @@ public interface GuiControlInterface {
 	boolean load(String pathFile);
 	void save(String pathFile);
 	void pause(boolean popup);
+	void unPause();
 	
 }

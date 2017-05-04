@@ -18,6 +18,6 @@ public interface GuiModelInterface {
 	public int[] getColsSizes();//AI, panel
 	public String[] makeHints();//ok
 	public String gameOverString();//ok
-	public ObservedPlayer makeObservedNextPlayers();//AI
+	public ArrayList<ObservedPlayer> makeObservedOtherPlayers();//AI
 	public int getLastSoldColumn();//ok
 }

@@ -1,26 +1,29 @@
 /*Gergo Kovats*/
 package stockexchange.gui;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Scanner;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import stockexchange.StockExchange;
 import stockexchange.GuiControlInterface;
+import stockexchange.StockExchange;
 
 public class GameContainerPanel extends JPanel {
 
@@ -34,7 +37,7 @@ public class GameContainerPanel extends JPanel {
 	//private GamePanel gamePanel;
 	private String[] players;
 
-	public GameContainerPanel(String[][] players, int[] dimensions, GamePanel gamePanel, GuiControlInterface theGame) {
+	public GameContainerPanel(String[][] players, int[] dimensions, GamePanel gamePanel, GuiControlInterface iGuiControl) {
 		//System.out.println("min: " + getMinimumSize().toString());
 		this.players = new String[players.length];
 		for (int i = 0; i < players.length; i++) {
@@ -132,24 +135,35 @@ public class GameContainerPanel extends JPanel {
 //		final String rulesString = String.valueOf(chB);
 		 */
 //</editor-fold>
-		URL textURL = gamePanel.getClass().getResource("/images/RuleBook.txt");//imported to .jar
-		StringBuilder rules = new StringBuilder();
+//		URL textURL = gamePanel.getClass().getResource("/images/RuleBook.txt");//imported to .jar
+//		StringBuilder rules = new StringBuilder();
+//		try {
+//			java.util.Scanner s = new Scanner(textURL.openStream());
+//			while (s.hasNextLine()) {
+//				rules.append(s.nextLine());
+//				rules.append("\n");
+//			}
+//		} catch (IOException e) {
+//			System.out.println(e.getStackTrace());
+//			rules.append("Error while reading rules");
+//		}
+		URL htmlURL = gamePanel.getClass().getResource("/images/RuleBook.html");//imported to .jar
+		JEditorPane jepRules = null;
 		try {
-			java.util.Scanner s = new Scanner(textURL.openStream());
-			while (s.hasNextLine()) {
-				rules.append(s.nextLine());
-				rules.append("\n");
-			}
+			jepRules = new JEditorPane(htmlURL);
 		} catch (IOException e) {
-			System.out.println(e.getStackTrace());
-			rules.append("Error while reading rules");
+			System.out.println("RULES FILE NOT FOUND");
 		}
-
-		JTextArea textArea = new JTextArea(40, 42);
-		textArea.setText(rules.toString());
-		textArea.setEditable(false);
-		JScrollPane scrollPane = new JScrollPane(textArea);
+//		JTextArea textArea = new JTextArea(40, 42);
+//		textArea.setText(rules.toString());
+//		textArea.setEditable(false);
+		//JScrollPane scrollPane = new JScrollPane(textArea);
+		jepRules.setEditable(false);
+		jepRules.setPreferredSize(new Dimension(500,
+						Toolkit.getDefaultToolkit().getScreenSize().height-200));
+		JScrollPane scrollPane = new JScrollPane(jepRules);
 		final JFrame rulesFrame = new JFrame("Game Rules");
+		rulesFrame.setLayout(new FlowLayout());
 		rulesFrame.add(scrollPane);
 		rulesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		rulesFrame.pack();//nem tudok jobbat
@@ -166,7 +180,16 @@ public class GameContainerPanel extends JPanel {
 		btRestart.setFocusable(false);//to have keyboard focus on gamePanel
 		btRestart.addActionListener((ActionEvent e) -> {
 			JButton temp = (JButton) e.getSource();
-			StockExchange.switchToSetup();
+			if (iGuiControl != null)
+					iGuiControl.pause(false);
+				if (JOptionPane.showConfirmDialog(this,
+								"Are you sure you want to quit this game?",
+								"Confirm Quit", JOptionPane.OK_CANCEL_OPTION,
+								JOptionPane.QUESTION_MESSAGE) == 0)
+					StockExchange.switchToSetup();
+				else if (iGuiControl != null)
+					iGuiControl.unPause();
+			
 		});
 		// Add Player names to the top
 		setTopNames(this.players);

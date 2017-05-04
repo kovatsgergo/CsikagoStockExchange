@@ -15,6 +15,9 @@ public class StockExchange implements GuiControlInterface {
 	private ControlModelInterface iControlModel;
 	private ControlGuiInterface iControlGui; // To communicate with GUI
 	private static MainFrame frame;
+	private javax.swing.Timer timerAI = new javax.swing.Timer(AI_SPEED, (ActionEvent e) -> {
+		aiChoice();
+	});
 
 	public StockExchange(Model model, ControlGuiInterface interfacePanel) {
 		this.iControlModel = model;
@@ -24,7 +27,7 @@ public class StockExchange implements GuiControlInterface {
 
 	@Override //From GuiControlInterface
 	public boolean load(String pathFile) {
-		if (iControlModel.load(pathFile)){
+		if (iControlModel.load(pathFile)) {
 			iControlGui.startFromLoaded(iControlModel.getChoiceStage());
 			return true;
 		}
@@ -59,6 +62,11 @@ public class StockExchange implements GuiControlInterface {
 		}
 	}
 
+	@Override
+	public void unPause() {
+		runRound(-1);
+	}
+
 	/////////////////////////
 	///////////////////////AI
 	private int[] getAIMove() {
@@ -71,10 +79,6 @@ public class StockExchange implements GuiControlInterface {
 			timerAI.start();
 		}
 	}
-
-	javax.swing.Timer timerAI = new javax.swing.Timer(AI_SPEED, (ActionEvent e) -> {
-		aiChoice();
-	});
 
 	/**
 	 * Handles the AIs' turns at both stages
@@ -136,8 +140,8 @@ public class StockExchange implements GuiControlInterface {
 	private void endGame() {
 		int n;
 		if (iControlModel.isAllPlayersAI()) {
-			n = 2;//to test AIs
-			//n = panel.gameOverPopup(gameOverString(winner));
+			//n = 2;//to test AIs
+			n = iControlGui.gameOverPopup();
 		} else {
 			n = iControlGui.gameOverPopup();
 		}

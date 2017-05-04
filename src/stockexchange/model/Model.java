@@ -99,9 +99,9 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	public boolean load(String pathName) {
 		new GameSaver(propertiesToSave, false, pathName);
 		boolean success = false;
-		for (int i = 0; i < propertiesToSave.size(); i++) {
-			System.out.println(i + ": " + propertiesToSave.get(i).toString());
-		}
+//		for (int i = 0; i < propertiesToSave.size(); i++) {
+//			System.out.println(i + ": " + propertiesToSave.get(i).toString());
+//		}
 		if (propertiesToSave != null & isStructured(propertiesToSave)) {
 			gameOver = (boolean) propertiesToSave.get(0);
 			choiceStage = (boolean) propertiesToSave.get(1);
@@ -153,19 +153,20 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 				if (size > n)
 					for (int i = 7; structured & i < n; i++)
 						structured = list.get(i) instanceof Player;
-				else structured = false;
+				else
+					structured = false;
 				if (list.get(n) instanceof Integer) {
 					int m = n + (int) list.get(n) + 1;
 					if (size == m + 1)
 						for (int i = n + 1; structured & i < m; i++)
 							structured = list.get(i) instanceof Column;
 					structured = structured & list.get(m) instanceof ArrayList;
-				}
-				else structured = false;
-			}
-			else structured = false;
-		else
+				} else
+					structured = false;
+			} else
 				structured = false;
+		else
+			structured = false;
 		return structured;
 	}
 
@@ -238,7 +239,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	@Override //from ControlModelInterface 
 	public boolean isAllPlayersAI() {
 		int i = 0;
-		boolean isAllAi = false;
+		boolean isAllAi = true;
 		do {
 			isAllAi = isAllAi && (players.get(i++) instanceof AI);
 		} while (i < players.size() && isAllAi);
@@ -303,8 +304,18 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 
 	//only AI uses
 	@Override //from GuiModelInterface
-	public ObservedPlayer makeObservedNextPlayers() {
-		return new ObservedPlayer(players.get(nextPlayer(actualPlayer)));
+	public ArrayList<ObservedPlayer> makeObservedOtherPlayers() {
+		ArrayList<ObservedPlayer> others = new ArrayList<>();
+		//System.out.println(players.size());
+		for (int i = 0; i < players.size(); i++) {
+			//System.out.println("i: "+i);
+			if (i != actualPlayer) {
+				int j = nextPlayer(i + actualPlayer);
+				//System.out.println("happening i: "+i+"\t: "+j);
+				others.add(new ObservedPlayer(players.get(j)));
+			}
+		}
+		return others;
 	}
 
 	@Override //from ControlModelInterface 
@@ -422,6 +433,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	 */
 	@Override //from ControlModelInterface 
 	public void reStart() {
+		//System.out.println(gameOverString());
 		gameOver = false;
 		//prices = Arrays.copyOf(PRICES_AT_START, prices.length);
 		for (Player player : players) {

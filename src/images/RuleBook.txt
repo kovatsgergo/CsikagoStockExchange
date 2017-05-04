@@ -45,7 +45,7 @@ Each person plays in turn. The player who starts moves the Trader in a
 clockwise direction, from stack to stack. He moves by 1, 2 or 3 squares at a
 time.
 He then takes the 2 commodities from the top of the two stacks around him.
-Tactically, he keeps 1 for himself and puts 1 in the Bank. He ﬁnishes his turn
+Tactically, he keeps 1 for himself and puts 1 in the Bank. He finishes his turn
 by updating the Commodity Price Board. To do so, he moves the token for
 the commodity he has sold down by one notch. This reduces its value by the
 same amount. Its price cannot increase.
@@ -54,7 +54,7 @@ Game end:
 
 The game is over when there are only 2 stacks left in the game.
 You should then add up your points. Each player calculates the Value of his
-commodities according to the trading price shown on the ﬁnal board.
+commodities according to the trading price shown on the final board.
 The player with the most points is the winner!
 
 "Expert" version:
@@ -64,4 +64,4 @@ by as many stacks as you wish, in a clockwise direction, up to a square
 displaying the same commodity as the one shown on the square he just left,
 without going beyond it. If the next square contains the same commodity,
 in this case he will only move by a single square. If it's behind him, he may
-possibly go all the way around.</html>
+possibly go all the way around.

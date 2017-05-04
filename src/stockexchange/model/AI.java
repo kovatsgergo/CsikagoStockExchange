@@ -1,17 +1,16 @@
 package stockexchange.model;
 
 /* Gergo Kovats */
-import stockexchange.GuiModelInterface;
 import java.util.ArrayList;
-//import java.util.Scanner;
+import stockexchange.GuiModelInterface;
 
 public abstract class AI extends Player {
 
-	protected ObservedPlayer observedPlayer;
+	protected ArrayList<ObservedPlayer> observedPlayers;
 	private static GuiModelInterface iGuiModel;
 
 	public void setObservedNextPlayer(ObservedPlayer observedPlayer) {
-		
+
 	}
 
 	public AI(String name) {
@@ -19,13 +18,13 @@ public abstract class AI extends Player {
 	}
 
 	protected abstract int[] makeMove(int position, ArrayList<Commodity> tops, int[] colsSizes);
-	
-	public int[] makeMove(){
-		this.observedPlayer = iGuiModel.makeObservedNextPlayers();
+
+	public int[] makeMove() {
+		observedPlayers = iGuiModel.makeObservedOtherPlayers();
 		return makeMove(iGuiModel.getPosition(), iGuiModel.getTopCommodities(), iGuiModel.getColsSizes());
 	}
-	
-	protected static void setModelInterface(GuiModelInterface GuiModelint){
+
+	protected static void setModelInterface(GuiModelInterface GuiModelint) {
 		iGuiModel = GuiModelint;
 	}
 
@@ -130,7 +129,6 @@ public abstract class AI extends Player {
 //		System.out.println("enter to continue");
 //		String anything = sc.nextLine();
 //	}
-
 	protected int[][] getForecasts(int position, ArrayList<Commodity> tops, int[] colsSizes) {
 		int[][] forecasts = new int[3][2];
 		for (int i = 0; i < 3; i++) {
@@ -167,7 +165,9 @@ public abstract class AI extends Player {
 			thrownpos = thrownpos % tops.size();
 		}
 		Commodity lastThrown = tops.get(thrownpos);
-		evilpoint = countContain(observedPlayer.getCommodities(), lastThrown);
+		for (ObservedPlayer observedPlayer : observedPlayers) {
+			evilpoint += countContain(observedPlayer.getCommodities(), lastThrown);
+		}
 		//calculate the hypothetic price list after the hypothetic choice
 //		int[] hypotPrices = new int[GameClass.COMMODITY_TYPES.length];
 //		for (int i = 0; i < GameClass.COMMODITY_TYPES.length; i++) {
@@ -185,7 +185,7 @@ public abstract class AI extends Player {
 		//System.out.println("\ngetMakeMoveMax " + position);
 		int[][] gains = getGains(position, tops);
 		//System.out.println("gains " + Arrays.deepToString(gains));
-		int[][] losses = getLosses(position, tops, observedPlayer.getCommodities());
+		int[][] losses = getLosses(position, tops, observedPlayers.get(0).getCommodities());
 		//System.out.println("losses " + Arrays.deepToString(losses));
 		int maximum = getMaxIndex(matrixAddition(gains, losses), true);
 		//System.out.println("maximum " + maximum);
@@ -206,7 +206,7 @@ public abstract class AI extends Player {
 
 	private int getPriceAtPosition(int position, ArrayList<Commodity> tops, Commodity lastThrown) {
 		Commodity commAtPos = tops.get(position);
-		return (lastThrown.equals(commAtPos))?commAtPos.getPrice()-1:commAtPos.getPrice();
+		return (lastThrown.equals(commAtPos)) ? commAtPos.getPrice() - 1 : commAtPos.getPrice();
 	}
 
 }

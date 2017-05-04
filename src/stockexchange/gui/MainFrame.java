@@ -40,11 +40,15 @@ public class MainFrame extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				if(JOptionPane.showConfirmDialog(MainFrame.this,
+				if (iGuiControl != null)
+					iGuiControl.pause(false);
+				if (JOptionPane.showConfirmDialog(MainFrame.this,
 								"Are you sure you want to exit?",
-								"Confirm Exit",JOptionPane.OK_CANCEL_OPTION,
+								"Confirm Exit", JOptionPane.OK_CANCEL_OPTION,
 								JOptionPane.QUESTION_MESSAGE) == 0)
 					System.exit(0);
+				else if (iGuiControl != null)
+					iGuiControl.unPause();
 			}
 		});
 
@@ -57,6 +61,7 @@ public class MainFrame extends JFrame {
 		mFile.add(miOpen);
 
 		miOpen.addActionListener((ActionEvent e) -> {
+			iGuiControl.pause(false);
 			FileDialog chooser = new FileDialog(this, "Open saved game", FileDialog.LOAD);
 			chooser.setFilenameFilter((File dir, String name1) -> name1.substring(name1.length() - 4).equals(".cse"));
 			chooser.setFile(".cse");
@@ -114,6 +119,7 @@ public class MainFrame extends JFrame {
 	}
 
 	public void setToStartup() {
+		iGuiControl.pause(false);
 		gameContainerPanel.setVisible(false);
 		startupPanel.setVisible(true);
 		setBounds(w / 4, 0, w / 2, h / 2);

@@ -175,7 +175,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 				if (figureStopped && colsStopped && goodsStopped && pricesStopped) {
 					timerAll.stop();
 					repaint();
-					System.out.println("All stopped");
+					//System.out.println("All stopped");
 				} else {
 					//System.out.println("All moved");
 					repaint();
