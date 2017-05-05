@@ -174,6 +174,8 @@ public class StockExchange implements GuiControlInterface {
 	private void setIcon(BufferedImage icn) {
 		if (exists("com.apple.eawt.Application")) {
 			com.apple.eawt.Application.getApplication().setDockIconImage(icn);
+		}else{
+			setIcon(icn);
 		}
 	}
 
