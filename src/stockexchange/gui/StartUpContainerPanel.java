@@ -39,7 +39,7 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 	private int h;
 
 	public StartUpContainerPanel(Player[] playersGiven) {
-		System.out.println("namesgiven " + Arrays.toString(playersGiven));
+		//System.out.println("namesgiven " + Arrays.toString(playersGiven));
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		w = screenSize.width;
 		h = screenSize.height;
@@ -96,7 +96,7 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 		setBounds(w / 2 - width / 2, 0, width, height);
 		//setSize(width, height);
 		setVisible(true);
-		System.out.println("startup size "+getSize().toString());
+		//System.out.println("startup size "+getSize().toString());
 	}
 
 	@Override
@@ -164,6 +164,7 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 				tf = new JTextField(name[0]);
 			cb = new JComboBox(new String[]{"Easy", "Medium", "Hard"});
 			tf.setFont(textFont);
+			//tf.set
 			//tf.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
 			//tf.putClientProperty("TextField.inactiveBackground", new ColorUIResource(new Color(255, 0, 0)));
 			cb.setFont(textFont);

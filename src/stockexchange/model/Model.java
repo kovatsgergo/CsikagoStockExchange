@@ -50,12 +50,12 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	private ArrayList<Player> createPlayers(String[][] players) {
 		System.out.println("players at createPlayers: " + Arrays.deepToString(players));
 		ArrayList<Player> playerArray = new ArrayList<>();
-		boolean isThereAnyAI = false;
+		//boolean isThereAnyAI = false;
 		for (int i = 0; i < players.length; i++) {
 			if (players[i][1].equals("human"))
 				playerArray.add(new Player(players[i][0]));
 			else {
-				isThereAnyAI = true;
+				//isThereAnyAI = true;
 				switch (players[i][0]) {
 					case "Easy":
 						playerArray.add(new AIeasy("AI " + (i + 1) + " (easy)"));

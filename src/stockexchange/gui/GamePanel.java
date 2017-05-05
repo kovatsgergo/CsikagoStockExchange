@@ -201,7 +201,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		hintPanel.setVisible(false);
 	}
 
-	private BufferedImage readFromURL(URL url) {
+	public static BufferedImage readFromURL(URL url) {
 		BufferedImage temp = null;
 		try {
 			temp = ImageIO.read(url);
@@ -246,6 +246,11 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		hintPanel.resize(w);
 		repaint();
 	}
+	
+//	@Override
+//	public Dimension getPreferredSize(){
+//		return new Dimension(900, 600);
+//	}
 
 	private int getClickedCol(Point pnt) {
 		int col = -1;

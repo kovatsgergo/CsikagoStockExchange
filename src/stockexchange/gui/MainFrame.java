@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.net.URL;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -34,6 +36,10 @@ public class MainFrame extends JFrame {
 		w = screenSize.width;
 		h = screenSize.height;
 
+		URL iconURL = getClass().getResource("/images/Icon_big.png");
+		ImageIcon icon = new ImageIcon(iconURL);
+		setIconImage(icon.getImage());
+		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setTitle("Stock Exchange");
 
@@ -107,6 +113,7 @@ public class MainFrame extends JFrame {
 		startupPanel = new StartUpContainerPanel(new Player[0]);
 		add(startupPanel);
 		setBounds(w / 4, 0, w / 2, h / 2);
+		setLocationRelativeTo(null);
 		setResizable(false);
 	}
 
@@ -124,6 +131,7 @@ public class MainFrame extends JFrame {
 		startupPanel.setVisible(true);
 		setBounds(w / 4, 0, w / 2, h / 2);
 		miSave.setEnabled(false);
+		setLocationRelativeTo(null);
 		//this.setResizable(false);
 	}
 
@@ -131,8 +139,11 @@ public class MainFrame extends JFrame {
 		//setResizable(true);
 		startupPanel.setVisible(false);
 		miSave.setEnabled(true);
+		gameContainerPanel.setTopNames(iGuiModel.getAllNames());
 		setContainerPanel(gameContainerPanel);
 		int frameWidth = w * 5 / 7;
+		//pack();
+		setLocationRelativeTo(null);
 		setBounds(w / 2 - frameWidth / 2, 0, frameWidth, Math.round(frameWidth / 1.5f));
 	}
 

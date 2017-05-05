@@ -2,6 +2,8 @@ package stockexchange;
 
 /* Gergo Kovats */
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.net.URL;
 import stockexchange.gui.GameContainerPanel;
 import stockexchange.gui.GamePanel;
 import stockexchange.gui.MainFrame;
@@ -20,6 +22,9 @@ public class StockExchange implements GuiControlInterface {
 	});
 
 	public StockExchange(Model model, ControlGuiInterface interfacePanel) {
+		URL imageURL = getClass().getResource("/images/Icon_big.png");
+		BufferedImage img = GamePanel.readFromURL(imageURL);
+		setIcon(img);
 		this.iControlModel = model;
 		this.iControlGui = interfacePanel;
 		reStart();
@@ -154,6 +159,21 @@ public class StockExchange implements GuiControlInterface {
 				break;
 			case 0:
 				System.exit(0);
+		}
+	}
+
+	private boolean exists(String className) {
+		try {
+			Class.forName(className, false, null);
+			return true;
+		} catch (ClassNotFoundException exception) {
+			return false;
+		}
+	}
+
+	private void setIcon(BufferedImage icn) {
+		if (exists("com.apple.eawt.Application")) {
+			com.apple.eawt.Application.getApplication().setDockIconImage(icn);
 		}
 	}
 

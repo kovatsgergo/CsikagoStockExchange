@@ -3,6 +3,7 @@ package stockexchange.gui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -160,7 +161,7 @@ public class GameContainerPanel extends JPanel {
 		//JScrollPane scrollPane = new JScrollPane(textArea);
 		jepRules.setEditable(false);
 		jepRules.setPreferredSize(new Dimension(500,
-						Toolkit.getDefaultToolkit().getScreenSize().height-200));
+						Toolkit.getDefaultToolkit().getScreenSize().height - 200));
 		JScrollPane scrollPane = new JScrollPane(jepRules);
 		final JFrame rulesFrame = new JFrame("Game Rules");
 		rulesFrame.setLayout(new FlowLayout());
@@ -181,18 +182,18 @@ public class GameContainerPanel extends JPanel {
 		btRestart.addActionListener((ActionEvent e) -> {
 			JButton temp = (JButton) e.getSource();
 			if (iGuiControl != null)
-					iGuiControl.pause(false);
-				if (JOptionPane.showConfirmDialog(this,
-								"Are you sure you want to quit this game?",
-								"Confirm Quit", JOptionPane.OK_CANCEL_OPTION,
-								JOptionPane.QUESTION_MESSAGE) == 0)
-					StockExchange.switchToSetup();
-				else if (iGuiControl != null)
-					iGuiControl.unPause();
-			
+				iGuiControl.pause(false);
+			if (JOptionPane.showConfirmDialog(this,
+							"Are you sure you want to quit this game?",
+							"Confirm Quit", JOptionPane.OK_CANCEL_OPTION,
+							JOptionPane.QUESTION_MESSAGE) == 0)
+				StockExchange.switchToSetup();
+			else if (iGuiControl != null)
+				iGuiControl.unPause();
+
 		});
 		// Add Player names to the top
-		setTopNames(this.players);
+		//setTopNames(this.players);
 		// Add components to panel
 		bottom.add(tglHints, 0);
 		bottom.add(new JLabel(), 1);
@@ -210,8 +211,18 @@ public class GameContainerPanel extends JPanel {
 	void setTopNames(String[] players) {
 		top.removeAll();
 		String[] names = players;//gamePanel.model.getAllNames();
+		int max = names[0].length();
+		for (int i = 1; i < names.length; i++) {
+			max = (max < names[i].length()) ? names[i].length() : max;
+		}
+		int fontSize = Math.max(13, getPreferredSize().width * 2 / (names.length * 2 + 1) / max * 2);
+		fontSize = Math.min(fontSize, 20);
+		System.out.println("fontSize "+ fontSize);
 		for (int i = 0; i < names.length; i++) {
-			top.add(new JLabel(names[i], SwingConstants.CENTER), i * 2);
+			JLabel temp = new JLabel(names[i], SwingConstants.CENTER);
+			//System.out.println("top "+getPreferredSize().width);
+			temp.setFont(new Font("LucidaGrande", Font.PLAIN, fontSize));
+			top.add(temp, i * 2);
 			if (i < names.length - 1)
 				top.add(new JLabel("vs", SwingConstants.CENTER), i * 2 + 1);
 		}
