@@ -1,7 +1,6 @@
 /*Gergo Kovats*/
 package stockexchange.gui;
 
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -17,11 +16,14 @@ public class HintPanel extends JPanel {
 
 	public HintPanel(ArrayList<BufferedImage> commodityImgs, int nrPlayers) {
 		setLayout(new GridLayout(0, 1));
-		setBackground(new Color(40, 120, 255));
+		//setBackground(new Color(40, 120, 255));
+		setBackground(MainFrame.bgColor.brighter());
+		//setBackground(new Color(10, 30, 80));
 		length = nrPlayers;
 		lbAll = new ArrayList<>();
 		for (int i = 0; i < length; i++) {
 			lbAll.add(new JLabel(i + " bad initialization"));
+			lbAll.get(i).setForeground(MainFrame.PLAYER_COLORS[i]);
 			add(lbAll.get(i), i);
 		}
 	}

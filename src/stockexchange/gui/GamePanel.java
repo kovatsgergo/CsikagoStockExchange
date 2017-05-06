@@ -68,7 +68,6 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 	private int glowSize;
 	private final Color[] priceColors = {new Color(0, 0, 255, 170), new Color(255, 255, 255, 170), new Color(0, 0, 0, 170),
 		new Color(0, 255, 0, 170), new Color(205, 130, 80, 170), new Color(255, 255, 0, 170)};
-
 	private final ArrayList<BufferedImage> commodityImgs = new ArrayList();
 	private final BufferedImage stockImg;
 	private final BufferedImage figureImg;
@@ -194,7 +193,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 
 		timerFig.setInitialDelay(ANIM_INIT_DELAY);
 		timerAll.setInitialDelay(ANIM_INIT_DELAY);
-		setBackground(new Color(5, 15, 40));
+		setBackground(MainFrame.bgColor);
 		setLayout(new BorderLayout());
 		hintPanel = new HintPanel(commodityImgs, model.getWins().length);
 		add(hintPanel, BorderLayout.SOUTH);
@@ -478,14 +477,16 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 			g.drawImage(figureImg, x + figureSize, y + figureSize, x + goodsSize - figureSize,
 							y + goodsSize - figureSize, 0, 0, 300, 300, null);
 
-			g.setColor(Color.LIGHT_GRAY);
+			//g.setColor(Color.LIGHT_GRAY);
 			//Draw win counters
 			for (int i = 0; i < playerNames.length; i++) {
+				g.setColor(MainFrame.PLAYER_COLORS[i]);
 				g.drawString(wins[i] + "", scoreTablePosition / 2 + i * 2 * scoreTablePosition, w / 50 + 5);
 			}
 
 			//Draw who's turn it is
 			String turnText = playerNames[actualPlayer] + "\'s turn";
+			g.setColor(MainFrame.PLAYER_COLORS[actualPlayer]);
 			g.drawString(turnText, (int) Math.round(w / 15f), stockStartV - g.getFont().getSize());
 
 			//Draw the sinkingSold goods

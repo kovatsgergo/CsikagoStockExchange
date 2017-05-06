@@ -1,15 +1,16 @@
 /*Gergo Kovats*/
 package stockexchange.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -25,6 +26,9 @@ public class MainFrame extends JFrame {
 	private StartUpContainerPanel startupPanel = null;
 	private GuiControlInterface iGuiControl;
 	private GuiModelInterface iGuiModel;
+	//static final javafx.scene.paint.Color[] PLAYER_COLORSx = {javafx.scene.paint.Color.YELLOWGREEN, javafx.scene.paint.Color.YELLOWGREEN, javafx.scene.paint.Color.CHARTREUSE, javafx.scene.paint.Color.PALETURQUOISE};
+	static final Color[] PLAYER_COLORS = {Color.decode("#9ACD32"), Color.decode("#EF4347"), Color.decode("#AFCEFE"), Color.decode("#CABD32")};
+	public static final Color bgColor = new Color(5, 15, 40);
 
 	private JMenuItem miSave;
 
@@ -35,10 +39,12 @@ public class MainFrame extends JFrame {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		w = screenSize.width;
 		h = screenSize.height;
+		
+		setBackground(MainFrame.bgColor);
 
 		URL iconURL = getClass().getResource("/images/Icon_big.png");
-		ImageIcon icon = new ImageIcon(iconURL);
-		setIconImage(icon.getImage());
+		BufferedImage img = GamePanel.readFromURL(iconURL);
+		setIcon(img);
 		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setTitle("Stock Exchange");
@@ -115,6 +121,23 @@ public class MainFrame extends JFrame {
 		setBounds(w / 4, 0, w / 2, h / 2);
 		setLocationRelativeTo(null);
 		setResizable(false);
+	}
+	
+		private boolean exists(String className) {
+		try {
+			Class.forName(className, false, null);
+			return true;
+		} catch (ClassNotFoundException exception) {
+			return false;
+		}
+	}
+
+	private void setIcon(BufferedImage icn) {
+		if (exists("com.apple.eawt.Application")) {
+			com.apple.eawt.Application.getApplication().setDockIconImage(icn);
+		}else{
+			setIconImage(icn);
+		}
 	}
 
 	public void setiGuiControl(GuiControlInterface iGuiControl) {

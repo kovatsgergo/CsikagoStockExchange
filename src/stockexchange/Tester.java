@@ -1,6 +1,7 @@
 package stockexchange;
 
 /*Gergo Kovats*/
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
@@ -14,8 +15,17 @@ import javax.swing.JTextField;
 public class Tester {
 
 	//static AI ai = new AIeasy("nothing");
-
+	
 	public static void main(String[] args) {
+		int color;
+		System.out.println(color = (new Color(0x0000FF)).getRGB());
+		for (int i = 0; i < 6; i++) {
+			System.out.print(color>>(i*4));
+		}
+		
+	}
+
+	public static void main5(String[] args) {
 		String fonts[]
 						= GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 		JFrame frame = new JFrame();

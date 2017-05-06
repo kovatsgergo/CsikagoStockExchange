@@ -1,6 +1,7 @@
 /*Gergo Kovats*/
 package stockexchange.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -201,6 +202,7 @@ public class GameContainerPanel extends JPanel {
 		bottom.add(new JLabel(), 3);
 		bottom.add(btRestart, 4);
 
+		top.setBackground(new Color(10, 30, 80));
 		gamePanel.setFocusable(true);
 		add(top);//, BorderLayout.NORTH);
 		add(gamePanel);//, BorderLayout.CENTER);
@@ -222,9 +224,13 @@ public class GameContainerPanel extends JPanel {
 			JLabel temp = new JLabel(names[i], SwingConstants.CENTER);
 			//System.out.println("top "+getPreferredSize().width);
 			temp.setFont(new Font("LucidaGrande", Font.PLAIN, fontSize));
-			top.add(temp, i * 2);
-			if (i < names.length - 1)
-				top.add(new JLabel("vs", SwingConstants.CENTER), i * 2 + 1);
+			temp.setForeground(MainFrame.PLAYER_COLORS[i]);
+			top.add(temp/*, i * 2*/);
+			if (i < names.length - 1){
+				temp = new JLabel("vs", SwingConstants.CENTER);
+				temp.setForeground(Color.LIGHT_GRAY);
+				top.add(temp/*, i * 2 + 1*/);
+			}
 		}
 	}
 
