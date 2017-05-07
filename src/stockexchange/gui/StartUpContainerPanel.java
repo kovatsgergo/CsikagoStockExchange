@@ -3,7 +3,6 @@ package stockexchange.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -12,7 +11,6 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -30,9 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import stockexchange.StockExchange;
@@ -208,7 +205,7 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 			tf.setFont(textFont);
 			tf.setBorder(BorderFactory.createEmptyBorder());
 			cb.setFont(textFont);
-			cb.setForeground(MainFrame.PLAYER_COLORS[i]);
+			//cb.setForeground(MainFrame.PLAYER_COLORS[i]);
 			chb.addActionListener(this);
 			cb.addActionListener(this);
 			tf.addActionListener(this);
@@ -219,8 +216,19 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 			cb.setVisible(false);
 			//cb.setEnabled(false);
 			cb.setUI(ColorArrowUI.createUI(cbNumPlayers));
+			cb.setRenderer(new DefaultListCellRenderer() {
+				public void paint(Graphics g) {
+					if (cb.isEnabled()) {
+						setBackground(MainFrame.bgColor);
+						setForeground(MainFrame.PLAYER_COLORS[i]);
+					} else {
+						setBackground(MainFrame.bgColor);
+						setForeground(MainFrame.bgColor.brighter());
+					}
+					super.paint(g);
+				}
+			});
 			MainFrame.setAllBackground(this, MainFrame.bgColor);
-			MainFrame.setAllBackground(cb, Color.yellow);
 		}
 
 		protected void setName(int i, String name) {
@@ -286,60 +294,7 @@ class ColorArrowUI extends BasicComboBoxUI {
 	public static ComboBoxUI createUI(JComponent c) {
 		return new ColorArrowUI();
 	}
-
-	@Override
-	public void paintCurrentValue(Graphics g, Rectangle bounds, boolean hasFocus) {
-		ListCellRenderer renderer = comboBox.getRenderer();
-		Component c;
-
-		if (hasFocus && !isPopupVisible(comboBox)) {
-			c = renderer.getListCellRendererComponent(listBox,
-							comboBox.getSelectedItem(),
-							-1,
-							true,
-							false);
-		} else {
-			c = renderer.getListCellRendererComponent(listBox,
-							comboBox.getSelectedItem(),
-							-1,
-							false,
-							false);
-			c.setBackground(UIManager.getColor("ComboBox.background"));
-		}
-		c.setFont(comboBox.getFont());
-		if (hasFocus && !isPopupVisible(comboBox)) {
-			c.setForeground(listBox.getSelectionForeground());
-			c.setBackground(listBox.getSelectionBackground());
-		} else {
-			if (comboBox.isEnabled()) {
-				c.setForeground(comboBox.getForeground());
-				c.setBackground(comboBox.getBackground());
-			} else {
-				c.setForeground(comboBox.getBackground().brighter());
-				c.setBackground(comboBox.getBackground());
-//                c.setForeground(DefaultLookup.getColor(
-//                         comboBox, this, "ComboBox.disabledForeground", null));
-//                c.setBackground(DefaultLookup.getColor(
-//                         comboBox, this, "ComboBox.disabledBackground", null));
-			}
-		}
-
-		// Fix for 4238829: should lay out the JPanel.
-		boolean shouldValidate = false;
-		if (c instanceof JPanel) {
-			shouldValidate = true;
-		}
-
-		int x = bounds.x, y = bounds.y, w = bounds.width, h = bounds.height;
-		if (padding != null) {
-			x = bounds.x + padding.left;
-			y = bounds.y + padding.top;
-			w = bounds.width - (padding.left + padding.right);
-			h = bounds.height - (padding.top + padding.bottom);
-		}
-
-		currentValuePane.paintComponent(g, c, comboBox, x, y, w, h, shouldValidate);
-	}
+	
 	@Override
 	protected JButton createArrowButton() {
 		JButton button = null;
