@@ -40,7 +40,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 //Game state variables
 	private String[] playerNames;
 	private int[] wins;
-	private ArrayList<Commodity> topCommodities;
+	private ArrayList<String> topCommodities;
 	private int actualPlayer;
 	private int position;
 	private ArrayList<Integer> possibleCols;
@@ -52,6 +52,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 	private int h;
 	private int w;
 	private double[] center = new double[2];
+	private double[] coeff = new double[2];
 	private int goodsSize;
 	private int scoreTablePosition;
 	private int figureSize;
@@ -241,6 +242,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		//coloumns
 		center[0] = w * 2 / 3;
 		center[1] = w * 13 / 50;
+		coeff[0] = coeff[1] = Math.round(w * (float) Math.sqrt(nrGameCols / 9f) / 5f);
 		goodsSize = Math.round(w / 10f);
 		//figure
 		figureSize = Math.round(goodsSize / 5);
@@ -264,11 +266,12 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		return col;
 	}
 
-	private BufferedImage getImage(Commodity commodity) {//kivalasztas tetel
+	private BufferedImage getImage(String commodity) {//kivalasztas tetel
 		int i = 0;
-		while (!Model.COMMODITY_TYPES[i].equals(commodity))
+		while (!Model.COMMODITY_TYPES[i].getNameAndPrice(false).equals(commodity))
 			i++;
 		return commodityImgs.get(i);
+//<editor-fold defaultstate="collapsed" desc="comment">
 //		int imageNr = -1;                                //igy kereses tetel lenne
 //		for (int i = 0; i < Model.COMMODITY_TYPES.length; i++) {
 //			if (commodity.equals(Model.COMMODITY_TYPES[i]))
@@ -278,7 +281,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 //			return commodityImgs.get(imageNr);
 //		else
 //			return null;
-
+//</editor-fold>
 	}
 
 	@Override //from ControlGuiInterface
@@ -324,7 +327,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 
 	@Override //from ControlGuiInterface
 	public void start() {
-		topCommodities = model.getTopCommodities();
+		topCommodities = model.getTopCommoditiesString();
 		wins = model.getWins();
 		playerNames = model.getAllNames();
 		colSizes = model.getColsSizes();
@@ -342,6 +345,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		if (model != null)
 			possibleCols = model.getPossible();//new ArrayList<Integer>();//{1, 2, 3};
 		nrCols = nrGameCols;
+		coeff[0] = coeff[1] = Math.round(w * (float) Math.sqrt(nrGameCols / 9f) / 5f);
 		repaint();
 	}
 
@@ -364,9 +368,9 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		sinkingSold = model.getLastSoldColumn();//model.getNeighbors().get(1 - model.getNeighbors().indexOf(kept));
 		sinkingKept = kept;
 		//System.out.println("\nkept: " + sinkingKept + "\tsold: " + sinkingSold);
-		sinkSoldImg = getImage(this.topCommodities.get(sinkingSold));
+		sinkSoldImg = getImage(topCommodities.get(sinkingSold));
 		//System.out.println(model.getLastSoldCommodity());
-		sinkKeptImg = getImage(this.topCommodities.get(sinkingKept));
+		sinkKeptImg = getImage(topCommodities.get(sinkingKept));
 		setNrGameCols();
 		//Set prices
 		for (int i = 0; i < 6; i++) {
@@ -375,7 +379,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 
 		fallenCols = emptiedColumns;
 		colSizes = model.getColsSizes();
-		this.topCommodities = model.getTopCommodities();
+		topCommodities = model.getTopCommoditiesString();
 		//Start animating objects
 		beforeMoveGoods();
 		beforeMoveCols();
@@ -438,11 +442,11 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 			//Draw each coloumns
 			int before = (position + 1) % nrGameCols;
 			int after = (position + nrGameCols - 1) % nrGameCols;
-			int coeff = Math.round(w * (float) Math.sqrt(nrGameCols / 9f) / 5f);
+
 			for (int i = 0; i < nrGameCols; i++) {
 				//Calculate values
-				x = (int) (center[0] + coeff * Math.cos(angleCols[i]));
-				y = (int) (center[1] + coeff * Math.sin(angleCols[i]));
+				x = (int) (center[0] + coeff[0] * Math.cos(angleCols[i]));
+				y = (int) (center[1] + coeff[0] * Math.sin(angleCols[i]));
 				int height = colSizes[i];
 				g.setColor(Color.LIGHT_GRAY);
 				if (hints) {
@@ -480,8 +484,8 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 			}
 
 			// Draw the figureStopped
-			x = (int) Math.round(center[0] + coeff * Math.cos(angleFig[0]));
-			y = (int) Math.round(center[1] + coeff * Math.sin(angleFig[0]));
+			x = (int) Math.round(center[0] + coeff[0] * Math.cos(angleFig[0]));
+			y = (int) Math.round(center[1] + coeff[0] * Math.sin(angleFig[0]));
 			g.drawImage(figureImg, x + figureSize, y + figureSize, x + goodsSize - figureSize,
 							y + goodsSize - figureSize, 0, 0, 300, 300, null);
 
@@ -508,7 +512,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 			}
 
 			//Is is choice stage
-			//g.drawString(Boolean.toString(choiceStage), w / 20, w * 5 / 10);
+			//g.drawString(Boolean.getNameAndPrice(choiceStage), w / 20, w * 5 / 10);
 		}
 //</editor-fold>
 	}
@@ -578,11 +582,12 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 	}
 
 	private void beforeMoveCols() {
+		coeff[1] = Math.round(w * (float) Math.sqrt(nrGameCols / 9f) / 5f);
 		//System.out.println("beforeMove nrCols: " + nrCols + "\tnrGameCols: " + nrGameCols);
 		if (nrCols > nrGameCols /*&& nrGameCols < 9*/) {
 			for (int i = 0; i < nrGameCols; i++) {
 				angleCols[i + Model.START_NR_COLOUMS] = i * (Math.PI * 2 / nrGameCols);
-				//System.out.println("fallenCols: " + Arrays.toString(fallenCols));
+				//System.out.println("fallenCols: " + Arrays.getNameAndPrice(fallenCols));
 				boolean first = (fallenCols[0] >= 0 && i >= fallenCols[0]);
 				boolean second = (fallenCols[1] >= 0 && i >= fallenCols[1]);
 				//System.out.println("first: " + first + "\tsecond: " + second);
@@ -606,6 +611,8 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 	private boolean moveCols() {//timer2
 		//repaint();
 		//System.out.println("moveCols nrCols: " + nrCols + "\tnrGameCols: " + nrGameCols);
+		if (coeff[0] - coeff[1] > 0)
+			coeff[0] -= (coeff[0] - coeff[1]) / 5;
 		double sumDiff = 0;
 		double[] colsDiff = new double[nrGameCols];
 		//if (nrCols > nrGameCols /*&& nrGameCols < 9*/) {
@@ -623,7 +630,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 			for (int i = 0; i < nrGameCols; i++) {
 				angleCols[i] -= colsDiff[i] / 5;
 			}
-			//System.out.println(Arrays.toString(colsDiff));
+			//System.out.println(Arrays.getNameAndPrice(colsDiff));
 		} else {
 			for (int i = 0; i < nrGameCols; i++) {
 				angleCols[i] = angleCols[i + Model.START_NR_COLOUMS];
@@ -677,9 +684,9 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		soldCommodityY[1] = h;
 		keptCommodityX[1] = ((actualPlayer * 2 + 0.5f) * scoreTablePosition);
 		keptCommodityY[1] = -goodsSize;
-//		System.out.println("beforeMove: keptY" + Arrays.toString(keptCommodityY));
-//		System.out.println("beforeMove: keptX" + Arrays.toString(keptCommodityX));
-//		System.out.println("beforeMove: soldY" + Arrays.toString(soldCommodityY));
+//		System.out.println("beforeMove: keptY" + Arrays.getNameAndPrice(keptCommodityY));
+//		System.out.println("beforeMove: keptX" + Arrays.getNameAndPrice(keptCommodityX));
+//		System.out.println("beforeMove: soldY" + Arrays.getNameAndPrice(soldCommodityY));
 	}
 
 	private boolean moveGoods() {
@@ -716,7 +723,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 			sinkingKept = -1;
 			sinkSoldImg = null;
 			sinkKeptImg = null;
-			//System.out.println(diff + " " + diff2 + " " + Arrays.toString(soldCommodityY) + " " + Arrays.toString(keptCommodityY));
+			//System.out.println(diff + " " + diff2 + " " + Arrays.getNameAndPrice(soldCommodityY) + " " + Arrays.getNameAndPrice(keptCommodityY));
 			finished = true;
 		}
 		return finished;

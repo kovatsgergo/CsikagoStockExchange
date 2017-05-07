@@ -15,6 +15,7 @@ public interface GuiModelInterface {
 	public int getActualPlayerIndex();//ok
 	public int getPosition();//panel, AI
 	public ArrayList<Commodity> getTopCommodities();//panel, AI
+	public ArrayList<String> getTopCommoditiesString();/////////////////////////////////
 	public int[] getColsSizes();//AI, panel
 	public String[] makeHints();//ok
 	public String gameOverString();//ok

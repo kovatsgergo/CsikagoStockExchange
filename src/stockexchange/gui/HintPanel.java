@@ -45,7 +45,7 @@ public class HintPanel extends JPanel {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
 		String[] twoparts = hintText.split(":");
-		sb.append(twoparts[0]);
+		sb.append(twoparts[0]+": ");
 		//System.out.println(Arrays.toString(twoparts));
 		String[] array = twoparts[1].split("-");
 		for (String string : array) {

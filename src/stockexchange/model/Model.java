@@ -38,7 +38,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		for (Player player : this.players) {
 			System.out.println(player.getClass().getSimpleName());
 		}
-		//System.out.println("constructor players: " + Arrays.toString(players));
+		//System.out.println("constructor players: " + Arrays.getNameAndPrice(players));
 		wins = new ArrayList<>();
 		for (Player player : this.players) {
 			wins.add(0);
@@ -92,7 +92,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 			propertiesToSave.add(column);
 		}
 		propertiesToSave.add(getPriceArray());
-//		System.out.println(propertiesToSave.toString());
+//		System.out.println(propertiesToSave.getNameAndPrice());
 		GameSaver.save(propertiesToSave, pathName);
 	}
 
@@ -100,7 +100,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		GameSaver.load(propertiesToSave, pathName);
 		boolean success = false;
 //		for (int i = 0; i < propertiesToSave.size(); i++) {
-//			System.out.println(i + ": " + propertiesToSave.get(i).toString());
+//			System.out.println(i + ": " + propertiesToSave.get(i).getNameAndPrice());
 //		}
 		if (propertiesToSave != null /*& isStructured(propertiesToSave)*/) {
 			gameOver = (boolean) propertiesToSave.get(0);
@@ -180,7 +180,7 @@ public static boolean isStructured(String pathFile) {
 				//System.out.println(COMMODITY_TYPES[i]+" lowered");
 				COMMODITY_TYPES[i].lowerPrice();
 			}
-			//System.out.println(COMMODITY_TYPES[i].toString());
+			//System.out.println(COMMODITY_TYPES[i].getNameAndPrice());
 		}
 	}
 
@@ -207,14 +207,14 @@ public static boolean isStructured(String pathFile) {
 	 * Deal all the commodities to the columns
 	 */
 	private void dealGoods() {
-		//System.out.println(startGoods.toString());
+		//System.out.println(startGoods.getNameAndPrice());
 		for (int i = 0; i < START_NR_COLOUMS; i++) {
 			for (int j = 0; j < START_HEIGHT_COLOUMNS; j++) {
 				//columns.get(i).add(startGoods.get(0));
 				columns.get(i).add(startCommodities.remove(0));
 			}
 		}
-		//System.out.println(startGoods.toString());
+		//System.out.println(startGoods.getNameAndPrice());
 	}
 
 	/**
@@ -412,6 +412,15 @@ public static boolean isStructured(String pathFile) {
 		}
 		return topGoods;
 	}
+	
+		@Override // form GuiModelInterface
+	public ArrayList<String> getTopCommoditiesString() {
+		ArrayList<String> topGoods = new ArrayList<>();
+		for (Column column : columns) {
+			topGoods.add(column.getTop().getNameAndPrice(false));
+		}
+		return topGoods;
+	}
 
 	@Override // form GuiModelInterface
 	public int[] getColsSizes() {
@@ -463,7 +472,7 @@ public static boolean isStructured(String pathFile) {
 		for (int i = 0; i < players.size(); i++) {
 			StringBuffer temp = new StringBuffer("");
 			for (Commodity commodity : players.get(i).commodities) {
-				temp.append(commodity.toString(true));
+				temp.append(commodity.getNameAndPrice(true));
 			}
 			returnHints[i] = players.get(i).getName() + " has " + players.get(i).getPoints() + " points." + " Kept: " + temp.toString();
 		}

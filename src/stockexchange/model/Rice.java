@@ -14,7 +14,7 @@ public class Rice extends Commodity implements Serializable {
 		return name + "{price =" + price + ", START_PRICE=" + START_PRICE + '}';
 	}
 
-	public String toString(boolean full) {
+	public String getNameAndPrice(boolean full) {
 		if (full)
 			return name + "_" + price + "-";
 		else
@@ -42,7 +42,7 @@ public class Rice extends Commodity implements Serializable {
 	}
 
 	public boolean equals(Commodity other) {
-		return this.toString(false).equals(other.toString(false));
+		return this.getNameAndPrice(false).equals(other.getNameAndPrice(false));
 	}
 
 }

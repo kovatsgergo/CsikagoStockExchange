@@ -5,8 +5,9 @@ package stockexchange.model;
 public abstract class Commodity{
 	//"Wheat", "Sugar", "Coffee", "Rice", "Cocoa", "Corn"
 
+	@Override
 	public abstract String toString();
-	public abstract String toString(boolean full);
+	public abstract String getNameAndPrice(boolean full);
 	public abstract int getStartPrice();
 	
 	public abstract int getPrice();
