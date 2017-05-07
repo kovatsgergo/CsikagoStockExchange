@@ -13,6 +13,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.net.URL;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
@@ -24,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EtchedBorder;
 import stockexchange.GuiControlInterface;
 import stockexchange.StockExchange;
 
@@ -64,6 +67,7 @@ public class GameContainerPanel extends JPanel {
 
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					tglHints.setText("HINTS ON");
+					//tglHints.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 					double hintRatio = 1.5 - (1.5 - 1.35) / 4 * (players.length);
 					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / hintRatio));
 					gamePanel.setHintsOnOff(true);
@@ -76,6 +80,7 @@ public class GameContainerPanel extends JPanel {
 					//setBounds(getX(), getY(), getWidth(), (int) (getWidth() / 1.4) + topAndBottom);
 				} else {
 					tglHints.setText("hints off");
+					//tglHints.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / 1.5));
 					gamePanel.setHintsOnOff(false);
 					//gamePanel.setSize(getWidth(), (int) (getWidth() / 1.7));
@@ -208,6 +213,10 @@ public class GameContainerPanel extends JPanel {
 		add(gamePanel);//, BorderLayout.CENTER);
 		add(bottom);//, BorderLayout.SOUTH);
 		gamePanel.requestFocusInWindow();
+		bottom.setBackground(MainFrame.bgColor.brighter());
+		setAllButtons(bottom);
+		MainFrame.setAllForeground(bottom, Color.LIGHT_GRAY);
+		//MainFrame.setAllBackground(bottom, MainFrame.bgColor.brighter());
 	}
 
 	void setTopNames(String[] players) {
@@ -219,18 +228,30 @@ public class GameContainerPanel extends JPanel {
 		}
 		int fontSize = Math.max(13, getPreferredSize().width * 2 / (names.length * 2 + 1) / max * 2);
 		fontSize = Math.min(fontSize, 20);
-		System.out.println("fontSize "+ fontSize);
+		System.out.println("fontSize " + fontSize);
 		for (int i = 0; i < names.length; i++) {
 			JLabel temp = new JLabel(names[i], SwingConstants.CENTER);
 			//System.out.println("top "+getPreferredSize().width);
 			temp.setFont(new Font("LucidaGrande", Font.PLAIN, fontSize));
 			temp.setForeground(MainFrame.PLAYER_COLORS[i]);
 			top.add(temp/*, i * 2*/);
-			if (i < names.length - 1){
+			if (i < names.length - 1) {
 				temp = new JLabel("vs", SwingConstants.CENTER);
 				temp.setForeground(Color.LIGHT_GRAY);
 				top.add(temp/*, i * 2 + 1*/);
 			}
+		}
+	}
+
+	private void setAllButtons(JPanel panel) {
+		for (int i = 0; i < panel.getComponentCount(); i++) {
+			//System.out.println(panel.getComponent(i));
+			if (panel.getComponent(i) instanceof AbstractButton) {
+				((AbstractButton)panel.getComponent(i)).setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+				((AbstractButton) panel.getComponent(i)).setOpaque(true);
+				panel.getComponent(i).setBackground(MainFrame.bgColor.brighter().brighter());
+			}
+
 		}
 	}
 

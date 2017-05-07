@@ -3,13 +3,16 @@ package stockexchange.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,7 +30,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import stockexchange.StockExchange;
@@ -105,7 +110,7 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 		btStart.setFont(textFont);
 		bottom.add(btStart);
 		add(bottom, BorderLayout.SOUTH);
-		setAllForeground(this, Color.LIGHT_GRAY);
+		MainFrame.setAllForeground(this, Color.LIGHT_GRAY);
 		rowPs = new RowPanel[Model.MAX_NR_PLAYERS];
 		for (int i = 0; i < Model.MAX_NR_PLAYERS; i++) {
 			if (i >= playersGiven.length)
@@ -120,7 +125,7 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 		setBounds(w / 2 - width / 2, 0, width, height);
 		//setSize(width, height);
 		setVisible(true);
-		setAllBackground(this, MainFrame.bgColor);
+		MainFrame.setAllBackground(this, MainFrame.bgColor);
 		btStart.setOpaque(true);
 		btStart.setBackground(MainFrame.bgColor.brighter().brighter());
 
@@ -183,25 +188,6 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 		StockExchange.switchToGame(names, new int[]{w / 7 * 5, Math.round(w * 0.45f), w, h});
 	}
 
-	protected static void setAllBackground(Container panel, Color color) {
-		//System.out.println("panel " + panel);
-		for (int i = 0; i < panel.getComponentCount(); i++) {
-			if (panel.getComponent(i) instanceof JPanel)
-				setAllBackground((JPanel) panel.getComponent(i), color);
-			panel.getComponent(i).setBackground(color);
-		}
-	}
-
-	protected static void setAllForeground(JPanel panel, Color color) {
-		//System.out.println("panel " + panel);
-		for (int i = 0; i < panel.getComponentCount(); i++) {
-			//System.out.println(panel.getComponent(i));
-			if (panel.getComponent(i) instanceof JPanel)
-				setAllForeground((JPanel) panel.getComponent(i), color);
-			panel.getComponent(i).setForeground(color);
-		}
-	}
-
 	public class RowPanel extends JPanel implements ActionListener, FocusListener {
 
 		JTextField tf;
@@ -233,8 +219,8 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 			cb.setVisible(false);
 			//cb.setEnabled(false);
 			cb.setUI(ColorArrowUI.createUI(cbNumPlayers));
-			setAllBackground(this, MainFrame.bgColor);
-			setAllBackground(cb, Color.yellow);
+			MainFrame.setAllBackground(this, MainFrame.bgColor);
+			MainFrame.setAllBackground(cb, Color.yellow);
 		}
 
 		protected void setName(int i, String name) {
@@ -301,59 +287,59 @@ class ColorArrowUI extends BasicComboBoxUI {
 		return new ColorArrowUI();
 	}
 
-//	@Override
-//	public void paintCurrentValue(Graphics g, Rectangle bounds, boolean hasFocus) {
-//		ListCellRenderer renderer = comboBox.getRenderer();
-//		Component c;
-//
-//		if (hasFocus && !isPopupVisible(comboBox)) {
-//			c = renderer.getListCellRendererComponent(listBox,
-//							comboBox.getSelectedItem(),
-//							-1,
-//							true,
-//							false);
-//		} else {
-//			c = renderer.getListCellRendererComponent(listBox,
-//							comboBox.getSelectedItem(),
-//							-1,
-//							false,
-//							false);
-//			c.setBackground(UIManager.getColor("ComboBox.background"));
-//		}
-//		c.setFont(comboBox.getFont());
-//		if (hasFocus && !isPopupVisible(comboBox)) {
-//			c.setForeground(listBox.getSelectionForeground());
-//			c.setBackground(listBox.getSelectionBackground());
-//		} else {
-//			if (comboBox.isEnabled()) {
-//				c.setForeground(comboBox.getForeground());
-//				c.setBackground(comboBox.getBackground());
-//			} else {
-//				c.setForeground(comboBox.getBackground().brighter());
-//				c.setBackground(comboBox.getBackground());
-////                c.setForeground(DefaultLookup.getColor(
-////                         comboBox, this, "ComboBox.disabledForeground", null));
-////                c.setBackground(DefaultLookup.getColor(
-////                         comboBox, this, "ComboBox.disabledBackground", null));
-//			}
-//		}
-//
-//		// Fix for 4238829: should lay out the JPanel.
-//		boolean shouldValidate = false;
-//		if (c instanceof JPanel) {
-//			shouldValidate = true;
-//		}
-//
-//		int x = bounds.x, y = bounds.y, w = bounds.width, h = bounds.height;
-//		if (padding != null) {
-//			x = bounds.x + padding.left;
-//			y = bounds.y + padding.top;
-//			w = bounds.width - (padding.left + padding.right);
-//			h = bounds.height - (padding.top + padding.bottom);
-//		}
-//
-//		currentValuePane.paintComponent(g, c, comboBox, x, y, w, h, shouldValidate);
-//	}
+	@Override
+	public void paintCurrentValue(Graphics g, Rectangle bounds, boolean hasFocus) {
+		ListCellRenderer renderer = comboBox.getRenderer();
+		Component c;
+
+		if (hasFocus && !isPopupVisible(comboBox)) {
+			c = renderer.getListCellRendererComponent(listBox,
+							comboBox.getSelectedItem(),
+							-1,
+							true,
+							false);
+		} else {
+			c = renderer.getListCellRendererComponent(listBox,
+							comboBox.getSelectedItem(),
+							-1,
+							false,
+							false);
+			c.setBackground(UIManager.getColor("ComboBox.background"));
+		}
+		c.setFont(comboBox.getFont());
+		if (hasFocus && !isPopupVisible(comboBox)) {
+			c.setForeground(listBox.getSelectionForeground());
+			c.setBackground(listBox.getSelectionBackground());
+		} else {
+			if (comboBox.isEnabled()) {
+				c.setForeground(comboBox.getForeground());
+				c.setBackground(comboBox.getBackground());
+			} else {
+				c.setForeground(comboBox.getBackground().brighter());
+				c.setBackground(comboBox.getBackground());
+//                c.setForeground(DefaultLookup.getColor(
+//                         comboBox, this, "ComboBox.disabledForeground", null));
+//                c.setBackground(DefaultLookup.getColor(
+//                         comboBox, this, "ComboBox.disabledBackground", null));
+			}
+		}
+
+		// Fix for 4238829: should lay out the JPanel.
+		boolean shouldValidate = false;
+		if (c instanceof JPanel) {
+			shouldValidate = true;
+		}
+
+		int x = bounds.x, y = bounds.y, w = bounds.width, h = bounds.height;
+		if (padding != null) {
+			x = bounds.x + padding.left;
+			y = bounds.y + padding.top;
+			w = bounds.width - (padding.left + padding.right);
+			h = bounds.height - (padding.top + padding.bottom);
+		}
+
+		currentValuePane.paintComponent(g, c, comboBox, x, y, w, h, shouldValidate);
+	}
 	@Override
 	protected JButton createArrowButton() {
 		JButton button = null;

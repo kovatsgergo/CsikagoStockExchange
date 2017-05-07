@@ -2,6 +2,7 @@
 package stockexchange.gui;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Toolkit;
@@ -18,6 +19,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import stockexchange.GuiControlInterface;
 import stockexchange.GuiModelInterface;
+import stockexchange.StockExchange;
 import stockexchange.model.Player;
 
 public class MainFrame extends JFrame {
@@ -39,13 +41,13 @@ public class MainFrame extends JFrame {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		w = screenSize.width;
 		h = screenSize.height;
-		
+
 		setBackground(MainFrame.bgColor);
 
 		URL iconURL = getClass().getResource("/images/Icon_big.png");
 		BufferedImage img = GamePanel.readFromURL(iconURL);
 		setIcon(img);
-		
+
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setTitle("Stock Exchange");
 
@@ -73,7 +75,8 @@ public class MainFrame extends JFrame {
 		mFile.add(miOpen);
 
 		miOpen.addActionListener((ActionEvent e) -> {
-			iGuiControl.pause(false);
+			if (iGuiControl != null)
+				iGuiControl.pause(false);
 			FileDialog chooser = new FileDialog(this, "Open saved game", FileDialog.LOAD);
 			chooser.setFilenameFilter((File dir, String name1) -> name1.substring(name1.length() - 4).equals(".cse"));
 			chooser.setFile(".cse");
@@ -81,14 +84,16 @@ public class MainFrame extends JFrame {
 			String chosenDir = chooser.getDirectory();
 			String chosenFile = chooser.getFile();
 			chooser.dispose();
-			if (chosenFile != null) {
+			boolean isItStartup;
+			if (isItStartup = (chosenFile != null)) {
 				if (startupPanel.isVisible())
 					startupPanel.startGame();
 				if (!iGuiControl.load(chosenDir + chosenFile)) {
 					JOptionPane.showMessageDialog(MainFrame.this,
 									"Error while loading saved game",
 									"Load error", JOptionPane.ERROR_MESSAGE);
-
+					if (isItStartup)
+						StockExchange.switchToSetup();
 				} else
 					gameContainerPanel.setTopNames(iGuiModel.getAllNames());
 			}
@@ -122,8 +127,8 @@ public class MainFrame extends JFrame {
 		setLocationRelativeTo(null);
 		setResizable(false);
 	}
-	
-		private boolean exists(String className) {
+
+	private boolean exists(String className) {
 		try {
 			Class.forName(className, false, null);
 			return true;
@@ -135,7 +140,7 @@ public class MainFrame extends JFrame {
 	private void setIcon(BufferedImage icn) {
 		if (exists("com.apple.eawt.Application")) {
 			com.apple.eawt.Application.getApplication().setDockIconImage(icn);
-		}else{
+		} else {
 			setIconImage(icn);
 		}
 	}
@@ -173,6 +178,28 @@ public class MainFrame extends JFrame {
 	protected void setContainerPanel(GameContainerPanel gameContainerPanel) {
 		this.gameContainerPanel = gameContainerPanel;
 		add(gameContainerPanel);
+	}
+
+	protected static void setAllBackground(Container panel, Color color) {
+		//System.out.println("panel " + panel);
+		panel.setBackground(color);
+		for (int i = 0; i < panel.getComponentCount(); i++) {
+			//System.out.println(panel.getComponent(i));
+			panel.getComponent(i).setBackground(color);
+			if (panel.getComponent(i) instanceof Container)
+				setAllBackground((Container) panel.getComponent(i), color);
+		}
+	}
+
+	protected static void setAllForeground(Container panel, Color color) {
+		//System.out.println("panel " + panel);
+		panel.setForeground(color);
+		for (int i = 0; i < panel.getComponentCount(); i++) {
+			//System.out.println(panel.getComponent(i));
+			panel.getComponent(i).setForeground(color);
+			if (panel.getComponent(i) instanceof Container)
+				setAllForeground((Container) panel.getComponent(i), color);
+		}
 	}
 
 }
