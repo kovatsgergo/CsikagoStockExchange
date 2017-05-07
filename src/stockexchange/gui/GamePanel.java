@@ -190,14 +190,17 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 				repaint();
 			}
 		});
-
 		timerFig.setInitialDelay(ANIM_INIT_DELAY);
 		timerAll.setInitialDelay(ANIM_INIT_DELAY);
 		setBackground(MainFrame.bgColor);
 		setLayout(new BorderLayout());
+		initializeHintPanel();
+	}
+
+	private void initializeHintPanel() {
 		hintPanel = new HintPanel(commodityImgs, model.getWins().length);
 		add(hintPanel, BorderLayout.SOUTH);
-		hintPanel.setVisible(false);
+		hintPanel.setVisible(hints);
 	}
 
 	public static BufferedImage readFromURL(URL url) {
@@ -245,12 +248,11 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		hintPanel.resize(w);
 		repaint();
 	}
-	
+
 //	@Override
 //	public Dimension getPreferredSize(){
 //		return new Dimension(900, 600);
 //	}
-
 	private int getClickedCol(Point pnt) {
 		int col = -1;
 		for (int i = 0; i < nrGameCols; i++) {
@@ -262,16 +264,21 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		return col;
 	}
 
-	private BufferedImage getImage(Commodity commodity) {
-		int imageNr = -1;
-		for (int i = 0; i < Model.COMMODITY_TYPES.length; i++) {
-			if (commodity.equals(Model.COMMODITY_TYPES[i]))
-				imageNr = i;
-		}
-		if (imageNr > -1)
-			return commodityImgs.get(imageNr);
-		else
-			return null;
+	private BufferedImage getImage(Commodity commodity) {//kivalasztas tetel
+		int i = 0;
+		while (!Model.COMMODITY_TYPES[i].equals(commodity))
+			i++;
+		return commodityImgs.get(i);
+//		int imageNr = -1;                                //igy kereses tetel lenne
+//		for (int i = 0; i < Model.COMMODITY_TYPES.length; i++) {
+//			if (commodity.equals(Model.COMMODITY_TYPES[i]))
+//				imageNr = i;
+//		}
+//		if (imageNr > -1)
+//			return commodityImgs.get(imageNr);
+//		else
+//			return null;
+
 	}
 
 	@Override //from ControlGuiInterface
@@ -287,9 +294,9 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 	/**
 	 * Start from a saved position
 	 */
+	@Override
 	public void startFromLoaded(boolean choiceStage) {
 		start();
-
 		setFigure();
 		this.choiceStage = choiceStage;//model.getChoiceStage();
 		this.position = model.getPosition();
@@ -303,6 +310,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		}
 		remove(hintPanel);
 		hintPanel = new HintPanel(commodityImgs, model.getWins().length);
+		hintPanel.resize(w);
 		add(hintPanel, BorderLayout.SOUTH);
 		setHint();
 		hintPanel.setVisible(hints);
@@ -400,7 +408,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
 							RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                             RenderingHints.VALUE_ANTIALIAS_ON);
+							RenderingHints.VALUE_ANTIALIAS_ON);
 //			g.setRenderingHint(RenderingHints.KEY_DITHERING,
 //							RenderingHints.VALUE_DITHER_ENABLE);
 //			g.setRenderingHint(RenderingHints.KEY_RENDERING,

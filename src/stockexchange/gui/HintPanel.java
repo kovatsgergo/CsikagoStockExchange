@@ -10,10 +10,10 @@ import stockexchange.model.Model;
 
 public class HintPanel extends JPanel {
 
-	ArrayList<JLabel> lbAll;
-	int w;
-	int length;
-	int size;
+	private ArrayList<JLabel> lbAll;
+	private int w;
+	private int length;
+	private int size;
 
 	public HintPanel(ArrayList<BufferedImage> commodityImgs, int nrPlayers) {
 		setLayout(new GridLayout(0, 1));
@@ -30,7 +30,7 @@ public class HintPanel extends JPanel {
 		}
 	}
 
-	public void setHint(String[] hintText) {
+	protected void setHint(String[] hintText) {
 		for (int i = 0; i < Model.MAX_NR_PLAYERS; i++)
 			if (i < hintText.length) {
 				lbAll.get(i).setVisible(true);
@@ -70,10 +70,13 @@ public class HintPanel extends JPanel {
 //		for (int i = 0; i < length; i++)
 //			lbAll.get(i).setFont(lbAll.get(i).getFont().deriveFont((float) (w * 0.011) + 6));
 //	}
-	public void resize(int w) {
+	protected void resize(int w) {
 		this.w = w;
 		size = (int)((w * 0.018) + 6);
-		for (int i = 0; i < length; i++)
-			lbAll.get(i).setFont(lbAll.get(i).getFont().deriveFont((float) size));
+//		for (int i = 0; i < length; i++)
+//			lbAll.get(i).setFont(lbAll.get(i).getFont().deriveFont((float) size));
+		for (JLabel jLabel : lbAll) {
+			jLabel.setFont(jLabel.getFont().deriveFont((float)size));
+		}
 	}
 }

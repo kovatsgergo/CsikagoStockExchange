@@ -19,7 +19,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import stockexchange.GuiControlInterface;
 import stockexchange.GuiModelInterface;
-import stockexchange.model.GameSaver;
+import stockexchange.model.Model;
 import stockexchange.model.Player;
 
 public class MainFrame extends JFrame {
@@ -86,7 +86,7 @@ public class MainFrame extends JFrame {
 			chooser.dispose();
 			//boolean isItStartup;
 			if (chosenFile != null) {
-				if (GameSaver.isStructured(chosenDir + chosenFile)) {
+				if (Model.isStructured(chosenDir + chosenFile)) {
 					if (startupPanel.isVisible())
 						startupPanel.startGame();
 					if (!iGuiControl.load(chosenDir + chosenFile)) {
@@ -184,7 +184,7 @@ public class MainFrame extends JFrame {
 	}
 
 	protected static void setAllBackground(Container panel, Color color) {
-		//System.out.println("panel " + panel);
+		//System.out.println("panel " + panel);///////////JComponent?
 		panel.setBackground(color);
 		for (int i = 0; i < panel.getComponentCount(); i++) {
 			//System.out.println(panel.getComponent(i));

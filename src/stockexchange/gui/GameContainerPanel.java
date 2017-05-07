@@ -143,7 +143,7 @@ public class GameContainerPanel extends JPanel {
 //		final String rulesString = String.valueOf(chB);
 		 */
 //</editor-fold>
-//		URL textURL = gamePanel.getClass().getResource("/images/RuleBook.txt");//imported to .jar
+//		URL textURL = gamePanel.getClass().getResource("/files/RuleBook.txt");//imported to .jar
 //		StringBuilder rules = new StringBuilder();
 //		try {
 //			java.util.Scanner s = new Scanner(textURL.openStream());
@@ -155,7 +155,7 @@ public class GameContainerPanel extends JPanel {
 //			System.out.println(e.getStackTrace());
 //			rules.append("Error while reading rules");
 //		}
-		URL htmlURL = gamePanel.getClass().getResource("/images/RuleBook.html");//imported to .jar
+		URL htmlURL = gamePanel.getClass().getResource("/files/RuleBook.html");//imported to .jar
 		JEditorPane jepRules = null;
 		try {
 			jepRules = new JEditorPane(htmlURL);
