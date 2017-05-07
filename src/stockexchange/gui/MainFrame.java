@@ -19,7 +19,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import stockexchange.GuiControlInterface;
 import stockexchange.GuiModelInterface;
-import stockexchange.StockExchange;
+import stockexchange.model.GameSaver;
 import stockexchange.model.Player;
 
 public class MainFrame extends JFrame {
@@ -84,18 +84,21 @@ public class MainFrame extends JFrame {
 			String chosenDir = chooser.getDirectory();
 			String chosenFile = chooser.getFile();
 			chooser.dispose();
-			boolean isItStartup;
-			if (isItStartup = (chosenFile != null)) {
-				if (startupPanel.isVisible())
-					startupPanel.startGame();
-				if (!iGuiControl.load(chosenDir + chosenFile)) {
+			//boolean isItStartup;
+			if (chosenFile != null) {
+				if (GameSaver.isStructured(chosenDir + chosenFile)) {
+					if (startupPanel.isVisible())
+						startupPanel.startGame();
+					if (!iGuiControl.load(chosenDir + chosenFile)) {
+						JOptionPane.showMessageDialog(MainFrame.this,
+										"Error while loading saved game",
+										"Load error", JOptionPane.ERROR_MESSAGE);
+					} else
+						gameContainerPanel.setTopNames(iGuiModel.getAllNames());
+				} else
 					JOptionPane.showMessageDialog(MainFrame.this,
 									"Error while loading saved game",
 									"Load error", JOptionPane.ERROR_MESSAGE);
-					if (isItStartup)
-						StockExchange.switchToSetup();
-				} else
-					gameContainerPanel.setTopNames(iGuiModel.getAllNames());
 			}
 			//gameContainerPanel.validate();
 
