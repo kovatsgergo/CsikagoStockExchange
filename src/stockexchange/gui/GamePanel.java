@@ -116,7 +116,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		//System.out.println(this.getClass().getResource(""));
 		URL imageURL = this.getClass().getResource("/images/Wheat.png");
 		commodityImgs.add(readFromURL(imageURL));
-		imageURL = this.getClass().getResource("/images/Sugar2.png");
+		imageURL = this.getClass().getResource("/images/Sugar.png");
 		commodityImgs.add(readFromURL(imageURL));
 		imageURL = this.getClass().getResource("/images/Coffee.png");
 		commodityImgs.add(readFromURL(imageURL));

@@ -70,6 +70,7 @@ public class GameContainerPanel extends JPanel {
 					//tglHints.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 					double hintRatio = 1.5 - (1.5 - 1.35) / 4 * (players.length);
 					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / hintRatio));
+					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / 1.5 + players.length * 30));
 					gamePanel.setHintsOnOff(true);
 					//gamePanel.setSize(getWidth(), (int) (getWidth() / 1.35));
 					System.out.println("size: " + gamePanel.getSize().toString());
@@ -247,7 +248,7 @@ public class GameContainerPanel extends JPanel {
 		for (int i = 0; i < panel.getComponentCount(); i++) {
 			//System.out.println(panel.getComponent(i));
 			if (panel.getComponent(i) instanceof AbstractButton) {
-				((AbstractButton)panel.getComponent(i)).setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+				((AbstractButton) panel.getComponent(i)).setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 				((AbstractButton) panel.getComponent(i)).setOpaque(true);
 				panel.getComponent(i).setBackground(MainFrame.bgColor.brighter().brighter());
 			}

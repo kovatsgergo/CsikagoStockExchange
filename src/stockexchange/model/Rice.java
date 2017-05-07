@@ -16,7 +16,7 @@ public class Rice extends Commodity implements Serializable {
 
 	public String toString(boolean full) {
 		if (full)
-			return name + "{" + price + "}";
+			return name + "_" + price + "-";
 		else
 			return name;
 	}

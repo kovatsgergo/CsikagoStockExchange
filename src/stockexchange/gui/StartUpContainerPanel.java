@@ -3,7 +3,6 @@ package stockexchange.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -145,13 +144,13 @@ public class StartUpContainerPanel extends JPanel implements ActionListener {
 		}
 	}
 
-	private void printComponents(Container container) {
-		for (int i = 0; i < container.getComponentCount(); i++) {
-			System.out.println(container.getComponent(i));
-			if (container.getComponent(i) instanceof Container)
-				printComponents((Container) container.getComponent(i));
-		}
-	}
+//	private void printComponents(Container container) {
+//		for (int i = 0; i < container.getComponentCount(); i++) {
+//			System.out.println(container.getComponent(i));
+//			if (container.getComponent(i) instanceof Container)
+//				printComponents((Container) container.getComponent(i));
+//		}
+//	}
 
 	private void initialize(Player[] players) {
 		int numPlayers = (players.length == 0) ? DEF_NUM_PLAYERS : players.length;
