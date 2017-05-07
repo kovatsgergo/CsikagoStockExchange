@@ -13,6 +13,7 @@ public class HintPanel extends JPanel {
 	ArrayList<JLabel> lbAll;
 	int w;
 	int length;
+	int size;
 
 	public HintPanel(ArrayList<BufferedImage> commodityImgs, int nrPlayers) {
 		setLayout(new GridLayout(0, 1));
@@ -45,7 +46,6 @@ public class HintPanel extends JPanel {
 		sb.append("<html>");
 		String[] twoparts = hintText.split(":");
 		sb.append(twoparts[0]);
-		int size = (int)((w * 0.011) + 6);
 		//System.out.println(Arrays.toString(twoparts));
 		String[] array = twoparts[1].split("-");
 		for (String string : array) {
@@ -60,7 +60,7 @@ public class HintPanel extends JPanel {
 			}
 		}
 		sb.append("</html>");
-		System.out.println(sb.toString());
+		//System.out.println(sb.toString());
 		return sb.toString();
 	}
 
@@ -72,8 +72,8 @@ public class HintPanel extends JPanel {
 //	}
 	public void resize(int w) {
 		this.w = w;
-		System.out.println(w+"width");
+		size = (int)((w * 0.018) + 6);
 		for (int i = 0; i < length; i++)
-			lbAll.get(i).setFont(lbAll.get(i).getFont().deriveFont((float) (w * 0.011) + 6));
+			lbAll.get(i).setFont(lbAll.get(i).getFont().deriveFont((float) size));
 	}
 }

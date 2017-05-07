@@ -70,7 +70,7 @@ public class GameContainerPanel extends JPanel {
 					//tglHints.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 					double hintRatio = 1.5 - (1.5 - 1.35) / 4 * (players.length);
 					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / hintRatio));
-					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / 1.5 + players.length * 30));
+					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / 1.5 + players.length * ((w * 0.018) + 6)));
 					gamePanel.setHintsOnOff(true);
 					//gamePanel.setSize(getWidth(), (int) (getWidth() / 1.35));
 					System.out.println("size: " + gamePanel.getSize().toString());
