@@ -11,51 +11,56 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 public class GameSaver {
-	
 
 	private GameSaver() {
 	}
-	
-	public static void save(ArrayList<Object> savedProperties, String pathFile){
+
+	public static void save(ArrayList<Object> savedProperties, String pathFile) throws GameFileException {
 		File savedGameFile = new File(pathFile);
 		try {
-				if (savedGameFile.exists())
-					savedGameFile.delete();
-				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(savedGameFile));
-				for (Object savedProperty : savedProperties) {
-					oos.writeObject(savedProperty);
-				}
-				oos.close();
-				savedProperties.clear();
-			}	catch (NotSerializableException e) {
-				System.out.println("Not serializable object");
-			} catch (IOException e) {
-				System.out.println("I/O hiba: " + e.getMessage());
+			if (savedGameFile.exists())
+				savedGameFile.delete();
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(savedGameFile));
+			for (Object savedProperty : savedProperties) {
+				oos.writeObject(savedProperty);
 			}
+			oos.close();
+			savedProperties.clear();
+		} catch (NotSerializableException e) {
+			System.out.println("Not serializable object");
+			throw new GameFileException("Error while saving file");
+		} catch (IOException e) {
+			System.out.println("I/O Exception: " + e.getMessage());
+			throw new GameFileException("Error while saving file");
+		}
 	}
-	
-	public static void load(ArrayList<Object> savedProperties, String pathFile){
+
+	public static void load(ArrayList<Object> savedProperties, String pathFile) throws GameFileException {
 		File savedGameFile = new File(pathFile);
 		ObjectInputStream ois = null;
+		try {
+			ois = new ObjectInputStream(new FileInputStream(savedGameFile));
+			savedProperties.clear();
+			while (true)
+				savedProperties.add(ois.readObject());
+		} catch (ClassNotFoundException e) {
+			System.out.println("Class not found");
+			throw new GameFileException("Wrong file format");
+		} catch (IOException e) {
+			System.out.println("I/O Exception: " + e.getMessage());
+			if (e.getMessage() != null)
+				if (e.getMessage().contains("local class incompatible"))
+					throw new GameFileException("Wrong (probably older) file format");
+				else
+					throw new GameFileException("Error while loading file");
+		} finally {
 			try {
-				ois = new ObjectInputStream(new FileInputStream(savedGameFile));
-				//System.out.println(savedGameFile.toString());
-				//System.out.println(ois);
-				savedProperties.clear();
-				while (true)
-					savedProperties.add(ois.readObject());
-			} catch (ClassNotFoundException e) {
-				System.out.println("Class not found");
+				if (ois != null)
+					ois.close();
 			} catch (IOException e) {
-				System.out.println("I/O hiba: " + e.getMessage());
-			} finally {
-				try {
-					if (ois != null)
-						ois.close();
-				} catch (IOException e) {
-					System.out.println("I/O hiba: " + e.getMessage());
-				}
+				System.out.println("I/O Exception: " + e.getMessage());
 			}
+		}
 	}
 
 }

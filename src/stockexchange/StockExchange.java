@@ -2,6 +2,8 @@ package stockexchange;
 
 /* Gergo Kovats */
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.net.URL;
 import stockexchange.gui.GameContainerPanel;
 import stockexchange.gui.GamePanel;
 import stockexchange.gui.MainFrame;
@@ -19,22 +21,20 @@ public class StockExchange implements GuiControlInterface {
 		aiChoice();
 	});
 
-	public StockExchange(Model model, ControlGuiInterface interfacePanel) {
+	private StockExchange(Model model, ControlGuiInterface interfacePanel) {
 		this.iControlModel = model;
 		this.iControlGui = interfacePanel;
 		reStart();
 	}
 
 	@Override //From GuiControlInterface
-	public boolean load(String pathFile) {
-		if (iControlModel.load(pathFile)) {
+	public void load(String pathFile) throws GameFileException{
+			iControlModel.load(pathFile);
 			iControlGui.startFromLoaded(iControlModel.getChoiceStage());
-			return true;
-		}
-		return false;
 	}
 
-	public void save(String pathFile) {
+	@Override //From GuiControlInterface
+	public void save(String pathFile) throws GameFileException{
 		iControlModel.save(pathFile);
 	}
 
@@ -169,8 +169,7 @@ public class StockExchange implements GuiControlInterface {
 	}
 
 	public static void switchToGame(String[][] players, int[] dims) {
-		
-		
+
 		Model model = new Model(players);
 		GuiModelInterface iGuiModel = model;
 		ControlModelInterface iControlModel = model;
@@ -189,10 +188,18 @@ public class StockExchange implements GuiControlInterface {
 	}
 
 	public static void main(String[] args) {
+		URL iconURL = StockExchange.class.getResource("/images/Icon_big.png");
+		BufferedImage img = GamePanel.readFromURL(iconURL);
+		boolean mac = false;
 		if (System.getProperty("os.name").contains("Mac")) {
+			System.out.println(System.getProperty("os.name"));
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			com.apple.eawt.Application.getApplication().setDockIconImage(img);
+			mac = true;
 		}
 		frame = new MainFrame();
+		if (!mac)
+			frame.setIconImage(img);
 		frame.setVisible(true);
 	}
 

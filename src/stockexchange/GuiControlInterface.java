@@ -1,12 +1,14 @@
 package stockexchange;
 
+import stockexchange.model.GameFileException;
+
 /*Gergo Kovats*/
 
 public interface GuiControlInterface {
 	
 	void setClickedColoumn(int coloumn);
-	boolean load(String pathFile);
-	void save(String pathFile);
+	void load(String pathFile) throws GameFileException;
+	void save(String pathFile) throws GameFileException;
 	void pause(boolean popup);
 	void unPause();
 	

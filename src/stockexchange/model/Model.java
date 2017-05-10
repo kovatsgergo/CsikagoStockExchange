@@ -75,7 +75,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 	}
 
 	@Override //from ControlModelInterface
-	public void save(String pathName) {
+	public void save(String pathName) throws GameFileException{
 		propertiesToSave.clear();
 		propertiesToSave.add(gameOver);//0
 		propertiesToSave.add(choiceStage);//1
@@ -96,7 +96,7 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 		GameSaver.save(propertiesToSave, pathName);
 	}
 
-	public boolean load(String pathName) {
+	public void load(String pathName) throws GameFileException{
 		GameSaver.load(propertiesToSave, pathName);
 		boolean success = false;
 //		for (int i = 0; i < propertiesToSave.size(); i++) {
@@ -135,10 +135,11 @@ public class Model implements ControlModelInterface, GuiModelInterface {
 			AI.setModelInterface(iGuiModel);
 			success = true;
 		}
-		return success;
+		if(!success)
+			throw new GameFileException("Error while loading saved game");
 	}
 
-public static boolean isStructured(String pathFile) {
+public static boolean isStructured(String pathFile) throws GameFileException{
 		ArrayList<Object> list = new ArrayList<>();
 		GameSaver.load(list, pathFile);
 		boolean structured = true;

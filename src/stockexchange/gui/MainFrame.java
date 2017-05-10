@@ -9,9 +9,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.net.URL;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -19,7 +17,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import stockexchange.GuiControlInterface;
 import stockexchange.GuiModelInterface;
-import stockexchange.model.Model;
+import stockexchange.StockExchange;
+import stockexchange.model.GameFileException;
 import stockexchange.model.Player;
 
 public class MainFrame extends JFrame {
@@ -41,16 +40,9 @@ public class MainFrame extends JFrame {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		w = screenSize.width;
 		h = screenSize.height;
-
 		setBackground(MainFrame.bgColor);
-
-		URL iconURL = getClass().getResource("/images/Icon_big.png");
-		BufferedImage img = GamePanel.readFromURL(iconURL);
-		setIcon(img);
-
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setTitle("Stock Exchange");
-
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -86,66 +78,49 @@ public class MainFrame extends JFrame {
 			chooser.dispose();
 			//boolean isItStartup;
 			if (chosenFile != null) {
-				if (Model.isStructured(chosenDir + chosenFile)) {
-					if (startupPanel.isVisible())
-						startupPanel.startGame();
-					if (!iGuiControl.load(chosenDir + chosenFile)) {
-						JOptionPane.showMessageDialog(MainFrame.this,
-										"Error while loading saved game",
-										"Load error", JOptionPane.ERROR_MESSAGE);
-					} else
-						gameContainerPanel.setTopNames(iGuiModel.getAllNames());
-				} else
+				if (startupPanel.isVisible())
+					startupPanel.startGame();
+				try {
+					iGuiControl.load(chosenDir + chosenFile);
+					gameContainerPanel.setTopNames(iGuiModel.getAllNames());
+				} catch (GameFileException gfe) {
+					StockExchange.switchToSetup();
 					JOptionPane.showMessageDialog(MainFrame.this,
-									"Error while loading saved game",
+									gfe.getMessage(),
 									"Load error", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 			//gameContainerPanel.validate();
-
 		});
 		mFile.add(miSave);
-		miSave.addActionListener((ActionEvent e) -> {
-			FileDialog chooser = new FileDialog(this, "Save game as", FileDialog.SAVE);
-			chooser.setFile(".cse");
-			chooser.setVisible(true);
-			String chosenDir = chooser.getDirectory();
-			String chosenFile = chooser.getFile();
-			chooser.dispose();
+		miSave.addActionListener(
+						(ActionEvent e) -> {
+							FileDialog chooser = new FileDialog(this, "Save game as", FileDialog.SAVE);
+							chooser.setFile(".cse");
+							chooser.setVisible(true);
+							String chosenDir = chooser.getDirectory();
+							String chosenFile = chooser.getFile();
+							chooser.dispose();
 //			JFileChooser chooser = new JFileChooser();
 //			int returnVal = chooser.showSaveDialog(SwingUtilities.getWindowAncestor(this));
 //			String pathName = "";
 //			if (returnVal == JFileChooser.APPROVE_OPTION) {
-			if (chosenFile != null) {
-//				File file = chooser.getSelectedFile();
-//				pathName = file.getPath();
-//				iGuiModel.save(pathName);
-				iGuiControl.save(chosenDir + chosenFile);
-			}
-		});
+							if (chosenFile != null) {
+								try {
+									iGuiControl.save(chosenDir + chosenFile);
+								} catch (GameFileException gfe) {
+									JOptionPane.showMessageDialog(MainFrame.this,
+													gfe.getMessage(),
+													"Save error", JOptionPane.ERROR_MESSAGE);
+								}
+							}
+						});
 		setJMenuBar(mb);
-
 		startupPanel = new StartUpContainerPanel(new Player[0]);
 		add(startupPanel);
 		setBounds(w / 4, 0, w / 2, h / 2);
-		setLocationRelativeTo(null);
+		setLocationRelativeTo(this);
 		setResizable(false);
-	}
-
-	private boolean exists(String className) {
-		try {
-			Class.forName(className, false, null);
-			return true;
-		} catch (ClassNotFoundException exception) {
-			return false;
-		}
-	}
-
-	private void setIcon(BufferedImage icn) {
-		if (exists("com.apple.eawt.Application")) {
-			com.apple.eawt.Application.getApplication().setDockIconImage(icn);
-		} else {
-			setIconImage(icn);
-		}
 	}
 
 	public void setiGuiControl(GuiControlInterface iGuiControl) {
@@ -163,7 +138,7 @@ public class MainFrame extends JFrame {
 		setBounds(w / 4, 0, w / 2, h / 2);
 		miSave.setEnabled(false);
 		setLocationRelativeTo(null);
-		//this.setResizable(false);
+		this.setResizable(false);
 	}
 
 	public void setToGame(GameContainerPanel gameContainerPanel) {
@@ -175,6 +150,7 @@ public class MainFrame extends JFrame {
 		int frameWidth = w * 5 / 7;
 		//pack();
 		setLocationRelativeTo(null);
+		this.setResizable(true);
 		setBounds(w / 2 - frameWidth / 2, 0, frameWidth, Math.round(frameWidth / 1.5f));
 	}
 

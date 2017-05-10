@@ -49,6 +49,7 @@ public class GameContainerPanel extends JPanel {
 			this.players[i] = players[i][0];
 		}
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		//setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		//panels
 		//this.gamePanel = gamePanel;
 		top = new JPanel(new GridLayout(1, players.length * 2 - 1));
@@ -61,16 +62,17 @@ public class GameContainerPanel extends JPanel {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				/////////////LISTENER KIKAPCS, BEKAPCS
-				int w = gamePanel.getWidth();
-				int h = gamePanel.getHeight();
+				int w = top.getWidth();
+				//int h = gamePanel.getHeight();
 //				int topAndBottom = getHeight() - h;
 
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					tglHints.setText("HINTS ON");
 					//tglHints.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-					double hintRatio = 1.5 - (1.5 - 1.35) / 4 * (players.length);
-					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / hintRatio));
+					//double hintRatio = 1.5 - (1.5 - 1.35) / 4 * (players.length);
+					//SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / hintRatio));
 					SwingUtilities.getWindowAncestor(gamePanel).setSize(getWidth(), (int) (getWidth() / 1.5 + players.length * ((w * 0.018) + 6)));
+					//gamePanel.setSize(getWidth(), (int) (getWidth() / 1.5 + players.length * ((w * 0.018) + 6)));
 					gamePanel.setHintsOnOff(true);
 					//gamePanel.setSize(getWidth(), (int) (getWidth() / 1.35));
 					System.out.println("size: " + gamePanel.getSize().toString());
@@ -129,6 +131,24 @@ public class GameContainerPanel extends JPanel {
 //		};
 //		addComponentListener(caFixRatio);
 //</editor-fold>
+//		addComponentListener(new ComponentAdapter() {
+//			@Override
+//			public void componentResized(ComponentEvent e) {
+//				Dimension d = GameContainerPanel.this.getSize();
+//				System.out.println("container: " + d);
+//				if (d.width / (double) d.height > 1.501) {
+//					gamePanel.setSize(d.height * 3 / 2, d.height);
+//					gamePanel.setMaximumSize(new Dimension(d.height * 3 / 2, d.height));
+//					gamePanel.setPreferredSize(new Dimension(d.height * 3 / 2, d.height));
+//					System.out.println("after: "+gamePanel.getSize());
+//				} else if (d.width / (double) d.height < 1.499){
+//					gamePanel.setSize(d.width, d.width * 2 / 3);
+//					gamePanel.setMaximumSize(new Dimension(d.width, d.width * 2 / 3));
+//					gamePanel.setPreferredSize(new Dimension(d.width, d.width * 2 / 3));
+//					System.out.println("after: "+gamePanel.getSize());
+//				}
+//			}
+//		});
 		//Rules button
 		final JButton btRules = new JButton("Rules");
 		btRules.setFocusable(false);//to have keyboard focus on gamePanel
@@ -143,6 +163,7 @@ public class GameContainerPanel extends JPanel {
 //		final String rulesString = String.valueOf(chB);
 		 */
 //</editor-fold>
+//<editor-fold defaultstate="collapsed" desc="comment">
 //		URL textURL = gamePanel.getClass().getResource("/files/RuleBook.txt");//imported to .jar
 //		StringBuilder rules = new StringBuilder();
 //		try {
@@ -155,6 +176,7 @@ public class GameContainerPanel extends JPanel {
 //			System.out.println(e.getStackTrace());
 //			rules.append("Error while reading rules");
 //		}
+//</editor-fold>
 		URL htmlURL = gamePanel.getClass().getResource("/files/RuleBook.html");//imported to .jar
 		JEditorPane jepRules = null;
 		try {
@@ -211,6 +233,7 @@ public class GameContainerPanel extends JPanel {
 		top.setBackground(new Color(10, 30, 80));
 		gamePanel.setFocusable(true);
 		add(top);//, BorderLayout.NORTH);
+		gamePanel.setAlignmentX(CENTER_ALIGNMENT);
 		add(gamePanel);//, BorderLayout.CENTER);
 		add(bottom);//, BorderLayout.SOUTH);
 		gamePanel.requestFocusInWindow();

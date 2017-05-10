@@ -225,6 +225,7 @@ public class GamePanel extends JPanel implements ControlGuiInterface {
 		////drawing constants only changing when panel resized
 		w = this.getWidth();
 		h = this.getHeight();
+		System.out.println("panel: "+this.getSize());
 		//stock image
 		stockStartV = Math.round(w / 10f);
 		stockWidth = Math.round(w * 0.35f);

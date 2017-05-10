@@ -1,11 +1,12 @@
 /*Gergo Kovats*/
 package stockexchange;
 
+import stockexchange.model.GameFileException;
 import stockexchange.model.Player;
 
 public interface ControlModelInterface {
-	public void save(String pathFile);
-	public boolean load(String pathFile);
+	public void save(String pathFile) throws GameFileException;
+	public void load(String pathFile)  throws GameFileException;
 	public boolean getChoiceStage();//ok
 	public void changeStage();//ok
 	public boolean isAllPlayersAI();//ok
